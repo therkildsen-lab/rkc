@@ -7,4 +7,21 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+#### load packages
+```{r}
+library("tidyverse")
+library("ggplot2")
+```
+
+# make sample table from rkc metadata
+```{r make sample table}
+metadata <- read_csv("/fs/cbsubscb16/storage/rkc/sample_lists/rkc_whitelist_1x_metadata.csv")
+```
+
+## run pcangsd 
+
+```{bash}
+
+```
+
 
