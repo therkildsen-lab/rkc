@@ -16,12 +16,23 @@ library("ggplot2")
 # make sample table from rkc metadata
 ```{r make sample table}
 metadata <- read_csv("/fs/cbsubscb16/storage/rkc/sample_lists/rkc_whitelist_1x_metadata.csv")
+
+sample_table <- metadata %>% 
+  mutate(CollectionDate = parse_date(CollectionDate, format = "%m/%d/%Y")) %>% 
+   mutate(year = as.character(format(CollectionDate, "%Y"))) %>% 
+  mutate(month = as.character(format(CollectionDate, "%m"))) %>% 
+  mutate(day = as.character(format(CollectionDate, "%d"))) %>%
+  mutate(population = str_c(substr(Locality, 1, 3), year,sep="")) %>% 
+  filter(ABLG != c(5617,5618,5637,5644,5648,5650,5651,5663,5667,5669,5670)) %>% # remove outliers
+  select(ABLG, population, Loc, GeneralLoc, StartLatDD, StartLonDD, k3_inferred_pop, k4_inferred_pop, k5_inferred_pop)
+
+write_tsv(sample_table, "/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
 ```
 
 ## run pcangsd 
 
 ```{bash}
-
+nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_pcangsd.sh /fs/cbsubscb16/storage/rkc/ /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz 0.05 pca 1 8 > /fs/cbsubscb16/storage/rkc/nohups/run_pcangsd_pca.nohup &
 ```
 
 

@@ -1,0 +1,180 @@
+ABLG	population	Loc	GeneralLoc	StartLatDD	StartLonDD	k3_inferred_pop	k4_inferred_pop	k5_inferred_pop
+5328	Ada2015	AI	Aleutian Islands	NA	NA	B	C	E
+5331	Ada2015	AI	Aleutian Islands	NA	NA	B	C	E
+5333	Ada2015	AI	Aleutian Islands	NA	NA	B	C	E
+5334	Ada2015	AI	Aleutian Islands	NA	NA	B	C	E
+5339	Ada2015	AI	Aleutian Islands	NA	NA	B	C	E
+5343	Ada2015	AI	Aleutian Islands	NA	NA	B	C	E
+5345	Ada2015	AI	Aleutian Islands	NA	NA	B	C	E
+5346	Bri2008	EastBering	Bering Sea	56.4519	-161.8869	A	B	A
+5348	Bri2008	EastBering	Bering Sea	56.4519	-161.8869	A	B	A
+5349	Bri2008	EastBering	Bering Sea	56.4519	-161.8869	A	B	A
+5351	Bri2008	EastBering	Bering Sea	56.4519	-161.8869	A	B	A
+5369	Bri2001	EastBering	Bering Sea	58.33	-158.07	A	B	A
+5371	Bri2001	EastBering	Bering Sea	58.33	-158.07	A	B	A
+5378	Bri2001	EastBering	Bering Sea	58.33	-158.07	A	B	A
+5384	Bri2001	EastBering	Bering Sea	58.33	-158.07	A	B	A
+5385	Bri2001	EastBering	Bering Sea	58.33	-158.07	A	B	A
+5387	Bri2001	EastBering	Bering Sea	58.33	-158.07	A	B	A
+5405	Kam2001	GOA	Gulf of Alaska	59.23283	-152.8203	A	B	A
+5407	Kam2001	GOA	Gulf of Alaska	59.23283	-152.8203	A	B	A
+5414	Kam2001	GOA	Gulf of Alaska	59.23283	-152.8203	A	B	A
+5416	Kam2001	GOA	Gulf of Alaska	59.23283	-152.8203	A	B	A
+5418	Kam2001	GOA	Gulf of Alaska	59.23283	-152.8203	A	B	A
+5419	Kam2001	GOA	Gulf of Alaska	59.23283	-152.8203	A	B	A
+5425	Kam2001	GOA	Gulf of Alaska	59.23283	-152.8203	A	A	A
+5432	Kam2001	GOA	Gulf of Alaska	59.23283	-152.8203	A	B	A
+5473	Uga2002	GOA	Gulf of Alaska	NA	NA	A	B	A
+5474	Uga2002	GOA	Gulf of Alaska	NA	NA	A	B	A
+5479	Uga2002	GOA	Gulf of Alaska	NA	NA	A	B	A
+5482	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5484	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5486	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5489	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	C
+5491	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5492	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5493	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5495	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5496	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5497	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5499	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5502	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5503	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5505	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5506	Nor2010	NorthBering	Bering Sea	64.5258	-165.7257	A	B	D
+5510	Pri2002	EastBering	Bering Sea	56.82	-170	A	B	A
+5511	Pri2002	EastBering	Bering Sea	56.82	-170	A	B	A
+5513	Pri2002	EastBering	Bering Sea	56.82	-170	A	B	A
+5515	Pri2002	EastBering	Bering Sea	56.82	-170	A	B	A
+5520	Pri2002	EastBering	Bering Sea	56.82	-170	A	B	A
+5521	Pri2002	EastBering	Bering Sea	56.82	-170	A	B	A
+5524	Pri2002	EastBering	Bering Sea	57.5	-169.9833	A	B	A
+5526	Pri2002	EastBering	Bering Sea	57.5	-169.9833	A	B	A
+5528	Pri2002	EastBering	Bering Sea	57.5	-169.9833	A	B	A
+5532	Pri2002	EastBering	Bering Sea	57.5	-169.9833	A	B	E
+5538	Pri2002	EastBering	Bering Sea	57.5	-169.9833	A	B	E
+5539	Pri2002	EastBering	Bering Sea	57.5	-169.9833	A	B	A
+5541	Pri2002	EastBering	Bering Sea	57.5	-169.9833	A	B	C
+5560	Col2002	AI	Gulf of Alaska	55.2073	-162.7159	B	C	E
+5561	Col2002	AI	Gulf of Alaska	55.2073	-162.7159	B	C	E
+5564	Col2002	AI	Gulf of Alaska	55.2073	-162.7159	B	C	E
+5570	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
+5571	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
+5572	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
+5573	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
+5574	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
+5575	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
+5576	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
+5577	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
+5578	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
+5579	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
+5580	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
+5581	Sou1988	GOA	Gulf of Alaska	55.518	-161.56	A	B	A
+5582	Sou1988	GOA	Gulf of Alaska	55.518	-161.56	A	B	A
+5583	Sou1988	GOA	Gulf of Alaska	55.518	-161.56	A	B	A
+5584	Sou1988	GOA	Gulf of Alaska	55.518	-161.56	A	B	A
+5586	Sou1988	GOA	Gulf of Alaska	55.518	-161.56	A	B	A
+5587	Sou1988	GOA	Gulf of Alaska	55.518	-161.56	A	B	A
+5589	Sou1988	GOA	Gulf of Alaska	55.518	-161.56	A	B	A
+5590	Sou1988	GOA	Gulf of Alaska	55.518	-161.56	A	B	C
+5591	Sou1988	GOA	Gulf of Alaska	55.518	-161.56	A	B	A
+5592	Sou1988	GOA	Gulf of Alaska	55.518	-161.56	A	B	A
+5593	Por1988	SEAK	Southeast Marine	58.07	-135.57	C	D	B
+5594	Por1988	SEAK	Southeast Marine	58.07	-135.57	C	D	B
+5595	Por1988	SEAK	Southeast Marine	58.07	-135.57	C	D	B
+5596	Por1988	SEAK	Southeast Marine	58.07	-135.57	C	D	B
+5597	Por1988	SEAK	Southeast Marine	58.07	-135.57	C	D	B
+5599	Kac1988	GOA	Gulf of Alaska	59.63	-151.31	A	B	A
+5600	Kac1988	GOA	Gulf of Alaska	59.63	-151.31	A	B	A
+5601	Kac1988	GOA	Gulf of Alaska	59.63	-151.31	A	B	C
+5602	Kac1988	GOA	Gulf of Alaska	59.63	-151.31	A	B	A
+5609	Kac1988	GOA	Gulf of Alaska	59.63	-151.31	A	B	A
+5610	Kac1988	GOA	Gulf of Alaska	59.63	-151.31	A	B	A
+5613	Kac1988	GOA	Gulf of Alaska	59.63	-151.31	A	B	A
+5615	Kac1988	GOA	Gulf of Alaska	59.63	-151.31	A	B	A
+5617	Kac1988	GOA	Gulf of Alaska	59.63	-151.31	C	D	B
+5618	Kac1988	GOA	Gulf of Alaska	59.63	-151.31	C	D	B
+5625	Kac1988	GOA	Gulf of Alaska	59.63	-151.31	A	B	C
+5626	Eag1988	SEAK	Southeast Marine	58.5259	-134.8216	C	D	B
+5627	Eag1988	SEAK	Southeast Marine	58.5259	-134.8216	C	D	B
+5628	Eag1988	SEAK	Southeast Marine	58.5259	-134.8216	C	D	B
+5629	Eag1988	SEAK	Southeast Marine	58.5259	-134.8216	C	D	B
+5630	Eag1988	SEAK	Southeast Marine	58.5259	-134.8216	C	D	B
+5633	Ada1988	AI	Aleutian Islands	51.8627	-176.6607	B	C	E
+5637	Ada1988	AI	Aleutian Islands	51.8627	-176.6607	A	B	D
+5640	Ada1988	AI	Aleutian Islands	51.8627	-176.6607	B	C	E
+5642	Ada1988	AI	Aleutian Islands	51.8627	-176.6607	B	C	E
+5644	Ada1988	AI	Aleutian Islands	51.8627	-176.6607	A	B	D
+5648	Ada1988	AI	Aleutian Islands	51.8627	-176.6607	A	B	D
+5649	Fun1990	SEAK	Southeast Marine	58.351	-134.8916	C	D	B
+5650	Fun1990	SEAK	Southeast Marine	58.351	-134.8916	A	B	A
+5651	Fun1990	SEAK	Southeast Marine	58.351	-134.8916	A	B	A
+5653	Fun1990	SEAK	Southeast Marine	58.351	-134.8916	C	D	B
+5655	Gam1988	SEAK	Southeast Marine	57.45	-134.95	C	D	B
+5656	Gam1988	SEAK	Southeast Marine	57.45	-134.95	C	D	B
+5657	Gam1988	SEAK	Southeast Marine	57.45	-134.95	C	D	B
+5658	Gam1988	SEAK	Southeast Marine	57.45	-134.95	C	D	B
+5659	Chu1989	NorthBering	Bering Sea	68	-167	A	A	D
+5662	Chu1989	NorthBering	Bering Sea	68	-167	A	B	D
+5674	Chu1989	NorthBering	Bering Sea	68	-167	A	C	D
+5679	Chu1989	NorthBering	Bering Sea	68	-167	A	A	D
+5680	Chu1989	NorthBering	Bering Sea	68	-167	A	B	D
+5681	Chu1989	NorthBering	Bering Sea	68	-167	A	B	D
+5682	Chu1989	NorthBering	Bering Sea	68	-167	A	A	D
+5684	Chu1989	NorthBering	Bering Sea	68	-167	A	B	D
+5685	Chu1989	NorthBering	Bering Sea	68	-167	A	B	D
+5690	Bri1989	EastBering	Bering Sea	58.2	-158.6	A	A	A
+5691	Bri1989	EastBering	Bering Sea	58.2	-158.6	A	B	D
+5708	Bri1989	EastBering	Bering Sea	58.2	-158.6	A	B	A
+5709	Bri1989	EastBering	Bering Sea	58.2	-158.6	A	B	A
+5713	Bri1989	EastBering	Bering Sea	58.2	-158.6	A	B	A
+5715	Bri1989	EastBering	Bering Sea	58.2	-158.6	A	B	C
+5717	Exc1988	SEAK	Southeast Marine	58.4203	-135.4439	C	D	B
+5718	Exc1988	SEAK	Southeast Marine	58.4203	-135.4439	C	D	B
+5719	Exc1988	SEAK	Southeast Marine	58.4203	-135.4439	C	D	B
+5720	Exc1988	SEAK	Southeast Marine	58.4203	-135.4439	C	D	B
+5721	Exc1988	SEAK	Southeast Marine	58.4203	-135.4439	C	D	B
+5722	Exc1988	SEAK	Southeast Marine	58.4203	-135.4439	C	D	B
+5740	Chi1991	GOA	Gulf of Alaska	57.7	-152.4	A	B	A
+5741	Chi1991	GOA	Gulf of Alaska	57.7	-152.4	A	B	C
+5742	Chi1991	GOA	Gulf of Alaska	57.7	-152.4	A	B	A
+5743	Chi1991	GOA	Gulf of Alaska	57.7	-152.4	A	B	A
+5744	Chi1991	GOA	Gulf of Alaska	57.7	-152.4	A	B	A
+5745	Chi1991	GOA	Gulf of Alaska	57.7	-152.4	A	B	A
+5746	Chi1991	GOA	Gulf of Alaska	57.7	-152.4	A	B	A
+5749	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5750	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5751	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5752	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5753	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5754	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5755	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5760	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5761	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5762	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5763	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5764	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5765	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	C
+5766	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5771	Kuk1991	GOA	Gulf of Alaska	58.31	-154.25	A	B	A
+5772	Uga1991	GOA	Gulf of Alaska	57.8547	-153.5217	A	B	A
+5773	Uga1991	GOA	Gulf of Alaska	57.8547	-153.5217	A	B	A
+5775	Uga1991	GOA	Gulf of Alaska	57.8547	-153.5217	A	B	A
+5776	Uga1991	GOA	Gulf of Alaska	57.8547	-153.5217	A	B	A
+5777	Uga1991	GOA	Gulf of Alaska	57.8547	-153.5217	A	B	A
+5780	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	C
+5782	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	C
+5783	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	C
+5784	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	A
+5785	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	A
+5786	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	A
+5787	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	C
+5789	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	E
+5790	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	A
+5792	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	A	A
+5794	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	A
+5795	Sai1991	EastBering	Bering Sea	57.178	-170.297	B	B	C
+5796	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	A
+5797	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	A
+5798	Sai1991	EastBering	Bering Sea	57.178	-170.297	A	B	C
+5799	Pri1996	EastBering	Bering Sea	56.82	-170	A	A	A
