@@ -55,9 +55,9 @@ ABLG,AltID,CommonName,SpeciesName,CollectionDate,notSEAK,Locality,Loc,GeneralLoc
 5538,RKPRIB02B_15,Red King Crab,Paralithodes camtschaticus,6/26/2002,1,"Pribilof, Bering Sea",EastBering,Bering Sea,57.5,-169.9833,0.523,0.398,0.079,A,0,0.537,0.439,0.024,B,0.294,0.01,0.194,0.165,0.337,E
 5539,RKPRIB02B_16,Red King Crab,Paralithodes camtschaticus,6/26/2002,1,"Pribilof, Bering Sea",EastBering,Bering Sea,57.5,-169.9833,0.743,0.132,0.125,A,0.071,0.713,0.158,0.058,B,0.447,0.022,0.3,0.167,0.064,A
 5541,RKPRIB02B_18,Red King Crab,Paralithodes camtschaticus,6/26/2002,1,"Pribilof, Bering Sea",EastBering,Bering Sea,57.5,-169.9833,0.601,0.309,0.09,A,0.097,0.553,0.313,0.036,B,0,0,1,0,0,C
-5560,RKADAK02_10,Red King Crab,Paralithodes camtschaticus,8/2/2002,1,"Cold Bay, Gulf of Alaska",AI,Gulf of Alaska,55.2073,-162.7159,0,1,0,B,0,0,1,0,C,0,0,0,0,1,E
-5561,RKADAK02_11,Red King Crab,Paralithodes camtschaticus,8/2/2002,1,"Cold Bay, Gulf of Alaska",AI,Gulf of Alaska,55.2073,-162.7159,0,1,0,B,0,0,1,0,C,0,0,0,0,1,E
-5564,RKADAK02_14,Red King Crab,Paralithodes camtschaticus,8/2/2002,1,"Cold Bay, Gulf of Alaska",AI,Gulf of Alaska,55.2073,-162.7159,0,1,0,B,0,0,1,0,C,0,0,0,0,1,E
+5560,RKADAK02_10,Red King Crab,Paralithodes camtschaticus,8/2/2002,1,"Cold Bay, Gulf of Alaska",AI,Aleutian Islands,55.2073,-162.7159,0,1,0,B,0,0,1,0,C,0,0,0,0,1,E
+5561,RKADAK02_11,Red King Crab,Paralithodes camtschaticus,8/2/2002,1,"Cold Bay, Gulf of Alaska",AI,Aleutian Islands,55.2073,-162.7159,0,1,0,B,0,0,1,0,C,0,0,0,0,1,E
+5564,RKADAK02_14,Red King Crab,Paralithodes camtschaticus,8/2/2002,1,"Cold Bay, Gulf of Alaska",AI,Aleutian Islands,55.2073,-162.7159,0,1,0,B,0,0,1,0,C,0,0,0,0,1,E
 5570,RKPYBUS10_66136,Red King Crab,Paralithodes camtschaticus,7/14/2010,0,"Pybus Bay, Southeast Marine",SEAK,Southeast Marine,57.34387,-134.1312,0,0,1,C,0,0,0,1,D,0,1,0,0,0,B
 5571,RKPYBUS10_66137,Red King Crab,Paralithodes camtschaticus,7/14/2010,0,"Pybus Bay, Southeast Marine",SEAK,Southeast Marine,57.34387,-134.1312,0,0,1,C,0,0,0,1,D,0,1,0,0,0,B
 5572,RKPYBUS10_66138,Red King Crab,Paralithodes camtschaticus,7/14/2010,0,"Pybus Bay, Southeast Marine",SEAK,Southeast Marine,57.34387,-134.1312,0,0,1,C,0,0,0,1,D,0,1,0,0,0,B

@@ -55,9 +55,9 @@ ABLG	population	Loc	GeneralLoc	StartLatDD	StartLonDD	k3_inferred_pop	k4_inferred
 5538	Pri2002	EastBering	Bering Sea	57.5	-169.9833	A	B	E
 5539	Pri2002	EastBering	Bering Sea	57.5	-169.9833	A	B	A
 5541	Pri2002	EastBering	Bering Sea	57.5	-169.9833	A	B	C
-5560	Col2002	AI	Gulf of Alaska	55.2073	-162.7159	B	C	E
-5561	Col2002	AI	Gulf of Alaska	55.2073	-162.7159	B	C	E
-5564	Col2002	AI	Gulf of Alaska	55.2073	-162.7159	B	C	E
+5560	Col2002	AI	Aleutian Islands	55.2073	-162.7159	B	C	E
+5561	Col2002	AI	Aleutian Islands	55.2073	-162.7159	B	C	E
+5564	Col2002	AI	Aleutian Islands	55.2073	-162.7159	B	C	E
 5570	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
 5571	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
 5572	Pyb2010	SEAK	Southeast Marine	57.34387	-134.1312	C	D	B
@@ -116,6 +116,10 @@ ABLG	population	Loc	GeneralLoc	StartLatDD	StartLonDD	k3_inferred_pop	k4_inferred
 5658	Gam1988	SEAK	Southeast Marine	57.45	-134.95	C	D	B
 5659	Chu1989	NorthBering	Bering Sea	68	-167	A	A	D
 5662	Chu1989	NorthBering	Bering Sea	68	-167	A	B	D
+5663	Chu1989	NorthBering	Bering Sea	68	-167	B	C	E
+5667	Chu1989	NorthBering	Bering Sea	68	-167	B	C	E
+5669	Chu1989	NorthBering	Bering Sea	68	-167	B	C	E
+5670	Chu1989	NorthBering	Bering Sea	68	-167	B	A	E
 5674	Chu1989	NorthBering	Bering Sea	68	-167	A	C	D
 5679	Chu1989	NorthBering	Bering Sea	68	-167	A	A	D
 5680	Chu1989	NorthBering	Bering Sea	68	-167	A	B	D
