@@ -110,6 +110,10 @@ RKC_PCA_lat_plot
 ```
 
 ![](data_analysis_files/figure-gfm/PCA%20by%20latitude-1.png)<!-- -->
+\## Fst peaks from Lauren
+
+![Fst
+plot](/fs/cbsubscb16/storage/rkc/figures/SEAK_23zoom_plot_fst.jpg "Region of elevated Fst on Chr 23")
 
 ## Run pcangsd for southeast alaska
 
@@ -157,7 +161,8 @@ All_pop_pca <- PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$po
 
 ![](data_analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-## run pcangsd for Bering Sea
+![SEAK map](/fs/cbsubscb16/storage/rkc/figures/RKC_SEAK_map.png) \## run
+pcangsd for Bering Sea
 
 ``` r
 sample_table_BSEA <- sample_table %>% 

@@ -72,6 +72,10 @@ RKC_PCA_lat_plot <- ggplot(data=RKC_pca_latitude,aes(x=PC1, y=PC2)) +
     ylab(paste0("PC2 ",round(RKC_pca_latitude_y_var,2),"%"))
 RKC_PCA_lat_plot
 ```
+## Fst peaks from Lauren 
+
+![Fst plot](/fs/cbsubscb16/storage/rkc/figures/SEAK_23zoom_plot_fst.jpg "Region of elevated Fst on Chr 23")
+
 
 ## Run pcangsd for southeast alaska
 
@@ -112,6 +116,7 @@ size = 3
 All_pop_pca <- PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 ```
 
+![SEAK map](/fs/cbsubscb16/storage/rkc/figures/RKC_SEAK_map.png)
 ## run pcangsd for Bering Sea
 
 ```{r filter sample table and beagle file for Bering Sea}
