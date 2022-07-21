@@ -12,6 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library("tidyverse")
 library("ggplot2")
 library("cowplot")
+library("maps")
+library("mapdata")
 source("/fs/cbsubscb16/storage/sucker_sp2021/scripts/individual_pca_functions_csj.R")
 ```
 
@@ -47,14 +49,6 @@ genome_cov <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_PCAM-PPLA-wholeg
 alpha = 0.7
 size = 3
 All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
-```
-#### Map colletion sites
-```{r}
-library(maps)
-library(mapdata)
-
-map("worldHires","USA", xlim=c(-180,-140),ylim=c(56,70), col="gray90", fill=TRUE) %>% 
-  points(sample_table$StartLonDD, sample_table$StartLatDD, pch=19, col="red", cex=0.5)  #plot my sample sites#plot the region of USA containing all sites 
 ```
 
 ```{r pca by locality}
@@ -175,7 +169,7 @@ alpha = 0.5
 size = 3
 BSEA_geoloc_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$geo_population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 
-ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_geoloc_pca.png", BSEA_geoloc_pca, device = "png")
+# ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_geoloc_pca.png", BSEA_geoloc_pca, device = "png")
 ```
 
 ```{r}
@@ -184,14 +178,18 @@ alpha = 0.5
 size = 3
 BSEA_loc_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$Loc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 
-ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_loc_pca.png", BSEA_loc_pca, device = "png")
+# ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_loc_pca.png", BSEA_loc_pca, device = "png")
 ```
 
-```{r}
-# Color by region
-alpha = 0.5
-size = 3
-All_region_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$GeneralLoc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 
-ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_region_pca.png", BSEA_region_pca, device = "png")
+#### Map collection sites
+```{r}
+color = c("#F8766D", "#CD9600", "#7CAE00", "#00BE67", "#00BFC4", "#00A9FF", "#C77CFF", "#FF61CC", "#FF3030")
+BSEA_coords <- sample_table_BSEA %>% 
+  select(population, StartLonDD, StartLatDD)
+BSEA_coords <- unique(BSEA_coords)
+
+library(ggmap)
+maps::map("worldHires","USA", xlim=c(-180,-140),ylim=c(55,71.2), col="gray90", fill=TRUE) #plot the region of USA containing all sites  
+points(BSEA_coords$StartLonDD, BSEA_coords$StartLatDD, pch=c(rep(c(15,16,17,18),7), 15, 16), cex=0.5, col = color)  #plot my sample sites 
 ```

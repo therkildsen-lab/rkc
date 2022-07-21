@@ -21,6 +21,18 @@ library("tidyverse")
 ``` r
 library("ggplot2")
 library("cowplot")
+library("maps")
+```
+
+    ## 
+    ## Attaching package: 'maps'
+
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     map
+
+``` r
+library("mapdata")
 source("/fs/cbsubscb16/storage/sucker_sp2021/scripts/individual_pca_functions_csj.R")
 ```
 
@@ -56,7 +68,7 @@ sample_table <- metadata %>%
   mutate(population = str_c(substr(Locality, 1, 3), year,sep="")) %>% 
   select(ABLG, population, Loc, GeneralLoc, StartLatDD, StartLonDD, k3_inferred_pop, k4_inferred_pop, k5_inferred_pop)
 
-write_tsv(sample_table, "/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
+#write_tsv(sample_table, "/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
 ```
 
 ## run pcangsd
@@ -167,6 +179,7 @@ pcangsd for Bering Sea
 ``` r
 sample_table_BSEA <- sample_table %>% 
   mutate(beagle_index = 1 + (3*(seq(1,183) +1))) %>% # converts individual ids to their index column names in beagle
+  mutate(geo_population = substr(population,1,3), .after = population) %>% 
   filter(GeneralLoc == "Bering Sea") %>% 
   filter(ABLG != 5617, ABLG !=5618, ABLG !=5637, ABLG !=5644, ABLG !=5648, ABLG !=5650, ABLG !=5651, ABLG !=5663, ABLG !=5667, ABLG !=5669, ABLG !=5670)
 
@@ -192,3 +205,138 @@ nohup zcat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic.be
 # PID 
 nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_pcangsd.sh /fs/cbsubscb16/storage/rkc/ /fs/cbsubscb16/storage/rkc/angsd/BSEA_PCAM-PPLA-wholegenome_polymorphic.beagle.gz 0.05 pca 1 8 > /fs/cbsubscb16/storage/rkc/nohups/run_pcangsd_pca_BSEA.nohup &
 ```
+
+#### Plot BSEA PCA
+
+``` r
+## Read in data
+library(RcppCNPy)
+genome_cov_BSEA <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_BSEA_PCAM-PPLA-wholegenome_polymorphic.cov.npy")
+
+# Color by collection location
+alpha = 0.5
+size = 4
+BSEA_pop_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+```
+
+![](data_analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_pop_pca.png", BSEA_pop_pca, device = "png")
+```
+
+    ## Saving 7 x 5 in image
+
+``` r
+# Color by collection location and date
+alpha = 0.5
+size = 3
+BSEA_geoloc_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$geo_population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+```
+
+![](data_analysis_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+# ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_geoloc_pca.png", BSEA_geoloc_pca, device = "png")
+```
+
+``` r
+# Color by locality
+alpha = 0.5
+size = 3
+BSEA_loc_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$Loc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+```
+
+![](data_analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+``` r
+# ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_loc_pca.png", BSEA_loc_pca, device = "png")
+```
+
+#### Map collection sites
+
+``` r
+color = c("#F8766D", "#CD9600", "#7CAE00", "#00BE67", "#00BFC4", "#00A9FF", "#C77CFF", "#FF61CC", "#FF3030")
+BSEA_coords <- sample_table_BSEA %>% 
+  select(population, StartLonDD, StartLatDD)
+BSEA_coords <- unique(BSEA_coords)
+
+maps::map("worldHires","USA", xlim=c(-180,-140),ylim=c(55,71.2), col="gray90", fill=TRUE) #plot the region of USA containing all sites  
+points(BSEA_coords$StartLonDD, BSEA_coords$StartLatDD, pch=c(rep(c(15,16,17,18),7), 15, 16), cex=0.5, col = color)  #plot my sample sites 
+```
+
+![](data_analysis_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+save
+```
+
+    ## function (..., list = character(), file = stop("'file' must be specified"), 
+    ##     ascii = FALSE, version = NULL, envir = parent.frame(), compress = isTRUE(!ascii), 
+    ##     compression_level, eval.promises = TRUE, precheck = TRUE) 
+    ## {
+    ##     opts <- getOption("save.defaults")
+    ##     if (missing(compress) && !is.null(opts$compress)) 
+    ##         compress <- opts$compress
+    ##     if (missing(compression_level) && !is.null(opts$compression_level)) 
+    ##         compression_level <- opts$compression_level
+    ##     if (missing(ascii) && !is.null(opts$ascii)) 
+    ##         ascii <- opts$ascii
+    ##     if (missing(version)) 
+    ##         version <- opts$version
+    ##     if (!is.null(version) && version < 2) 
+    ##         warning("Use of save versions prior to 2 is deprecated", 
+    ##             domain = NA)
+    ##     names <- as.character(substitute(list(...)))[-1L]
+    ##     if (missing(list) && !length(names)) 
+    ##         warning("nothing specified to be save()d")
+    ##     list <- c(list, names)
+    ##     if (!is.null(version) && version == 1) 
+    ##         .Internal(save(list, file, ascii, version, envir, eval.promises))
+    ##     else {
+    ##         if (precheck) {
+    ##             ok <- vapply(list, exists, NA, envir = envir)
+    ##             if (!all(ok)) {
+    ##                 n <- sum(!ok)
+    ##                 stop(sprintf(ngettext(n, "object %s not found", 
+    ##                   "objects %s not found"), paste(sQuote(list[!ok]), 
+    ##                   collapse = ", ")), domain = NA)
+    ##             }
+    ##         }
+    ##         if (is.character(file)) {
+    ##             if (!nzchar(file)) 
+    ##                 stop("'file' must be non-empty string")
+    ##             if (!is.character(compress)) {
+    ##                 if (!is.logical(compress)) 
+    ##                   stop("'compress' must be logical or character")
+    ##                 compress <- if (compress) 
+    ##                   "gzip"
+    ##                 else "no compression"
+    ##             }
+    ##             con <- switch(compress, bzip2 = {
+    ##                 if (!missing(compression_level)) bzfile(file, 
+    ##                   "wb", compression = compression_level) else bzfile(file, 
+    ##                   "wb")
+    ##             }, xz = {
+    ##                 if (!missing(compression_level)) xzfile(file, 
+    ##                   "wb", compression = compression_level) else xzfile(file, 
+    ##                   "wb", compression = 9)
+    ##             }, gzip = {
+    ##                 if (!missing(compression_level)) gzfile(file, 
+    ##                   "wb", compression = compression_level) else gzfile(file, 
+    ##                   "wb")
+    ##             }, `no compression` = file(file, "wb"), stop(gettextf("'compress = \"%s\"' is invalid", 
+    ##                 compress)))
+    ##             on.exit(close(con))
+    ##         }
+    ##         else if (inherits(file, "connection")) 
+    ##             con <- file
+    ##         else stop("bad file argument")
+    ##         if (isOpen(con) && !ascii && summary(con)$text != "binary") 
+    ##             stop("can only save to a binary connection")
+    ##         .Internal(saveToConn(list, con, ascii, version, envir, 
+    ##             eval.promises))
+    ##     }
+    ## }
+    ## <bytecode: 0x9569c10>
+    ## <environment: namespace:base>
