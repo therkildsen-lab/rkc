@@ -53,17 +53,29 @@ size = 3
 All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 ```
 
+Plot of every site to see if there are any strange outliers. Nothing obvious here
+
 ```{r pca by locality}
 alpha = 0.7
 size = 3
 All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$Loc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 ```
 
+PCA of all individuals colored by locality. 
+
+- All regions group together with some putative geneflow/migration between Gulf of Alaska (Kodiak) and East Bering Sea (Bristol Bay and Pribilof islands)
+- this is consistent with previous studies using mtDNA and nuclear markers. 
+
 ```{r pca by region}
 alpha = 0.7
 size = 3
 All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$GeneralLoc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 ```
+
+PCA plot colored by general locality 
+
+- Again, shows introgression between Bering Sea (Bristol Bay), and Gulf of Alaska (Kodiak)
+
 ```{r PCA by latitude}
 PCA_continuous_var(genome_cov, sample_table$ABLG, sample_table$StartLatDD, 1, 2, "RKC_pca_latitude", show.ellipse = F, show.line = F, show.label = F)
 
@@ -76,6 +88,12 @@ RKC_PCA_lat_plot <- ggplot(data=RKC_pca_latitude,aes(x=PC1, y=PC2)) +
     ylab(paste0("PC2 ",round(RKC_pca_latitude_y_var,2),"%"))
 RKC_PCA_lat_plot
 ```
+
+PCA colored by latitude
+- conceptual plot of first steps for local adaptation analysis
+- could use avg sea surface temp or salinity or other environmental analysis
+- GxE analysis may also be appropriate though I'm not sure if these analyses are developed for low coverage data yet
+
 ## Fst peaks from Lauren 
 
 ![Fst plot](/fs/cbsubscb16/storage/rkc/figures/SEAK_23zoom_plot_fst.jpg "Region of elevated Fst on Chr 23")
@@ -121,6 +139,7 @@ All_pop_pca <- PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$po
 ```
 
 ![SEAK map](/fs/cbsubscb16/storage/rkc/figures/RKC_SEAK_map.png)
+
 ## run pcangsd for Bering Sea
 
 ```{r filter sample table and beagle file for Bering Sea}
@@ -163,7 +182,7 @@ alpha = 0.5
 size = 4
 BSEA_pop_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 
-ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_pop_pca.png", BSEA_pop_pca, device = "png")
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_pop_pca.png", BSEA_pop_pca, device = "png")
 ```
 
 ```{r}
@@ -175,7 +194,7 @@ BSEA_geoloc_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSE
 # ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_geoloc_pca.png", BSEA_geoloc_pca, device = "png")
 ```
 
-```{r}
+```{r include=F}
 # Color by locality
 alpha = 0.5
 size = 3
@@ -184,9 +203,11 @@ BSEA_loc_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$L
 # ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_loc_pca.png", BSEA_loc_pca, device = "png")
 ```
 
+![BSEA map](/fs/cbsubscb16/storage/rkc/figures/BSEA_map.png)
+
 
 #### Map collection sites
-```{r}
+```{r include=F}
 color = c("#F8766D", "#CD9600", "#7CAE00", "#00BE67", "#00BFC4", "#00A9FF", "#C77CFF", "#FF61CC", "#FF3030")
 BSEA_coords <- sample_table_BSEA %>% 
   select(population, StartLonDD, StartLatDD)
@@ -197,4 +218,6 @@ BSEA_coords <- unique(BSEA_coords) %>%
 maps::map("worldHires","USA", xlim=c(-180,-140),ylim=c(54.5,71.2), col="gray90", fill=TRUE) #plot the region of USA containing all sites  
 points(BSEA_coords$StartLonDD, BSEA_coords$StartLatDD, pch=c(rep(c(15,16,17,18),7), 15, 16), cex=1.5, col = alpha(color,0.7))  #plot my sample sites 
 text(BSEA_coords$StartLonDD, BSEA_coords$StartLatDD, labels = BSEA_coords$population, pos = 2, offset = 0.5)
+
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/bering_sea_map.pdf", device = "pdf")
 ```

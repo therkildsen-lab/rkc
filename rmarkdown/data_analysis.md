@@ -92,6 +92,9 @@ All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$population, 1, 2,
 
 ![](data_analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
+Plot of every site to see if there are any strange outliers. Nothing
+obvious here
+
 ``` r
 alpha = 0.7
 size = 3
@@ -100,6 +103,14 @@ All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$Loc, 1, 2, show.e
 
 ![](data_analysis_files/figure-gfm/pca%20by%20locality-1.png)<!-- -->
 
+PCA of all individuals colored by locality.
+
+-   All regions group together with some putative geneflow/migration
+    between Gulf of Alaska (Kodiak) and East Bering Sea (Bristol Bay and
+    Pribilof islands)
+-   this is consistent with previous studies using mtDNA and nuclear
+    markers.
+
 ``` r
 alpha = 0.7
 size = 3
@@ -107,6 +118,11 @@ All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$GeneralLoc, 1, 2,
 ```
 
 ![](data_analysis_files/figure-gfm/pca%20by%20region-1.png)<!-- -->
+
+PCA plot colored by general locality
+
+-   Again, shows introgression between Bering Sea (Bristol Bay), and
+    Gulf of Alaska (Kodiak)
 
 ``` r
 PCA_continuous_var(genome_cov, sample_table$ABLG, sample_table$StartLatDD, 1, 2, "RKC_pca_latitude", show.ellipse = F, show.line = F, show.label = F)
@@ -122,7 +138,14 @@ RKC_PCA_lat_plot
 ```
 
 ![](data_analysis_files/figure-gfm/PCA%20by%20latitude-1.png)<!-- -->
-\## Fst peaks from Lauren
+
+PCA colored by latitude - conceptual plot of first steps for local
+adaptation analysis - could use avg sea surface temp or salinity or
+other environmental analysis - GxE analysis may also be appropriate
+though I’m not sure if these analyses are developed for low coverage
+data yet
+
+## Fst peaks from Lauren
 
 ![Fst
 plot](/fs/cbsubscb16/storage/rkc/figures/SEAK_23zoom_plot_fst.jpg "Region of elevated Fst on Chr 23")
@@ -173,8 +196,9 @@ All_pop_pca <- PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$po
 
 ![](data_analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-![SEAK map](/fs/cbsubscb16/storage/rkc/figures/RKC_SEAK_map.png) \## run
-pcangsd for Bering Sea
+![SEAK map](/fs/cbsubscb16/storage/rkc/figures/RKC_SEAK_map.png)
+
+## run pcangsd for Bering Sea
 
 ``` r
 sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
@@ -240,10 +264,8 @@ BSEA_pop_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$p
 ![](data_analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_pop_pca.png", BSEA_pop_pca, device = "png")
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_pop_pca.png", BSEA_pop_pca, device = "png")
 ```
-
-    ## Saving 7 x 5 in image
 
 ``` r
 # Color by collection location and date
@@ -271,6 +293,8 @@ BSEA_loc_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$L
 # ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_loc_pca.png", BSEA_loc_pca, device = "png")
 ```
 
+![BSEA map](/fs/cbsubscb16/storage/rkc/figures/BSEA_map.png)
+
 #### Map collection sites
 
 ``` r
@@ -287,3 +311,7 @@ text(BSEA_coords$StartLonDD, BSEA_coords$StartLatDD, labels = BSEA_coords$popula
 ```
 
 ![](data_analysis_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/bering_sea_map.pdf", device = "pdf")
+```
