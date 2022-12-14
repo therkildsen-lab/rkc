@@ -1,0 +1,34 @@
+---
+title: "Local PCA"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Subset beagle into chromosomes
+
+#### Make lg list
+
+```{bash eval=T, include=F}
+zcat angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz | sed 's/\_.*//' | uniq > sample_lists/lg_list.txt
+```
+
+#### Run subsetting script
+
+```{bash index bam files, eval=F, include=T}
+## Job ID
+
+echo '#!/bin/bash 
+bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/subset_beagle_by_lg.sh /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz /fs/cbsubscb16/storage/rkc/sample_lists/lg_list.txt 24' | \
+sbatch \
+--nodelist=cbsubscb16 \
+--partition=regular \
+--nodes=1 \
+--ntasks=25 \
+--mem=5G \
+--output=/home/cas399/rkc/log/subset_beagle.log
+```
+
+
