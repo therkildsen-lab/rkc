@@ -18,7 +18,8 @@ zcat angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz | sed 's/\_.*//' | uniq >
 #### Run subsetting script
 
 ```{bash index bam files, eval=F, include=T}
-## Job ID
+## Run on cluster
+## Job ID 48750
 
 echo '#!/bin/bash 
 bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/subset_beagle_by_lg.sh /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz /fs/cbsubscb16/storage/rkc/sample_lists/lg_list.txt 24' | \
@@ -31,4 +32,21 @@ sbatch \
 --output=/home/cas399/rkc/log/subset_beagle.log
 ```
 
+## Run local PCA
+
+```{bash eval=T, include=F}
+## Run on cluster
+## current issue, new pcangsd flags differ. will have to modify local_pca_1.sh script. 
+## Job ID 49957
+
+echo '#!/bin/bash 
+bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_local_pca.sh /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz /fs/cbsubscb16/storage/rkc/sample_lists/lg_list.txt 10000 2 26 /fs/cbsubscb16/storage/genomic-data-analysis/scripts/local_pca_1.sh /fs/cbsubscb16/storage/genomic-data-analysis/scripts/local_pca_2.R python /programs/pcangsd-1.10/pcangsd/pcangsd.py' | \
+sbatch \
+--nodelist=cbsubscb16 \
+--partition=regular \
+--nodes=1 \
+--ntasks=26 \
+--mem=5G \
+--output=/home/cas399/rkc/log/local_pca_all_chr.log
+```
 
