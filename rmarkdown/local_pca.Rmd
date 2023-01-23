@@ -16,7 +16,7 @@ library(tidyverse)
 
 #### Make lg list
 
-```{bash eval=T, include=F}
+```{bash eval=F, include=T}
 zcat angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz | sed 's/\_.*//' | uniq > sample_lists/lg_list.txt
 ```
 
@@ -39,7 +39,7 @@ sbatch \
 
 ## Run local PCA 10000 SNP window
 
-```{bash eval=T, include=F}
+```{bash eval=F, include=T}
 ## Run on cluster
 ## current issue, new pcangsd flags differ. will have to modify local_pca_1.sh script. 
 ## Job ID 49957
@@ -100,22 +100,40 @@ nohup Rscript /fs/cbsubscb16/storage/rkc/scripts/run_pc_dist_10000snp_2pc.R \
 
 ```{r fig.height=9, fig.width=12, message=F, warning=F}
 ## Read the SNP position file
-snp_position <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/local_pca/snp_position_10000snp_2pc.tsv", col_names = F) %>%
+snp_position10000 <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window10000/snp_position_10000snp_2pc.tsv", col_names = F) %>%
   transmute(lg = sub("\\_.*", "", X1), 
             start = as.integer(sub(".*\\_", "", X1)), 
             stop = as.integer(sub(".*\\_", "", X2)), 
             center = (start+stop)/2)
 ## Read in the window distance matrix
-dist <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window_dist_10000snp_2pc.tsv", col_names = F) %>%
+dist10000 <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window10000/window_dist_10000snp_2pc.tsv", col_names = F) %>%
   as.matrix()
 ## Do MDS with the distance matrix
-mds <- cmdscale(as.dist(dist), k=10, eig = T)
-proportion_variance <- round(mds$eig/sum(mds$eig)*100,2)
-mds <- mds$points %>%
+mds10000 <- cmdscale(as.dist(dist10000), k=10, eig = T)
+proportion_variance <- round(mds10000$eig/sum(mds10000$eig)*100,2)
+mds10000 <- mds10000$points %>%
   as.data.frame() %>%
   set_names(paste0("dist_", 1:10)) %>%
-  bind_cols(snp_position, .)
-mds %>%
+  bind_cols(snp_position10000, .)
+
+## Rename chromosomes in numerical order
+mds10000_chr <- mds10000 %>% 
+  mutate(lgN = NA, .after = lg)
+mds10000_chr$lgN[1] <- "LG001"
+n=1
+for(i in 2:length(mds10000_chr$lg)){
+  if(mds10000_chr$lg[i] == mds10000_chr$lg[i-1]){
+    mds10000_chr$lgN[i] <- paste("LG",sprintf("%03.0f", n), sep = "")
+  }
+  if(mds10000_chr$lg[i] != mds10000_chr$lg[i-1]){
+    n <- n+1
+    mds10000_chr$lgN[i] <- paste("LG",sprintf("%03.0f", n), sep = "")
+  }
+}
+mds10000_chr <- mds10000_chr %>% 
+  dplyr::select(-lg) 
+
+mds10000 %>%
   gather(key = axis, value = value, 5:14) %>%
   mutate(axis=fct_relevel(axis, paste0("dist_", 1:10))) %>%
   ggplot(aes(x=center/10^6, y=value, color=axis)) +
@@ -132,8 +150,8 @@ mds %>%
       panel.grid.major = element_blank(), 
       panel.grid.minor = element_blank()) 
 
-ggsave("/fs/cbsubscb16/storage/rkc/figures/local_pca_scan.png", plot = last_plot(), device = "png", width = 20, height = 10, units = "in")
-ggplot(mds, aes(x=dist_1, y=dist_2, color=lg, shape=lg)) +
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/local_pca_scan.png", plot = last_plot(), device = "png", width = 20, height = 10, units = "in")
+ggplot(mds10000_chr, aes(x=dist_1, y=dist_2, color=lgN, shape=lgN)) +
   geom_point() +
   scale_shape_manual(values = c(rep(c(15,16,17,18),26))) +
   xlab(paste0("PCo1 (", proportion_variance[1], "%)")) +
@@ -175,3 +193,144 @@ sbatch \
 --mem=5G \
 --output=/home/cas399/rkc/log/local_pca_all_chr_1000.log
 ```
+
+
+### Assemble local_pca input - 1000snp
+
+```{r warning=F, message=F}
+lg_list <- read_lines("/fs/cbsubscb16/storage/rkc/sample_lists/lg_list.txt")
+i=1
+for (lg in lg_list){
+  pca_summary_temp <- read_tsv(paste0("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/pca_summary_1000snp_", lg, "_2pc.tsv"), col_names = F)
+  snp_position_temp <- read_tsv(paste0("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/snp_position_1000snp_", lg, "_2pc.tsv"), col_names = F)
+  if (i == 1) {
+    pca_summary <- pca_summary_temp
+    snp_position <- snp_position_temp
+  } else {
+    pca_summary <- bind_rows(pca_summary, pca_summary_temp)
+    snp_position <- bind_rows(snp_position, snp_position_temp)
+  }
+  i <- i+1
+}
+
+write_tsv(pca_summary, "/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/pca_summary_1000snp_2pc.tsv", col_names = F)
+write_tsv(snp_position, "/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/snp_position_1000snp_2pc.tsv", col_names = F)
+```
+
+### Run pc_dist and assemble the output - 1000snp
+
+```{r message=F, eval=F, echo=T}
+rscript <- "library(tidyverse)
+library(lostruct)
+## Read the input
+pca_summary <- read_tsv('/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/pca_summary_1000snp_2pc.tsv', col_names = F) 
+## Run pc_dist with pca_summary
+pca_summary <- as.matrix(pca_summary)
+attr(pca_summary, 'npc') <- 2
+dist <- pc_dist(pca_summary)
+write_tsv(as.data.frame(dist), '/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/window_dist_1000snp_2pc.tsv', col_names = F)"
+write_lines(rscript, "/fs/cbsubscb16/storage/rkc/scripts/run_pc_dist_1000snp_2pc.R")
+```
+
+```{r message=F, eval=F, echo=T} 
+nohup /programs/R-4.2.1-r9/bin/Rscript /fs/cbsubscb16/storage/rkc/scripts/run_pc_dist_1000snp_2pc.R \
+> /fs/cbsubscb16/storage/rkc/nohups/run_pc_dist_1000snp_2pc.nohup 2>&1 &
+```
+
+### Analysis with all windows - 1000snp
+
+```{r fig.height=9, fig.width=12, message=F, warning=F}
+## Read the SNP position file
+snp_position <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/snp_position_1000snp_2pc.tsv", col_names = F) %>%
+  transmute(lg = sub("\\_.*", "", X1), 
+            start = as.integer(sub(".*\\_", "", X1)), 
+            stop = as.integer(sub(".*\\_", "", X2)), 
+            center = (start+stop)/2)
+## Read in the window distance matrix
+dist <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/window_dist_1000snp_2pc.tsv", col_names = F) %>%
+  as.matrix()
+## Do MDS with the distance matrix
+mds <- cmdscale(as.dist(dist), k=10, eig = T)
+proportion_variance <- round(mds$eig/sum(mds$eig)*100,2)
+mds <- mds$points %>%
+  as.data.frame() %>%
+  set_names(paste0("dist_", 1:10)) %>%
+  bind_cols(snp_position, .)
+
+## Rename chromosomes in numerical order
+mds_chr <- mds %>% 
+  mutate(lgN = NA, .after = lg)
+mds_chr$lgN[1] <- "LG001"
+n=1
+for(i in 2:length(mds_chr$lg)){
+  if(mds_chr$lg[i] == mds_chr$lg[i-1]){
+    mds_chr$lgN[i] <- paste("LG",sprintf("%03.0f", n), sep = "")
+  }
+  if(mds_chr$lg[i] != mds_chr$lg[i-1]){
+    n <- n+1
+    mds_chr$lgN[i] <- paste("LG",sprintf("%03.0f", n), sep = "")
+  }
+}
+mds_chr <- mds_chr %>% 
+  dplyr::select(-lg) 
+
+mds_chr %>%
+  gather(key = axis, value = value, 5:14) %>%
+  mutate(axis=fct_relevel(axis, paste0("dist_", 1:10))) %>%
+  ggplot(aes(x=center/10^6, y=value, color=axis)) +
+  geom_point(size=0.5) +
+  facet_grid(axis~lgN, scales="free_x", space="free_x") +
+  theme_bw() +
+  xlab("position (Mbp)") +
+  ylab("principal coordinate value") +
+  theme(panel.spacing = unit(0.1, "lines"),
+      axis.title.x=element_text(),
+      legend.position="none",
+      text = element_text(size=10),
+      axis.text = element_text(size=6),
+      panel.grid.major = element_blank(), 
+      panel.grid.minor = element_blank()) 
+
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/local_pca_scan_1000snp.png", plot = last_plot(), device = "png", width = 20, height = 10, units = "in")
+ggplot(mds_chr, aes(x=dist_1, y=dist_2, color=lgN, shape=lgN)) +
+  geom_point() +
+  scale_shape_manual(values = c(rep(c(15,16,17,18),26))) +
+  xlab(paste0("PCo1 (", proportion_variance[1], "%)")) +
+  ylab(paste0("PCo2 (", proportion_variance[2], "%)")) +
+  cowplot::theme_cowplot()
+ggplot(mds_chr, aes(x=dist_3, y=dist_4, color=lgN, shape=lgN)) +
+  geom_point() +
+  scale_shape_manual(values = c(rep(c(15,16,17,18),26))) +
+  xlab(paste0("PCo3 (", proportion_variance[3], "%)")) +
+  ylab(paste0("PCo4 (", proportion_variance[4], "%)")) +
+  cowplot::theme_cowplot()
+ggplot(mds, aes(x=dist_5, y=dist_6, color=lg, shape=lg)) +
+  geom_point() +
+  scale_shape_manual(values = c(rep(c(15,16,17,18),26))) +
+  xlab(paste0("PCo5 (", proportion_variance[5], "%)")) +
+  ylab(paste0("PCo6 (", proportion_variance[6], "%)")) +
+  cowplot::theme_cowplot()
+ggplot(mds, aes(x=dist_7, y=dist_8, color=lg, shape=lg)) +
+  geom_point() +
+  scale_shape_manual(values = c(rep(c(15,16,17,18),26))) +
+  xlab(paste0("PCo7 (", proportion_variance[7], "%)")) +
+  ylab(paste0("PCo8 (", proportion_variance[8], "%)")) +
+  cowplot::theme_cowplot()
+```
+
+## Find top 1% of outliers
+
+```{r}
+mds_chr %>% arrange(desc(dist_1)) %>% 
+  head(.,90)
+
+## top 90% outliers for dist_1 is > 0.3596825
+
+mds_chr %>% arrange(desc(dist_2))
+## Nothing > 0.23 for dist_2
+
+mds_chr %>% arrange(desc(dist_3))
+
+## islands in dist_3 are > 0.35242881
+```
+
