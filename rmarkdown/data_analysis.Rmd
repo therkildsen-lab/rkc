@@ -64,6 +64,8 @@ Plot of every site to see if there are any strange outliers. Nothing obvious her
 alpha = 0.7
 size = 2
 All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$Loc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_pca.png", device = "png")
 ```
 
 PCA of all individuals colored by locality. 
@@ -75,6 +77,7 @@ PCA of all individuals colored by locality.
 alpha = 0.7
 size = 3
 All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$GeneralLoc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_pca")
 ```
 
 PCA plot colored by general locality 

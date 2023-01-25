@@ -1,2 +1,223 @@
 gzip: angsd/PCAM-PPLA-wholegenome_polymorphic_CM023349.1.beagle.gz already exists;	not overwritten
 gzip: angsd/PCAM-PPLA-wholegenome_polymorphic_CM023351.1.beagle.gz already exists;	not overwritten
+usage: pcangsd [-h] [-b FILE] [-p FILE-PREFIX] [-e INT] [-t INT] [-o OUTPUT]
+               [--filter FILE] [--filterSites FILE] [--plink_error FLOAT]
+               [--minMaf FLOAT] [--maf_iter INT] [--maf_tole FLOAT]
+               [--iter INT] [--tole FLOAT] [--hwe FILE] [--hwe_tole FLOAT]
+               [--selection] [--snp_weights] [--pcadapt] [--selection_e INT]
+               [--inbreedSites] [--inbreedSamples] [--inbreed_iter INT]
+               [--inbreed_tole FLOAT] [--geno FLOAT] [--genoInbreed FLOAT]
+               [--admix] [--admix_K INT] [--admix_iter INT]
+               [--admix_tole FLOAT] [--admix_batch INT] [--admix_alpha FLOAT]
+               [--admix_seed INT] [--admix_auto FLOAT] [--admix_depth INT]
+               [--tree] [--tree_samples FILE] [--maf_save] [--pi_save]
+               [--dosage_save] [--sites_save]
+pcangsd: error: unrecognized arguments: /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist1_outlier.gz
+PCAngsd v1.11
+Jonas Meisner and Anders Albrechtsen.
+Using 16 thread(s).
+
+Parsing Beagle file.
+Loaded 208000 sites and 183 individuals.
+Estimating minor allele frequencies.
+EM (MAF) converged at iteration: 14
+Number of sites after MAF filtering (0.05): 208000
+
+Estimating covariance matrix.
+Using 1 principal components (MAP test).
+Individual allele frequencies estimated (1).
+Individual allele frequencies estimated (2). RMSE=0.003936500041210068
+Individual allele frequencies estimated (3). RMSE=0.0029040288049783113
+Individual allele frequencies estimated (4). RMSE=0.002183960722548201
+Individual allele frequencies estimated (5). RMSE=0.0016595332727928802
+Individual allele frequencies estimated (6). RMSE=0.0012696031335306273
+Individual allele frequencies estimated (7). RMSE=0.000976531562138163
+Individual allele frequencies estimated (8). RMSE=0.0007552292643910191
+Individual allele frequencies estimated (9). RMSE=0.000587315945346863
+Individual allele frequencies estimated (10). RMSE=0.00045841598661426554
+Individual allele frequencies estimated (11). RMSE=0.0003599859419251537
+Individual allele frequencies estimated (12). RMSE=0.0002839638218034954
+Individual allele frequencies estimated (13). RMSE=0.00022462944924188393
+Individual allele frequencies estimated (14). RMSE=0.0001783719959383424
+Individual allele frequencies estimated (15). RMSE=0.00014234903883280118
+Individual allele frequencies estimated (16). RMSE=0.00011393471503716687
+Individual allele frequencies estimated (17). RMSE=9.159048396180825e-05
+Individual allele frequencies estimated (18). RMSE=7.373305665515697e-05
+Individual allele frequencies estimated (19). RMSE=5.9562394322120946e-05
+Individual allele frequencies estimated (20). RMSE=4.8157284017546366e-05
+Individual allele frequencies estimated (21). RMSE=3.891152151791473e-05
+Individual allele frequencies estimated (22). RMSE=3.1517650314081824e-05
+Individual allele frequencies estimated (23). RMSE=2.559870737375735e-05
+Individual allele frequencies estimated (24). RMSE=2.075770798615135e-05
+Individual allele frequencies estimated (25). RMSE=1.6878443066231978e-05
+Individual allele frequencies estimated (26). RMSE=1.3748868599453864e-05
+Individual allele frequencies estimated (27). RMSE=1.1218958980769252e-05
+Individual allele frequencies estimated (28). RMSE=9.187190890779875e-06
+PCAngsd converged.
+Saved covariance matrix as /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist1_outlier.cov (Text).
+
+PCAngsd v1.11
+Jonas Meisner and Anders Albrechtsen.
+Using 16 thread(s).
+
+Parsing Beagle file.
+Loaded 19000 sites and 183 individuals.
+Estimating minor allele frequencies.
+EM (MAF) converged at iteration: 14
+Number of sites after MAF filtering (0.05): 19000
+
+Estimating covariance matrix.
+Using 1 principal components (MAP test).
+Individual allele frequencies estimated (1).
+Individual allele frequencies estimated (2). RMSE=0.00488581620901
+Individual allele frequencies estimated (3). RMSE=0.0032660854550920103
+Individual allele frequencies estimated (4). RMSE=0.0022911382878529024
+Individual allele frequencies estimated (5). RMSE=0.0016606151669882158
+Individual allele frequencies estimated (6). RMSE=0.001205432122582118
+Individual allele frequencies estimated (7). RMSE=0.0008691791525947285
+Individual allele frequencies estimated (8). RMSE=0.0006215360639336925
+Individual allele frequencies estimated (9). RMSE=0.0004424772473607423
+Individual allele frequencies estimated (10). RMSE=0.00031685018502149067
+Individual allele frequencies estimated (11). RMSE=0.0002257117720010969
+Individual allele frequencies estimated (12). RMSE=0.00016120204832018885
+Individual allele frequencies estimated (13). RMSE=0.00011644317317635373
+Individual allele frequencies estimated (14). RMSE=8.441706013898989e-05
+Individual allele frequencies estimated (15). RMSE=6.161142738476338e-05
+Individual allele frequencies estimated (16). RMSE=4.49954151734229e-05
+Individual allele frequencies estimated (17). RMSE=3.314799731315546e-05
+Individual allele frequencies estimated (18). RMSE=2.4557887853659274e-05
+Individual allele frequencies estimated (19). RMSE=1.8272783974084416e-05
+Individual allele frequencies estimated (20). RMSE=1.3628815580746887e-05
+Individual allele frequencies estimated (21). RMSE=1.0212259451663775e-05
+Individual allele frequencies estimated (22). RMSE=7.816334647553742e-06
+PCAngsd converged.
+Saved covariance matrix as /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist3_outlier.cov (Text).
+
+PCAngsd v1.11
+Jonas Meisner and Anders Albrechtsen.
+Using 16 thread(s).
+
+Parsing Beagle file.
+Loaded 92000 sites and 183 individuals.
+Estimating minor allele frequencies.
+EM (MAF) converged at iteration: 13
+Number of sites after MAF filtering (0.05): 92000
+
+Estimating covariance matrix.
+Using 1 principal components (MAP test).
+Individual allele frequencies estimated (1).
+Individual allele frequencies estimated (2). RMSE=0.0054806553623807
+Individual allele frequencies estimated (3). RMSE=0.14779506495841724
+Individual allele frequencies estimated (4). RMSE=0.0027940624735978787
+Individual allele frequencies estimated (5). RMSE=0.14782904474883338
+Individual allele frequencies estimated (6). RMSE=0.0016440559687070726
+Individual allele frequencies estimated (7). RMSE=0.0012967710788970872
+Individual allele frequencies estimated (8). RMSE=0.0010331664389257272
+Individual allele frequencies estimated (9). RMSE=0.14784192768184118
+Individual allele frequencies estimated (10). RMSE=0.0006757464143984041
+Individual allele frequencies estimated (11). RMSE=0.0005527470083401408
+Individual allele frequencies estimated (12). RMSE=0.00045593686968379063
+Individual allele frequencies estimated (13). RMSE=0.0003796942565037852
+Individual allele frequencies estimated (14). RMSE=0.000318057902034953
+Individual allele frequencies estimated (15). RMSE=0.00026711881240470335
+Individual allele frequencies estimated (16). RMSE=0.00022563937979034425
+Individual allele frequencies estimated (17). RMSE=0.00019133400134681573
+Individual allele frequencies estimated (18). RMSE=0.00016301206182064642
+Individual allele frequencies estimated (19). RMSE=0.0001395168913600789
+Individual allele frequencies estimated (20). RMSE=0.0001195815391255022
+Individual allele frequencies estimated (21). RMSE=0.00010289782988443312
+Individual allele frequencies estimated (22). RMSE=8.863928650499763e-05
+Individual allele frequencies estimated (23). RMSE=7.667020026616664e-05
+Individual allele frequencies estimated (24). RMSE=6.633278977865238e-05
+Individual allele frequencies estimated (25). RMSE=5.745850657901269e-05
+Individual allele frequencies estimated (26). RMSE=4.990888742681824e-05
+Individual allele frequencies estimated (27). RMSE=4.317634534013009e-05
+Individual allele frequencies estimated (28). RMSE=3.74768558812483e-05
+Individual allele frequencies estimated (29). RMSE=3.25306222413818e-05
+Individual allele frequencies estimated (30). RMSE=2.824265397591232e-05
+Individual allele frequencies estimated (31). RMSE=2.4585004708752105e-05
+Individual allele frequencies estimated (32). RMSE=2.140575469322235e-05
+Individual allele frequencies estimated (33). RMSE=1.882248184754312e-05
+Individual allele frequencies estimated (34). RMSE=1.635653857579684e-05
+Individual allele frequencies estimated (35). RMSE=1.4302527666693386e-05
+Individual allele frequencies estimated (36). RMSE=1.2565486457535802e-05
+Individual allele frequencies estimated (37). RMSE=1.093124787202235e-05
+Individual allele frequencies estimated (38). RMSE=9.548792541418842e-06
+PCAngsd converged.
+Saved covariance matrix as /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist4_outlier.cov (Text).
+
+PCAngsd v1.11
+Jonas Meisner and Anders Albrechtsen.
+Using 16 thread(s).
+
+Parsing Beagle file.
+Loaded 52000 sites and 183 individuals.
+Estimating minor allele frequencies.
+EM (MAF) converged at iteration: 13
+Number of sites after MAF filtering (0.05): 52000
+
+Estimating covariance matrix.
+Using 1 principal components (MAP test).
+Individual allele frequencies estimated (1).
+Individual allele frequencies estimated (2). RMSE=0.005901797152741053
+Individual allele frequencies estimated (3). RMSE=0.003831379415081688
+Individual allele frequencies estimated (4). RMSE=0.0025746636792275544
+Individual allele frequencies estimated (5). RMSE=0.001796069236547378
+Individual allele frequencies estimated (6). RMSE=0.0012856529052678433
+Individual allele frequencies estimated (7). RMSE=0.0009393173714198682
+Individual allele frequencies estimated (8). RMSE=0.0006944224245414299
+Individual allele frequencies estimated (9). RMSE=0.0005179564751967151
+Individual allele frequencies estimated (10). RMSE=0.0003908177791314396
+Individual allele frequencies estimated (11). RMSE=0.0002974381186817855
+Individual allele frequencies estimated (12). RMSE=0.00022735733713460804
+Individual allele frequencies estimated (13). RMSE=0.00017554206423649586
+Individual allele frequencies estimated (14). RMSE=0.00013711678992347156
+Individual allele frequencies estimated (15). RMSE=0.00010711825316297432
+Individual allele frequencies estimated (16). RMSE=8.433417461952419e-05
+Individual allele frequencies estimated (17). RMSE=6.670815997929615e-05
+Individual allele frequencies estimated (18). RMSE=5.298899643596007e-05
+Individual allele frequencies estimated (19). RMSE=4.223428890815263e-05
+Individual allele frequencies estimated (20). RMSE=3.3732612058140425e-05
+Individual allele frequencies estimated (21). RMSE=2.7018369470404732e-05
+Individual allele frequencies estimated (22). RMSE=2.168360508042396e-05
+Individual allele frequencies estimated (23). RMSE=1.7515147919263417e-05
+Individual allele frequencies estimated (24). RMSE=1.429245722608669e-05
+Individual allele frequencies estimated (25). RMSE=1.1579181473319355e-05
+Individual allele frequencies estimated (26). RMSE=9.84449988935756e-06
+PCAngsd converged.
+Saved covariance matrix as /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist5_outlier.cov (Text).
+
+PCAngsd v1.11
+Jonas Meisner and Anders Albrechtsen.
+Using 16 thread(s).
+
+Parsing Beagle file.
+Loaded 25000 sites and 183 individuals.
+Estimating minor allele frequencies.
+EM (MAF) converged at iteration: 13
+Number of sites after MAF filtering (0.05): 25000
+
+Estimating covariance matrix.
+Using 1 principal components (MAP test).
+Individual allele frequencies estimated (1).
+Individual allele frequencies estimated (2). RMSE=0.004202070418437432
+Individual allele frequencies estimated (3). RMSE=0.0025545426498396703
+Individual allele frequencies estimated (4). RMSE=0.0016267966881969701
+Individual allele frequencies estimated (5). RMSE=0.0010706031192602823
+Individual allele frequencies estimated (6). RMSE=0.000718761119541097
+Individual allele frequencies estimated (7). RMSE=0.0004895391851959264
+Individual allele frequencies estimated (8). RMSE=0.000334142724232234
+Individual allele frequencies estimated (9). RMSE=0.0002296764115698238
+Individual allele frequencies estimated (10). RMSE=0.00015954796805050194
+Individual allele frequencies estimated (11). RMSE=0.00011226378196218881
+Individual allele frequencies estimated (12). RMSE=7.865219372778283e-05
+Individual allele frequencies estimated (13). RMSE=5.5397441152705e-05
+Individual allele frequencies estimated (14). RMSE=3.925104599734848e-05
+Individual allele frequencies estimated (15). RMSE=2.9393919110449425e-05
+Individual allele frequencies estimated (16). RMSE=2.1468649216468452e-05
+Individual allele frequencies estimated (17). RMSE=1.505448393521356e-05
+Individual allele frequencies estimated (18). RMSE=1.05214996339711e-05
+Individual allele frequencies estimated (19). RMSE=7.382210031440983e-06
+PCAngsd converged.
+Saved covariance matrix as /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist7_outlier.cov (Text).
+

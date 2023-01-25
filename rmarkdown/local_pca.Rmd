@@ -10,6 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Load required packages
 ```{r}
 library(tidyverse)
+library(cowplot)
+source("/fs/cbsubscb16/storage/sucker_sp2021/scripts/individual_pca_functions_csj.R")
 ```
 
 ## Subset beagle into chromosomes
@@ -239,7 +241,7 @@ nohup /programs/R-4.2.1-r9/bin/Rscript /fs/cbsubscb16/storage/rkc/scripts/run_pc
 
 ### Analysis with all windows - 1000snp
 
-```{r fig.height=9, fig.width=12, message=F, warning=F}
+```{r mds, message=F, warning=F}
 ## Read the SNP position file
 snp_position <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/snp_position_1000snp_2pc.tsv", col_names = F) %>%
   transmute(lg = sub("\\_.*", "", X1), 
@@ -274,6 +276,10 @@ for(i in 2:length(mds_chr$lg)){
 mds_chr <- mds_chr %>% 
   dplyr::select(-lg) 
 
+write_tsv(mds, "/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/mds_table.tsv")
+```
+
+```{r plot, fig.height=9, fig.width=12,}
 mds_chr %>%
   gather(key = axis, value = value, 5:14) %>%
   mutate(axis=fct_relevel(axis, paste0("dist_", 1:10))) %>%
@@ -304,33 +310,198 @@ ggplot(mds_chr, aes(x=dist_3, y=dist_4, color=lgN, shape=lgN)) +
   xlab(paste0("PCo3 (", proportion_variance[3], "%)")) +
   ylab(paste0("PCo4 (", proportion_variance[4], "%)")) +
   cowplot::theme_cowplot()
-ggplot(mds, aes(x=dist_5, y=dist_6, color=lg, shape=lg)) +
+ggplot(mds_chr, aes(x=dist_4, y=dist_5, color=lgN, shape=lgN)) +
   geom_point() +
   scale_shape_manual(values = c(rep(c(15,16,17,18),26))) +
-  xlab(paste0("PCo5 (", proportion_variance[5], "%)")) +
-  ylab(paste0("PCo6 (", proportion_variance[6], "%)")) +
-  cowplot::theme_cowplot()
-ggplot(mds, aes(x=dist_7, y=dist_8, color=lg, shape=lg)) +
-  geom_point() +
-  scale_shape_manual(values = c(rep(c(15,16,17,18),26))) +
-  xlab(paste0("PCo7 (", proportion_variance[7], "%)")) +
-  ylab(paste0("PCo8 (", proportion_variance[8], "%)")) +
+  xlab(paste0("PCo4 (", proportion_variance[4], "%)")) +
+  ylab(paste0("PCo5 (", proportion_variance[5], "%)")) +
   cowplot::theme_cowplot()
 ```
 
 ## Find top 1% of outliers
 
-```{r}
-mds_chr %>% arrange(desc(dist_1)) %>% 
+```{r fig.height=4, fig.width=12}
+mds_dist1_outliers <- mds_chr %>% 
+  arrange(desc(dist_1)) %>% 
   head(.,90)
 
-## top 90% outliers for dist_1 is > 0.3596825
+## top 90% outliers for dist_1 is > 0.3596825. We'll round to 0.3 
+# name outliers for dist_1 
+mds_chr %>% 
+  gather(key = axis, value = value, 5:14) %>%
+  mutate(axis=fct_relevel(axis, paste0("dist_", 1:10))) %>% 
+  filter(axis %in% paste0("dist_", c(1, 3, 4, 5, 7))) %>%
+  mutate(outlier = ifelse ( (axis=="dist_1" & value > 0.3) | (axis=="dist_3" & value > 0.1) | (axis=="dist_4" & value < -0.1) | (axis=="dist_4" & value > 0.1) | (axis=="dist_5" & value < -0.1) | (lgN == "LG100" & axis=="dist_7" & value < -0.07),TRUE, FALSE) ) %>%
+  ggplot(aes(x=center/10^6, y=value, color=outlier)) +
+  geom_point(size=0.5) +
+  scale_color_manual(values = c("grey", "red")) +
+  facet_grid(axis~lgN, scales="free", space="free_x") +
+  theme_bw() +
+  xlab("position (Mbp)") +
+  ylab("principal coordinate value") +
+  theme(panel.spacing = unit(0.1, "lines"),
+      axis.title.x=element_text(),
+      legend.position="none",
+      text = element_text(size=10),
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.text = element_text(size=6),
+      panel.grid.major = element_blank(), 
+      panel.grid.minor = element_blank()) 
+
 
 mds_chr %>% arrange(desc(dist_2))
 ## Nothing > 0.23 for dist_2
 
-mds_chr %>% arrange(desc(dist_3))
-
+mds_dist3_outliers <- mds_chr %>% 
+  arrange(desc(dist_3)) %>% 
+  head(.,18)
 ## islands in dist_3 are > 0.35242881
+ggplot(mds_dist1_outliers, aes(x=dist_3, y=dist_4, color=lgN, shape=lgN)) +
+  geom_point() +
+  scale_shape_manual(values = c(rep(c(15,16,17,18),26))) +
+  xlab(paste0("PCo3 (", proportion_variance[3], "%)")) +
+  ylab(paste0("PCo4 (", proportion_variance[4], "%)")) +
+  cowplot::theme_cowplot()
 ```
 
+## Look at PCA pattern with local PCA outliers
+
+#### First make a list of beagle files
+```{bash eval=F, include=T}
+ls /fs/cbsubscb16/storage/rkc/angsd/local_pca/*beagle*.gz > /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/beagle_list.txt
+```
+
+#### Subset the list of all beagle files to only include outlier windows
+```{r}
+# Nicolas did this step which is likely only necessary if you filter out inversion before looking for outliers. 
+# We could probably just use regular mds table
+mds_table <- mds %>% 
+  mutate(start=str_c(lg, start, sep = "_"), stop=str_c(lg, stop, sep = "_")) %>% dplyr::select(-lg)
+
+beagle_list <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/beagle_list.txt", col_names = F)
+
+## dist_1 outliers
+dist1_outlier_index <- which(mds_table$dist_1 > 0.3)
+beagle_list_dist1_outlier <- beagle_list[dist1_outlier_index,]
+write_tsv(beagle_list_dist1_outlier, "/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/beagle_list_dist1_outlier.txt", col_names = F)
+
+## dist_3 outliers
+dist3_outlier_index <- which(mds_table$dist_3 > 0.1)
+beagle_list_dist3_outlier <- beagle_list[dist3_outlier_index,]
+write_tsv(beagle_list_dist3_outlier, "/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/beagle_list_dist3_outlier.txt", col_names = F)
+
+## dist_4 outliers
+dist4_outlier_index <- which(mds_table$dist_4 < -0.1 | mds_table$dist_4 > 0.1)
+beagle_list_dist4_outlier <- beagle_list[dist4_outlier_index,]
+write_tsv(beagle_list_dist4_outlier, "/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/beagle_list_dist4_outlier.txt", col_names = F)
+
+## dist_5 outliers
+dist5_outlier_index <- which(mds_table$dist_5 < -0.1)
+beagle_list_dist5_outlier <- beagle_list[dist5_outlier_index,]
+write_tsv(beagle_list_dist5_outlier, "/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/beagle_list_dist5_outlier.txt", col_names = F)
+
+## dist_7 chr 100 outliers
+dist7_outlier_index <- which(str_detect(mds_table$start, "CM023352.1") & mds_table$dist_7 < -0.07)
+beagle_list_dist7_outlier <- beagle_list[dist7_outlier_index,]
+# write_tsv(beagle_list_dist5_outlier, "/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/beagle_list_dist5_outlier.txt", col_names = F)
+```
+
+#### Make combined beagle files across outlier windows
+
+```{bash eval = f, include = T}
+## dist_1
+for BEAGLE in `cat /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/beagle_list_dist1_outlier.txt`; do
+  if [ ! -f /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist1_outlier ] ; then
+    zcat $BEAGLE > /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist1_outlier
+  else zcat $BEAGLE | tail -n +2 >> /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist1_outlier
+  fi
+done
+gzip /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist1_outlier
+
+## dist_3 
+for BEAGLE in `cat /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/beagle_list_dist3_outlier.txt`; do
+  if [ ! -f /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist3_outlier ] ; then
+    zcat $BEAGLE > /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist3_outlier
+  else zcat $BEAGLE | tail -n +2 >> /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist3_outlier
+  fi
+done
+gzip /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist3_outlier
+
+## dist_4
+for BEAGLE in `cat /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/beagle_list_dist4_outlier.txt`; do
+  if [ ! -f /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist4_outlier ] ; then
+    zcat $BEAGLE > /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist4_outlier
+  else zcat $BEAGLE | tail -n +2 >> /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist4_outlier
+  fi
+done
+gzip /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist4_outlier
+
+## dist_5
+for BEAGLE in `cat /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/beagle_list_dist5_outlier.txt`; do
+  if [ ! -f /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist5_outlier ] ; then
+    zcat $BEAGLE > /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist5_outlier
+  else zcat $BEAGLE | tail -n +2 >> /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist5_outlier
+  fi
+done
+gzip /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist5_outlier
+
+## dist_7 chr 100
+for BEAGLE in `cat /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/beagle_list_dist7_outlier.txt`; do
+  if [ ! -f /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist7_outlier ] ; then
+    zcat $BEAGLE > /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist7_outlier
+  else zcat $BEAGLE | tail -n +2 >> /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist7_outlier
+  fi
+done
+gzip /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist7_outlier
+```
+
+#### Run pcangsd on outlier beagles from each dist
+```{bash}
+export PYTHONPATH=/programs/pcangsd-1.10/lib64/python3.9/site-packages:/programs/pcangsd-1.10/lib/python3.9/site-packages:/programs/pcangsd-1.10/pcangsd
+
+export LD_LIBRARY_PATH=/programs/pcangsd-1.10/pcangsd
+
+## dist_1
+nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist1_outlier.gz -o /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist1_outlier --threads 16 &
+## dist_3
+nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist3_outlier.gz -o /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist3_outlier --threads 16 &
+## dist_4
+nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist4_outlier.gz -o /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist4_outlier --threads 16 &
+## dist_5
+nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist5_outlier.gz -o /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist5_outlier --threads 16 &
+nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist7_outlier.gz -o /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist7_outlier --threads 16 &
+```
+
+## Plot these PCAs
+```{r}
+sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
+```
+#### MDS axis 1
+
+```{r}
+dist1_outlier_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist1_outlier.cov", delim = " ", col_names = F) %>% as.matrix()
+PCA(dist1_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+
+# 
+```
+
+```{r}
+dist3_outlier_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist3_outlier.cov", delim = " ", col_names = F) %>% as.matrix()
+PCA(dist3_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+```
+
+```{r}
+dist4_outlier_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist4_outlier.cov", delim = " ", col_names = F) %>% as.matrix()
+PCA(dist4_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+```
+
+```{r}
+dist5_outlier_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist5_outlier.cov", delim = " ", col_names = F) %>% as.matrix()
+PCA(dist5_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+```
+
+```{r}
+dist7_outlier_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist7_outlier.cov", delim = " ", col_names = F) %>% as.matrix()
+PCA(dist7_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+```
