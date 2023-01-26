@@ -470,6 +470,7 @@ nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/s
 nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist4_outlier.gz -o /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist4_outlier --threads 16 &
 ## dist_5
 nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist5_outlier.gz -o /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist5_outlier --threads 16 &
+## dist_7
 nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist7_outlier.gz -o /fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist7_outlier --threads 16 &
 ```
 
@@ -482,8 +483,6 @@ sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.t
 ```{r}
 dist1_outlier_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/PCAM-PPLA-wholegenome_polymorphic.beagle.dist1_outlier.cov", delim = " ", col_names = F) %>% as.matrix()
 PCA(dist1_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
-
-# 
 ```
 
 ```{r}

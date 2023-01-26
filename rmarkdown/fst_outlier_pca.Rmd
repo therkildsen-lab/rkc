@@ -1,0 +1,49 @@
+---
+title: "Fst outlier PCAs"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load relevant libraries
+```{r}
+library(tidyverse)
+library(cowplot)
+```
+
+## identify outlier region on Chr 100
+
+```{r}
+chr100_Fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_CM023352.1_EastBering-GOA_polymorphic_folded.sfs.pbs.fst.txt")
+
+chr100_Fst %>% arrange(desc(fst))
+# chr 100 peak is 10744898-11050174
+# corresponds to lines 14821-15070
+```
+
+```{bash eval=F, include=T}
+## extract lines from beagle file
+zcat angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1.beagle.gz | sed -n '14821,15070p;15071q' | gzip > angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier.beagle.gz
+```
+
+## Run PCA for outlier loci
+
+```{bash}
+nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier.beagle.gz -o /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier --threads 16 &
+```
+
+## Plot PCAs
+```{r}
+sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
+```
+
+```{r}
+chr100_outlier_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier.cov", delim = " ", col_names = F) %>% as.matrix()
+PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = T, show.line = F, show.label = T, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+
+# ggsave("/fs/cbsubscb16/storage/rkc/figures/chr100_outlier_PCA.png", device = "png", width = 8, height = 6.5)
+
+# Three populations on the margins of the PCA, SEAK, GOA, and Aleutian Islands. East Bering is dispersed but closer to GOA, and North Bering is dispersed but closer to SEAK. 
+```
