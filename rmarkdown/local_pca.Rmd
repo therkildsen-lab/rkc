@@ -276,7 +276,14 @@ for(i in 2:length(mds_chr$lg)){
 mds_chr <- mds_chr %>% 
   dplyr::select(-lg) 
 
-write_tsv(mds, "/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/mds_table.tsv")
+#write_tsv(mds, "/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/mds_table.tsv")
+
+# Make chromosome list file w/ a chromosome name column and a number column
+chr_list <- mds_chr %>% 
+  dplyr::select(lg, lgN) %>% 
+  rename(chr = lg, chr_num = lgN) %>% 
+  unique()
+#write_tsv(chr_list, "/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.txt")
 ```
 
 ```{r plot, fig.height=9, fig.width=12,}

@@ -110,7 +110,7 @@ PCA colored by latitude
 ## Run pcangsd for southeast alaska
 
 ```{r filter sample table and beagle file for southeast alaska}
-read_csv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
+sample_table <- read_csv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
 sample_table_SEAK <- sample_table %>% 
   mutate(beagle_index = 1 + (3*(seq(0,182) +1))) %>% # converts individual ids to their index column names in beagle
   filter(Loc == "SEAK")
@@ -232,7 +232,7 @@ BSEA_GOA_loc_pca
 
 #### Map collection sites
 ```{r include=F}
-# copy this into an R script and run for now. Will have to figure out how to plot in poloting window so that I can save as a pdf
+# copy this into an R script and run for now. Will have to figure out how to plot in ploting window so that I can save as a pdf
 
 color = c("#F8766D", "#E58700", "#C99800", "#A3A500", "#6BB100", "#00BA38", "#00BF7D", "#00C0AF", "#00BCD8", "#00B0F6", "#619CFF", "#B983FF", "#E76BF3", "#FD61D1", "#FF67A4")
 BSEA_coords <- sample_table_BSEA_GOA %>% 
