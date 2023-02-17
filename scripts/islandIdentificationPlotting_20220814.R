@@ -54,7 +54,7 @@ if(CLUSTER == "YES"){
   # proportion of loci to subset per chromosome 
   # (I do one order of magnitude smaller than what I want for the final percent of loci genome-wide)
   # (so for top 0.1% of all loci I do 0.01% for N)
-  N <- 0.01
+  N <- 0.05
   
   # For plotting example of loci called in top % 
   FOCALPOP <- "GOA"
@@ -62,9 +62,9 @@ if(CLUSTER == "YES"){
   ## THESE PARAMETERS MAY NEED CHANGING DEPENDING THE CHARACTERISTICS OF YOUR ISLANDS ##
   # Set three parameters: 1) number of loci in top 0.1% that would constitute an interesting island, 2) the step size along the genome to search
   # and 3) the window size to look in
-  NLOCI_ISLAND <- 7
-  STEP_SIZE <- 5000
-  WIND_SIZE <- 10000
+  NLOCI_ISLAND <- 6
+  STEP_SIZE <- 4000
+  WIND_SIZE <- 8000
   
   # set the threshold for subsetting the fst values
   FST_THRESHOLD <- 0.25
@@ -210,7 +210,7 @@ comparisons <- unique(fst_df$comparison)
 chr_count <- 1
 for(i in 1:length(chromosomes)){ 
   start_chr <- 1
-  end_chr <- max(fst_df$midpos[fst_df$chr_num == paste0("chr_",i)]) # last snp location on the chromosome
+  end_chr <- max(fst_df$midpos[fst_df$chr_num == paste0("LG",sprintf("%03.0f", i))]) # last snp location on the chromosome
   step_size <- STEP_SIZE 
   wind_size <- WIND_SIZE
   starts <- seq(from = start_chr, to = end_chr, by = step_size) # vector of start locations for the steps
@@ -240,11 +240,11 @@ for(i in 1:length(chromosomes)){
   chr_count <- chr_count + 1
 } # end for loop stepping through each chromosome
 
-################################################################################
+################################################################################ 
 
 
 ################################################################################
-### PLOTTING 
+### PLOTTING  
 
 # upload file that has called island information
 ISLANDFILE <- paste0("islands_fstcutoff_", FST_THRESHOLD, "_nloci", NLOCI_ISLAND, "_stepSize", STEP_SIZE, "_windSize", WIND_SIZE, ".txt")
@@ -253,9 +253,9 @@ colnames(island_df) <- c("window", "chr", "start", "end", "comparison")
 island_df$island <- "Yes"
 
 windows_df <- NULL
-for(i in 1:length(unique(chrom_df$chr))){ 
+for(i in 1:length(unique(chrom_df$chr))){  
   start_chr <- 1
-  end_chr <- max(fst_df$midpos[fst_df$chr_num == paste0("chr_",i)]) # last snp location on the chromosome
+  end_chr <- max(fst_df$midpos[fst_df$chr_num == paste0("LG",sprintf("%03.0f", i))]) # last snp location on the chromosome
   step_size <- STEP_SIZE 
   wind_size <- WIND_SIZE
   starts <- seq(from = start_chr, to = end_chr, by = step_size) # vector of start locations for the steps
