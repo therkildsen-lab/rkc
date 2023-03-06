@@ -299,3 +299,4 @@ for(i in 1:length(unique(plot_df$chr))){
   ## FILENAME MIGHT NEED CHANGING
   ggsave(paste0(WORKDIR, OUTFILE,"_overallFst_", chrom_num, "_fst_top_", N,"Markers_", NLOCI_ISLAND, "loci_", STEP_SIZE, "kbstep_", WIND_SIZE,"kbwind.jpg"), plot = manplot, width = 10, height = 10, units = "in")
 }
+
