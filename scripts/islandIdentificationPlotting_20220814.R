@@ -63,8 +63,8 @@ if(CLUSTER == "YES"){
   # Set three parameters: 1) number of loci in top 0.1% that would constitute an interesting island, 2) the step size along the genome to search
   # and 3) the window size to look in
   NLOCI_ISLAND <- 6
-  STEP_SIZE <- 4000
-  WIND_SIZE <- 8000
+  STEP_SIZE <- 5000
+  WIND_SIZE <- 10000
   
   # set the threshold for subsetting the fst values
   FST_THRESHOLD <- 0.25
