@@ -1,0 +1,102 @@
+---
+title: "inbreeding_per_pop"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries and file lists
+```{r}
+library(tidyverse)
+setwd("/fs/cbsubscb16/storage/rkc/")
+
+for(p in POPLIST){
+  assign(paste(p,"_list", sep = ""), read_table(paste("sample_lists/", p, "_inbreeding.txt", sep = ""), col_names = F))
+}
+sample_table <- read_tsv("sample_lists/sample_table.tsv")
+```
+
+## Read data
+```{r, message=FALSE}
+setwd("/fs/cbsubscb16/storage/rkc/")
+
+AI_inbreeding <- read_table(AI_list$X1[1], col_names = F)
+for(f in 2:length(AI_list$X1)){
+  AI_inbreeding <- cbind(AI_inbreeding, read_table(AI_list$X1[f], col_names = F))
+}
+AI_inbreeding <- cbind(filter(sample_table, Loc == "AI") %>% select(ABLG,Loc), AI_inbreeding)
+
+EB_inbreeding <- read_table(EastBering_list$X1[1], col_names = F)
+for(f in 2:length(EastBering_list$X1)){
+  EB_inbreeding <- cbind(EB_inbreeding, read_table(EastBering_list$X1[f], col_names = F))
+}
+EB_inbreeding <- cbind(filter(sample_table, Loc == "EastBering") %>% select(ABLG,Loc), EB_inbreeding)
+
+GOA_inbreeding <- read_table(GOA_list$X1[1], col_names = F)
+for(f in 2:length(GOA_list$X1)){
+  GOA_inbreeding <- cbind(GOA_inbreeding, read_table(GOA_list$X1[f], col_names = F))
+}
+GOA_inbreeding <- cbind(filter(sample_table, Loc == "GOA") %>% select(ABLG,Loc), GOA_inbreeding)
+
+NB_inbreeding <- read_table(NorthBering_list$X1[1], col_names = F)
+for(f in 2:length(NorthBering_list$X1)){
+  NB_inbreeding <- cbind(NB_inbreeding, read_table(NorthBering_list$X1[f], col_names = F))
+}
+NB_inbreeding <- cbind(filter(sample_table, Loc == "NorthBering") %>% select(ABLG,Loc), NB_inbreeding)
+
+SEAK_inbreeding <- read_table(SEAK_list$X1[1], col_names = F)
+for(f in 2:length(SEAK_list$X1)){
+  SEAK_inbreeding <- cbind(SEAK_inbreeding, read_table(SEAK_list$X1[f], col_names = F))
+}
+SEAK_inbreeding <- cbind(filter(sample_table, Loc == "SEAK") %>% select(ABLG,Loc), SEAK_inbreeding)
+
+inbreeding_raw <- rbind(AI_inbreeding,EB_inbreeding,GOA_inbreeding,NB_inbreeding,SEAK_inbreeding)
+
+colnames(inbreeding_raw) <- c("ABLG", "Loc",seq(1,104,1))
+```
+
+## Calculate per ind avg inbreeding coefficient across all chromosomes
+```{r}
+inbreeding_raw <- inbreeding_raw %>% mutate(ind_mean = rowMeans(.[3:106]), .after = Loc)
+```
+
+## ANOVA to test differences in inbreeding among pops
+```{r}
+FIS_anova <- aov(ind_mean ~ Loc, data = inbreeding_raw)
+
+summary(FIS_anova)
+```
+
+## Test assumptions
+```{r}
+ggplot(inbreeding_raw, aes(sample = ind_mean)) + 
+  stat_qq() + stat_qq_line()
+```
+```{r}
+plot(predict(FIS_anova), residuals(FIS_anova))
+```
+
+
+## FIS boxplot
+```{r}
+inbreeding_raw %>% ggplot(aes(x = Loc, y = ind_mean)) +
+  geom_boxplot() +
+  geom_point(position = position_jitter(width = 0.1), alpha = 0.5, size = 1.5) +
+  labs(x = "Population", y = "Fis") +
+  cowplot::theme_cowplot()
+
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/inbreeding_boxplot.png", device = "png", height = 5, width = 8)
+```
+## Post-hoc tests
+```{r}
+TukeyHSD(FIS_anova, conf.level = 0.95)
+```
+
+#### mean and 95% CI
+```{r}
+inbreeding_raw %>% group_by(Loc) %>% 
+  summarise(mean = mean(ind_mean), conf95_low = mean(ind_mean)-(qt(0.975,df=length(ind_mean)-1)*sd(ind_mean)/sqrt(length(ind_mean))), conf95_high = mean(ind_mean)+(qt(0.975,df=length(ind_mean)-1)*sd(ind_mean)/sqrt(length(ind_mean))), n = length(ind_mean))
+```
+

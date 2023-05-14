@@ -54,7 +54,7 @@ if(CLUSTER == "YES"){
   # proportion of loci to subset per chromosome 
   # (I do one order of magnitude smaller than what I want for the final percent of loci genome-wide)
   # (so for top 0.1% of all loci I do 0.01% for N)
-  N <- 0.05
+  N <- 0.01
   
   # For plotting example of loci called in top % 
   FOCALPOP <- "GOA"
@@ -62,12 +62,12 @@ if(CLUSTER == "YES"){
   ## THESE PARAMETERS MAY NEED CHANGING DEPENDING THE CHARACTERISTICS OF YOUR ISLANDS ##
   # Set three parameters: 1) number of loci in top 0.1% that would constitute an interesting island, 2) the step size along the genome to search
   # and 3) the window size to look in
-  NLOCI_ISLAND <- 6
-  STEP_SIZE <- 5000
+  NLOCI_ISLAND <- 5
+  STEP_SIZE <- 6000
   WIND_SIZE <- 10000
   
   # set the threshold for subsetting the fst values
-  FST_THRESHOLD <- 0.25
+  FST_THRESHOLD <- 0.35
 }
 
 ################################################################################
@@ -94,7 +94,7 @@ meta_df$mypalette <- factor(meta_df$mypalette, levels = meta_df$mypalette)
 # Part 1: Create a concatenated dataframe and save it as a text file
 # This part of the code is just parsing the angsd files, concatenating them, and adding some information that will make plotting easier. 
 
-setwd(DATADIR)
+setwd(paste0(WORKDIR,DATADIR))
 ALLDATAFILENAMES <- Sys.glob("*")
 allData_file_list <- as.list(ALLDATAFILENAMES)
 
