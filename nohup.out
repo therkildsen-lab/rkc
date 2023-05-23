@@ -347,3 +347,6 @@ Individual allele frequencies estimated (100). RMSE=0.00010197653619544059
 Individual allele frequencies estimated (101). RMSE=0.00010536980178270478
 Saved covariance matrix as /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier.cov (Text).
 
+gzip: /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306.1_downsampledE.gz: No such file or directory
+gzip: /fs/cbsubscb16/storage/rkc/angsd/ is a directory -- ignored
+/programs/ngsLD-1.1.1/ngsLD: error while loading shared libraries: libgsl.so.0: cannot open shared object file: No such file or directory

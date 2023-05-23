@@ -21,11 +21,7 @@ else
 fi
 
 # Plot LD blocks
-module load R/4.2.1-r9
 cat <<EOF | R --vanilla --slave
-install.packages(c("gtools","reshape"),repos='http://cran.us.r-project.org')
-BiocManager::install("snpStats")
-devtools::install_github("https://github.com/SFUStatgen/LDheatmap")
 library(gtools)
 library(reshape2)
 library(LDheatmap)

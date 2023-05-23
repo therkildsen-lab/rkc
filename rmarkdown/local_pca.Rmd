@@ -383,6 +383,7 @@ ls /fs/cbsubscb16/storage/rkc/angsd/local_pca/*beagle*.gz > /fs/cbsubscb16/stora
 ```{r}
 # Nicolas did this step which is likely only necessary if you filter out inversion before looking for outliers. 
 # We could probably just use regular mds table
+mds_table2 <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/local_pca/window1000/mds_table.tsv")
 mds_table <- mds %>% 
   mutate(start=str_c(lg, start, sep = "_"), stop=str_c(lg, stop, sep = "_")) %>% dplyr::select(-lg)
 
