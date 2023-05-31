@@ -127,7 +127,7 @@ mode(m) = "numeric"
 ## Run LDna
 ```{r}
 ldna <- LDnaRaw(m)
-ldna$clusterfile
+LD_clusters <- as.data.frame(ldna$clusterfile)
 ldna$stats
 ```
 
@@ -151,8 +151,8 @@ plotLDnetwork_csj(ldna, LDmat=m, option = 2, clusters = cluster1, summary = summ
 ```{r}
 par(mfcol=c(1,3))
 extractClusters(ldna, m, min.edges = 1, plot.tree = T, extract = F)
+extractClusters(ldna, m, min.edges = 3, plot.tree = T, extract = F)
 extractClusters(ldna, m, min.edges = 5, plot.tree = T, extract = F)
-extractClusters(ldna, m, min.edges = 18, plot.tree = T, extract = F)
 ```
 Looks like there are two obvious clusters from the above plot. Lets try playing with thresholds around 0.35
 
@@ -161,9 +161,14 @@ par(mfcol=c(1,2))
 plotLDnetwork_csj(LDmat=m, option = 1, threshold = 0.37)
 plotLDnetwork_csj(LDmat=m, option = 1, threshold = 0.34)
 ```
-
+#### Color sites by cluster assignment
 ```{r}
-par(mfcol=c(1,2))
-plotLDnetwork_csj(LDmat=m, option = 2, threshold = 0.37)
-plotLDnetwork_csj(LDmat=m, option = 2, threshold = 0.34)
+LD_clusters <- as.data.frame(ldna$clusterfile)
+LD_clusters <- LD_clusters %>% mutate(site = rownames(LD_clusters), .before = `182_0.11`) %>% select(site, `138_0.38`, `139_0.38`) %>% separate(site, into = c("chr", "pos"), sep = ":") %>% 
+  mutate(cluster = ifelse(`138_0.38` == T, "138_0.38", ifelse(`139_0.38` == T, "139_0.38", NA)))
+LD_clusters$pos <- as.numeric(LD_clusters$pos)
+
+LD_clusters %>% ggplot(aes(x = pos, y = chr)) + 
+  geom_point(aes(color = cluster), pch = "+", size = 5 )  +
+  scale_x_continuous(breaks = seq(19500000,31960000, 2000000))
 ```
