@@ -100,3 +100,6 @@ inbreeding_raw %>% group_by(Loc) %>%
   summarise(mean = mean(ind_mean), conf95_low = mean(ind_mean)-(qt(0.975,df=length(ind_mean)-1)*sd(ind_mean)/sqrt(length(ind_mean))), conf95_high = mean(ind_mean)+(qt(0.975,df=length(ind_mean)-1)*sd(ind_mean)/sqrt(length(ind_mean))), n = length(ind_mean))
 ```
 
+## Heterozygosity per pop
+diversity stats were not calculated correctly in angsd
+

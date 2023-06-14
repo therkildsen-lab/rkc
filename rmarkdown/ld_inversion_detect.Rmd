@@ -67,11 +67,11 @@ zcat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306
 ```{bash eval = F, include = T}
 ## Full snp list
 ## important updates to script:
-# Path to ngsLD has changed to '/programs/ngsLD-1.1.1/ngsld.sif /ngsLD-1.1.1/ngsLD'. Oon top of this, it has been installed in something called a 'Singularity' which requires us to specify a working directory for the program that is done using 'export APPTAINER_BINDPATH=/fs/cbsubscb16/storage/rkc/'
+# Path to ngsLD has changed to '/programs/ngsLD-1.1.1/ngsld.sif /ngsLD-1.1.1/ngsLD'. On top of this, it has been installed in something called a 'Singularity' which requires us to specify a working directory for the program that is done using 'export APPTAINER_BINDPATH=/fs/cbsubscb16/storage/rkc/'
 
 export APPTAINER_BINDPATH=/fs/cbsubscb16/storage/rkc/
 
-nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/get_ld.sh /fs/cbsubscb16/storage/rkc/angsd/ PCAM-PPLA-wholegenome_polymorphic_CM023306.1_noheader.beagle.gz global_snp_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1.txt.gz 100 16 '/programs/ngsLD-1.1.1/ngsld.sif /ngsLD-1.1.1/ngsLD' > /fs/cbsubscb16/storage/rkc/nohups/run_ngsLD_bam_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1.nohup &
+nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/get_ld.sh /fs/cbsubscb16/storage/rkc/angsd/ PCAM-PPLA-wholegenome_polymorphic_CM023306.1_noheader.beagle.gz global_snp_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1.txt.gz 125 16 '/programs/ngsLD-1.1.1/ngsld.sif /ngsLD-1.1.1/ngsLD' > /fs/cbsubscb16/storage/rkc/nohups/run_ngsLD_bam_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1_125.nohup &
 ```
 
 ```{bash eval = F, include = T}
@@ -81,16 +81,18 @@ nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/get_ld.sh /fs/cb
 
 export APPTAINER_BINDPATH=/fs/cbsubscb16/storage/rkc/
 
-nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/get_ld.sh /fs/cbsubscb16/storage/rkc/angsd/ PCAM-PPLA-wholegenome_polymorphic_CM023306.1_downsampledEM_noheader.beagle.gz global_snp_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1_downsampledEM.txt.gz 12450 16 '/programs/ngsLD-1.1.1/ngsld.sif /ngsLD-1.1.1/ngsLD' > /fs/cbsubscb16/storage/rkc/nohups/run_ngsLD_bam_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1_downsampledEM_400.nohup &
+nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/get_ld.sh /fs/cbsubscb16/storage/rkc/angsd/ PCAM-PPLA-wholegenome_polymorphic_CM023306.1_downsampledEM_noheader.beagle.gz global_snp_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1_downsampledEM.txt.gz 15000 16 '/programs/ngsLD-1.1.1/ngsld.sif /ngsLD-1.1.1/ngsLD' > /fs/cbsubscb16/storage/rkc/nohups/run_ngsLD_bam_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1_downsampledEM_15000.nohup &
 ```
 
 ## Plot LD heatmap to see if there is an obvious block of ld
-Just plotting the start becaus there is too much data. Should downsample later
+Just plotting the start because there is too much data. Should downsample later
+- window should lie between positions 19841923-24981505 on chr 54
+
 ```{bash eval=F, include=T}
 cat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306.ld | bash /fs/cbsubscb16/storage/rkc/scripts/ld_blocks.sh \
 CM023306.1 \
-19500000 \
-32000000
+19000000 \
+36000000
 ```
 
 Do not see the start of an ld block here. 
@@ -101,11 +103,11 @@ Do not see the start of an ld block here.
 
 ```{bash eval=F, include=T}
 # Extract sites from input file
-cat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306.ld | awk -v chr=CM023306.1 -v min=19500000 -v max=32000000 'BEGIN{print "snp1\tsnp2\tdist\tr2p\tD\tDp\tr2"} {split($1,pos1,":"); split($2,pos2,":")} pos1[1]==chr && pos1[2]>=min && pos1[2]<=max && pos2[1]==chr && pos2[2]>=min && pos2[2]<=max' | cut -f 1-7 > PCAM-PPLA_CM023306.1_downsampledEM_12450_premat.ld
+cat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306.ld | awk -v chr=CM023306.1 -v min=19000000 -v max=36000000 'BEGIN{print "snp1\tsnp2\tdist\tr2p\tD\tDp\tr2"} {split($1,pos1,":"); split($2,pos2,":")} pos1[1]==chr && pos1[2]>=min && pos1[2]<=max && pos2[1]==chr && pos2[2]>=min && pos2[2]<=max' | cut -f 1-7 > /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_CM023306.1_downsampledEM_15000_premat.ld
 ```
 
 ```{r}
-r <- read.table("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_CM023306.1_downsampledEM_12450_premat.ld", header=TRUE, stringsAsFactors=FALSE)
+r <- read.table("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_CM023306.1_downsampledEM_15000_premat.ld", header=TRUE, stringsAsFactors=FALSE)
 id <- unique(mixedsort(c(r[,"snp1"],r[,"snp2"])))
 posStart <- head(id,1)
 posEnd <- tail(id,1)
@@ -170,5 +172,8 @@ LD_clusters$pos <- as.numeric(LD_clusters$pos)
 
 LD_clusters %>% ggplot(aes(x = pos, y = chr)) + 
   geom_point(aes(color = cluster), pch = "+", size = 5 )  +
-  scale_x_continuous(breaks = seq(19500000,31960000, 2000000))
+  scale_x_continuous(breaks = seq(19500000,31960000, 2000000)) +
+  geom_vline(xintercept = c(20520440, 29903464), color = "black", alpha = 0.5)
+
+ggsave("/fs/cbsubscb16/storage/rkc/figures/ld_window_clusters.png", device = "png", height = 4, width = 7, units = "in")
 ```
