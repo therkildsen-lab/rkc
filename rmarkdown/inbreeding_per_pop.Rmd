@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Load libraries and file lists
 ```{r}
 library(tidyverse)
+POPLIST <- c("AI", "SEAK", "NorthBering", "EastBering", "GOA")
 setwd("/fs/cbsubscb16/storage/rkc/")
 
 for(p in POPLIST){
@@ -101,5 +102,5 @@ inbreeding_raw %>% group_by(Loc) %>%
 ```
 
 ## Heterozygosity per pop
-diversity stats were not calculated correctly in angsd
+diversity stats from angsd output seems off 
 

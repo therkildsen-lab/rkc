@@ -11,6 +11,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(cowplot)
+source("/fs/cbsubscb16/storage/sucker_sp2021/scripts/individual_pca_functions_csj.R")
+sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
+chrom_df <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.txt")
 ```
 
 ## identify outlier region on Chr 100
@@ -30,7 +33,7 @@ zcat angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1.beagle.gz | sed -n '1482
 
 ## Run PCA for outlier loci
 
-```{bash}
+```{bash eval=F, include=T}
 nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier.beagle.gz -o /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier --threads 16 &
 ```
 
@@ -41,6 +44,9 @@ sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.t
 
 ```{r}
 chr100_outlier_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier.cov", delim = " ", col_names = F) %>% as.matrix()
+
+alpha = 0.7
+size = 3
 PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = T, show.line = F, show.label = T, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 
 # ggsave("/fs/cbsubscb16/storage/rkc/figures/chr100_outlier_PCA.png", device = "png", width = 8, height = 6.5)
@@ -48,6 +54,8 @@ PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse =
 # Three populations on the margins of the PCA, SEAK, GOA, and Aleutian Islands. East Bering is dispersed but closer to GOA, and North Bering is dispersed but closer to SEAK. 
 ```
 
+```{r}
 fst_6_5_10 <- read_delim("/fs/cbsubscb16/storage/rkc/islands_fstcutoff_0.25_nloci6_stepSize5000_windSize10000.txt", col_names = c("position", "chr","start","end","compare")) %>% 
   left_join(chrom_df, by = "chr")
 fst_6_4_8 <- read_delim("/fs/cbsubscb16/storage/rkc/islands_fstcutoff_0.25_nloci6_stepSize4000_windSize8000.txt")
+```

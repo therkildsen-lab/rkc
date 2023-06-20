@@ -18,6 +18,7 @@ library("maps")
 library("mapdata")
 library(RcppCNPy)
 source("/fs/cbsubscb16/storage/sucker_sp2021/scripts/individual_pca_functions_csj.R")
+sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
 ```
 
 # make sample table from rkc metadata
@@ -67,9 +68,7 @@ All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$Loc, 1, 2, show.e
 #ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_pca.png", device = "png", height = 5, width = 7)
 ```
 #### Subsample populations to even out sample sizes and run PCA
-```{r filter sample table and beagle file for southeast alaska}
-sample_table <- read_csv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
-
+```{r filter sample table and beagle file for even sample sizes}
 sample_table_subsamp_list <- sample_table %>% 
   mutate(beagle_index = 1 + (3*(seq(0,182) +1))) %>% # converts individual ids to their index column names in beagle
   arrange(Loc) %>% 
@@ -100,7 +99,7 @@ nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_pcangsd.sh /
 ```
 
 #### Subsetted PCA
-```{r pca by locality}
+```{r pca by locality subset}
 genome_cov_subsamp <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_subsamp_PCAM-PPLA-wholegenome_polymorphic.cov.npy")
 
 alpha = 0.7
@@ -119,7 +118,7 @@ subsamp_pca <- PCA(genome_cov_subsamp, sample_table_subsamp$ABLG, sample_table_s
 alpha = 0.7
 size = 3
 All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$GeneralLoc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
-ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_pca")
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_region_pca.png", device = "png")
 ```
 
 PCA plot colored by general locality 
@@ -152,7 +151,6 @@ PCA colored by latitude
 ## Run pcangsd for southeast alaska
 
 ```{r filter sample table and beagle file for southeast alaska}
-sample_table <- read_csv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
 sample_table_SEAK <- sample_table %>% 
   mutate(beagle_index = 1 + (3*(seq(0,182) +1))) %>% # converts individual ids to their index column names in beagle
   filter(Loc == "SEAK")
@@ -187,13 +185,12 @@ genome_cov_SEAK <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_SEAK_PCAM-P
 # Color by collection location and date
 alpha = 0.5
 size = 3
-SEAK_pca <-
 PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude = c(23,24))
 
 PCA_continuous_var(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2, "SEAK_label_pca", show.ellipse = F, show.line = F, show.label = F, index_exclude = c(23,24))
 SEAK_label_pca_plot <- ggplot(SEAK_label_pca, aes(x=PC1,y=PC2)) +
   geom_point(aes(color = population)) +
-  geom_text(aes(label = individual)) +
+  #eom_text(aes(label = individual)) +
   cowplot::theme_cowplot() +
     xlab(paste0("PC1 ", round(SEAK_label_pca_x_var,2),"%")) +
     ylab(paste0("PC2 ",round(SEAK_label_pca_y_var,2),"%"))

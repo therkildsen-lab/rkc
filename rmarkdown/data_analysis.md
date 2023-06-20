@@ -7,34 +7,55 @@ data analysis
 library("tidyverse")
 ```
 
-    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-
-    ## ✓ ggplot2 3.3.3     ✓ purrr   0.3.4
-    ## ✓ tibble  3.1.2     ✓ dplyr   1.0.6
-    ## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
-    ## ✓ readr   1.4.0     ✓ forcats 0.5.1
-
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ dplyr     1.1.0     ✔ readr     2.1.4
+    ## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+    ## ✔ ggplot2   3.4.1     ✔ tibble    3.1.8
+    ## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+    ## ✔ purrr     1.0.1     
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+    ## ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors
 
 ``` r
 library("ggplot2")
 library("cowplot")
+```
+
+    ## 
+    ## Attaching package: 'cowplot'
+    ## 
+    ## The following object is masked from 'package:lubridate':
+    ## 
+    ##     stamp
+
+``` r
 library("maps")
 ```
 
     ## 
     ## Attaching package: 'maps'
-
+    ## 
     ## The following object is masked from 'package:purrr':
     ## 
     ##     map
 
 ``` r
 library("mapdata")
+library(RcppCNPy)
 source("/fs/cbsubscb16/storage/sucker_sp2021/scripts/individual_pca_functions_csj.R")
+sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
 ```
+
+    ## Rows: 183 Columns: 9
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: "\t"
+    ## chr (6): population, Loc, GeneralLoc, k3_inferred_pop, k4_inferred_pop, k5_i...
+    ## dbl (3): ABLG, StartLatDD, StartLonDD
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 # make sample table from rkc metadata
 
@@ -42,31 +63,23 @@ source("/fs/cbsubscb16/storage/sucker_sp2021/scripts/individual_pca_functions_cs
 metadata <- read_csv("/fs/cbsubscb16/storage/rkc/sample_lists/rkc_whitelist_1x_metadata.csv")
 ```
 
-    ## 
+    ## Rows: 183 Columns: 26
     ## ── Column specification ────────────────────────────────────────────────────────
-    ## cols(
-    ##   .default = col_double(),
-    ##   AltID = col_character(),
-    ##   CommonName = col_character(),
-    ##   SpeciesName = col_character(),
-    ##   CollectionDate = col_character(),
-    ##   Locality = col_character(),
-    ##   Loc = col_character(),
-    ##   GeneralLoc = col_character(),
-    ##   k3_inferred_pop = col_character(),
-    ##   k4_inferred_pop = col_character(),
-    ##   k5_inferred_pop = col_character()
-    ## )
-    ## ℹ Use `spec()` for the full column specifications.
+    ## Delimiter: ","
+    ## chr (10): AltID, CommonName, SpeciesName, CollectionDate, Locality, Loc, Gen...
+    ## dbl (16): ABLG, notSEAK, StartLatDD, StartLonDD, k3_A, k3_B, k3_C, k4_A, k4_...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 ``` r
-sample_table <- metadata %>% 
+sample_table_pribs <- metadata %>% 
   mutate(CollectionDate = parse_date(CollectionDate, format = "%m/%d/%Y")) %>% 
-   mutate(year = as.character(format(CollectionDate, "%Y"))) %>% 
+  mutate(year = as.character(format(CollectionDate, "%Y"))) %>% 
   mutate(month = as.character(format(CollectionDate, "%m"))) %>% 
   mutate(day = as.character(format(CollectionDate, "%d"))) %>%
   mutate(population = str_c(substr(Locality, 1, 3), year,sep="")) %>% 
-  select(ABLG, population, Loc, GeneralLoc, StartLatDD, StartLonDD, k3_inferred_pop, k4_inferred_pop, k5_inferred_pop)
+  mutate(Loc = ifelse(str_detect(population, "Pri") | str_detect(population, "Sai"), "Pribilof_Is", Locality)) %>% select(ABLG, population, Loc, GeneralLoc, StartLatDD, StartLonDD, k3_inferred_pop, k4_inferred_pop, k5_inferred_pop)
 
 #write_tsv(sample_table, "/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
 ```
@@ -81,7 +94,7 @@ nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_pcangsd.sh /
 
 ``` r
 ## Read in data
-library(RcppCNPy)
+
 genome_cov <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_PCAM-PPLA-wholegenome_polymorphic.cov.npy")
 
 # Color by collection location and date
@@ -90,20 +103,83 @@ size = 3
 All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 ```
 
+    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    ## ℹ Please use `linewidth` instead.
+
 ![](data_analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+-   The following individuals are considered outliers: ABLG5617,
+    ABLG5618, ABLG5637, ABLG5644, ABLG5648, ABLG5650, ABLG5651,
+    ABLG5663, ABLG5667, ABLG5669, ABLG5670
 
 Plot of every site to see if there are any strange outliers. Nothing
 obvious here
 
 ``` r
 alpha = 0.7
-size = 3
+size = 2
 All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$Loc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 ```
 
 ![](data_analysis_files/figure-gfm/pca%20by%20locality-1.png)<!-- -->
 
-PCA of all individuals colored by locality.
+``` r
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_pca.png", device = "png", height = 5, width = 7)
+```
+
+#### Subsample populations to even out sample sizes and run PCA
+
+``` r
+sample_table_subsamp_list <- sample_table %>% 
+  mutate(beagle_index = 1 + (3*(seq(0,182) +1))) %>% # converts individual ids to their index column names in beagle
+  arrange(Loc) %>% 
+  slice(-c(37:61, 83:120, 170:183, 94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121)) %>% 
+  select(ABLG)
+sample_table_subsamp <- sample_table %>% 
+  right_join(sample_table_subsamp_list, by = "ABLG")
+
+nonsubsamp_beagle_index <- sample_table %>% 
+  mutate(beagle_index = 1 + (3*(seq(0,182) +1))) %>% # converts individual ids to their index column names in beagle
+  filter(!ABLG %in% sample_table_subsamp_list$ABLG) %>% 
+  dplyr::select(beagle_index) %>% 
+  mutate(beagle_index = str_c(beagle_index, beagle_index+1,beagle_index+2, sep = ",")) # add subsequent 2 beagle column indices to make three total
+
+str_c(nonsubsamp_beagle_index$beagle_index, collapse = ",")
+```
+
+    ## [1] "88,89,90,163,164,165,166,167,168,169,170,171,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,422,423,424,425,426,427,428,429,430,431,432,433,434,435,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,460,461,462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,494,495,496,497,498,499,500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,538,539,540,541,542,543,544,545,546,547,548,549,550,551,552"
+
+``` bash
+## subsample the beagle file for only the subsampled dataset
+## PID = 980495
+nohup zcat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz | cut -f 88,89,90,163,164,165,166,167,168,169,170,171,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,422,423,424,425,426,427,428,429,430,431,432,433,434,435,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,460,461,462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,494,495,496,497,498,499,500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,538,539,540,541,542,543,544,545,546,547,548,549,550,551,552 --complement |  gzip > /fs/cbsubscb16/storage/rkc/angsd/subsamp_PCAM-PPLA-wholegenome_polymorphic.beagle.gz &
+```
+
+#### Run pcangsd
+
+``` bash
+# Run on cbsunt246
+# PID 4134831
+nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_pcangsd.sh /fs/cbsubscb16/storage/rkc/ /fs/cbsubscb16/storage/rkc/angsd/subsamp_PCAM-PPLA-wholegenome_polymorphic.beagle.gz 0.05 pca 1 8 > /fs/cbsubscb16/storage/rkc/nohups/run_pcangsd_pca_subsamp.nohup &
+```
+
+#### Subsetted PCA
+
+``` r
+genome_cov_subsamp <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_subsamp_PCAM-PPLA-wholegenome_polymorphic.cov.npy")
+
+alpha = 0.7
+size = 2
+subsamp_pca <- PCA(genome_cov_subsamp, sample_table_subsamp$ABLG, sample_table_subsamp$Loc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude = c(88, 91, 92, 95, 96, 97, 98))
+```
+
+![](data_analysis_files/figure-gfm/pca%20by%20locality%20subset-1.png)<!-- -->
+
+``` r
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/subsamp_pca.png", device = "png", height = 5, width = 7)
+```
+
+#### PCA of all individuals colored by locality.
 
 -   All regions group together with some putative geneflow/migration
     between Gulf of Alaska (Kodiak) and East Bering Sea (Bristol Bay and
@@ -118,6 +194,10 @@ All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$GeneralLoc, 1, 2,
 ```
 
 ![](data_analysis_files/figure-gfm/pca%20by%20region-1.png)<!-- -->
+
+``` r
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_region_pca.png", device = "png")
+```
 
 PCA plot colored by general locality
 
@@ -154,31 +234,32 @@ plot](/fs/cbsubscb16/storage/rkc/figures/SEAK_23zoom_plot_fst.jpg "Region of ele
 
 ``` r
 sample_table_SEAK <- sample_table %>% 
-  mutate(beagle_index = 1 + (3*(seq(1,183) +1))) %>% # converts individual ids to their index column names in beagle
-  filter(Loc == "SEAK") %>% 
-  filter(ABLG != 5650, ABLG != 5651)
+  mutate(beagle_index = 1 + (3*(seq(0,182) +1))) %>% # converts individual ids to their index column names in beagle
+  filter(Loc == "SEAK")
 
-SEAK_beagle_index <- sample_table_SEAK %>% 
+nonSEAK_beagle_index <- sample_table %>% 
+  mutate(beagle_index = 1 + (3*(seq(0,182) +1))) %>% # converts individual ids to their index column names in beagle
+  filter(Loc != "SEAK") %>% 
   dplyr::select(beagle_index) %>% 
   mutate(beagle_index = str_c(beagle_index, beagle_index+1,beagle_index+2, sep = ",")) # add subsequent 2 beagle column indices to make three total
 
-str_c(SEAK_beagle_index$beagle_index, collapse = ",")
+str_c(nonSEAK_beagle_index$beagle_index, collapse = ",")
 ```
 
-    ## [1] "184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,328,329,330,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,409,410,411,412,413,414,415,416,417,418,419,420,421,422,423,424,425,426"
+    ## [1] "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,424,425,426,427,428,429,430,431,432,433,434,435,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,460,461,462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,494,495,496,497,498,499,500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,538,539,540,541,542,543,544,545,546,547,548,549,550,551,552"
 
 copy and past the above beagle index column list into the script below
 to cut the correct columns
 
 ``` bash
-nohup zcat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz | cut -f 184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,409,410,411,412,413,414,415,416,417,418,419,420,421,422,423,424,425,426 --complement |  gzip > /fs/cbsubscb16/storage/rkc/angsd/SEAK_PCAM-PPLA-wholegenome_polymorphic.beagle.gz &
+nohup zcat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz | cut -f 4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,424,425,426,427,428,429,430,431,432,433,434,435,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,460,461,462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,494,495,496,497,498,499,500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,538,539,540,541,542,543,544,545,546,547,548,549,550,551,552 --complement |  gzip > /fs/cbsubscb16/storage/rkc/angsd/SEAK_PCAM-PPLA-wholegenome_polymorphic.beagle.gz &
 ```
 
 #### Run pcangsd
 
 ``` bash
 # Run on cbsunt246
-# PID 14980
+# PID 7765
 nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_pcangsd.sh /fs/cbsubscb16/storage/rkc/ /fs/cbsubscb16/storage/rkc/angsd/SEAK_PCAM-PPLA-wholegenome_polymorphic.beagle.gz 0.05 pca 1 8 > /fs/cbsubscb16/storage/rkc/nohups/run_pcangsd_pca_SEAK.nohup &
 ```
 
@@ -191,10 +272,27 @@ genome_cov_SEAK <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_SEAK_PCAM-P
 # Color by collection location and date
 alpha = 0.5
 size = 3
-All_pop_pca <- PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude = c(23,24))
 ```
 
-![](data_analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](data_analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+PCA_continuous_var(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2, "SEAK_label_pca", show.ellipse = F, show.line = F, show.label = F, index_exclude = c(23,24))
+SEAK_label_pca_plot <- ggplot(SEAK_label_pca, aes(x=PC1,y=PC2)) +
+  geom_point(aes(color = population)) +
+  #eom_text(aes(label = individual)) +
+  cowplot::theme_cowplot() +
+    xlab(paste0("PC1 ", round(SEAK_label_pca_x_var,2),"%")) +
+    ylab(paste0("PC2 ",round(SEAK_label_pca_y_var,2),"%"))
+SEAK_label_pca_plot
+```
+
+![](data_analysis_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+``` r
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/SEAK_pop_pca.png", SEAK_pca, device = "png")
+```
 
 ![SEAK map](/fs/cbsubscb16/storage/rkc/figures/RKC_SEAK_map.png)
 
@@ -204,48 +302,44 @@ All_pop_pca <- PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$po
 sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
 ```
 
-    ## 
+    ## Rows: 183 Columns: 9
     ## ── Column specification ────────────────────────────────────────────────────────
-    ## cols(
-    ##   ABLG = col_double(),
-    ##   population = col_character(),
-    ##   Loc = col_character(),
-    ##   GeneralLoc = col_character(),
-    ##   StartLatDD = col_double(),
-    ##   StartLonDD = col_double(),
-    ##   k3_inferred_pop = col_character(),
-    ##   k4_inferred_pop = col_character(),
-    ##   k5_inferred_pop = col_character()
-    ## )
+    ## Delimiter: "\t"
+    ## chr (6): population, Loc, GeneralLoc, k3_inferred_pop, k4_inferred_pop, k5_i...
+    ## dbl (3): ABLG, StartLatDD, StartLonDD
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 ``` r
-sample_table_BSEA <- sample_table %>% 
-  mutate(beagle_index = 1 + (3*(seq(1,183) +1))) %>% # converts individual ids to their index column names in beagle
+sample_table_BSEA_GOA <- sample_table_pribs %>% 
+  mutate(beagle_index = 1 + (3*(seq(0,182) + 1))) %>% # converts individual ids to their index column names in beagle
   mutate(geo_population = substr(population,1,3), .after = population) %>% 
-  filter(GeneralLoc == "Bering Sea") %>% 
-  filter(ABLG != 5617, ABLG !=5618, ABLG !=5637, ABLG !=5644, ABLG !=5648, ABLG !=5650, ABLG !=5651, ABLG !=5663, ABLG !=5667, ABLG !=5669, ABLG !=5670)
+  filter(GeneralLoc == "Bering Sea" | GeneralLoc == "Gulf of Alaska")
 
-BSEA_beagle_index <- sample_table_BSEA %>% 
+nonBSEA_GOA_beagle_index <- sample_table %>% 
+  mutate(beagle_index = 1 + (3*(seq(0,182) +1))) %>% # converts individual ids to their index column names in beagle
+  filter(GeneralLoc != "Bering Sea", GeneralLoc != "Gulf of Alaska") %>% 
   dplyr::select(beagle_index) %>% 
   mutate(beagle_index = str_c(beagle_index, beagle_index+1,beagle_index+2, sep = ",")) # add subsequent 2 beagle column indices to make three total
 
-str_c(BSEA_beagle_index$beagle_index, collapse = ",")
+str_c(nonBSEA_GOA_beagle_index$beagle_index, collapse = ",")
 ```
 
-    ## [1] "28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,352,353,354,355,356,357,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,538,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553,554,555"
+    ## [1] "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,422,423"
 
 #### subset beagle file
 
 ``` bash
-nohup zcat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz | cut -f 28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,352,353,354,355,356,357,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,538,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553,554,555 --complement |  gzip > /fs/cbsubscb16/storage/rkc/angsd/BSEA_PCAM-PPLA-wholegenome_polymorphic.beagle.gz &
+nohup zcat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz | cut -f 4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,422,423 --complement |  gzip > /fs/cbsubscb16/storage/rkc/angsd/BSEA_GOA_PCAM-PPLA-wholegenome_polymorphic.beagle.gz &
 ```
 
 #### run pcangsd
 
 ``` bash
 # Run on cbsunt246
-# PID 
-nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_pcangsd.sh /fs/cbsubscb16/storage/rkc/ /fs/cbsubscb16/storage/rkc/angsd/BSEA_PCAM-PPLA-wholegenome_polymorphic.beagle.gz 0.05 pca 1 8 > /fs/cbsubscb16/storage/rkc/nohups/run_pcangsd_pca_BSEA.nohup &
+# PID 8094
+nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_pcangsd.sh /fs/cbsubscb16/storage/rkc/ /fs/cbsubscb16/storage/rkc/angsd/BSEA_GOA_PCAM-PPLA-wholegenome_polymorphic.beagle.gz 0.05 pca 1 8 > /fs/cbsubscb16/storage/rkc/nohups/run_pcangsd_pca_BSEA_GOA.nohup &
 ```
 
 #### Plot BSEA PCA
@@ -253,15 +347,15 @@ nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_pcangsd.sh /
 ``` r
 ## Read in data
 library(RcppCNPy)
-genome_cov_BSEA <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_BSEA_PCAM-PPLA-wholegenome_polymorphic.cov.npy")
+genome_cov_BSEA_GOA <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_BSEA_GOA_PCAM-PPLA-wholegenome_polymorphic.cov.npy")
 
 # Color by collection location
 alpha = 0.5
-size = 4
-BSEA_pop_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+size = 3
+BSEA_GOA_pop_pca <- PCA(genome_cov_BSEA_GOA, sample_table_BSEA_GOA$ABLG, sample_table_BSEA_GOA$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(68, 69, 73, 74, 75))
 ```
 
-![](data_analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](data_analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 #ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_pop_pca.png", BSEA_pop_pca, device = "png")
@@ -271,47 +365,99 @@ BSEA_pop_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$p
 # Color by collection location and date
 alpha = 0.5
 size = 3
-BSEA_geoloc_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$geo_population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+BSEA_GOA_geoloc_pca <- PCA(genome_cov_BSEA_GOA, sample_table_BSEA_GOA$ABLG, sample_table_BSEA_GOA$geo_population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(68, 69, 73, 74, 75))
 ```
 
-![](data_analysis_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](data_analysis_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
-# ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_geoloc_pca.png", BSEA_geoloc_pca, device = "png")
-```
-
-``` r
-# Color by locality
-alpha = 0.5
-size = 3
-BSEA_loc_pca <- PCA(genome_cov_BSEA, sample_table_BSEA$ABLG, sample_table_BSEA$Loc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
-```
-
-![](data_analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
-
-``` r
-# ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_loc_pca.png", BSEA_loc_pca, device = "png")
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_geoloc_pca.png", BSEA_GOA_geoloc_pca, device = "png")
 ```
 
 ![BSEA map](/fs/cbsubscb16/storage/rkc/figures/BSEA_map.png)
 
 #### Map collection sites
 
-``` r
-color = c("#F8766D", "#CD9600", "#7CAE00", "#00BE67", "#00BFC4", "#00A9FF", "#C77CFF", "#FF61CC", "#FF3030")
-BSEA_coords <- sample_table_BSEA %>% 
-  select(population, StartLonDD, StartLatDD)
-BSEA_coords <- unique(BSEA_coords) %>%  
-  arrange(population) %>% 
-  slice(-7)
+## Admixture
 
-maps::map("worldHires","USA", xlim=c(-180,-140),ylim=c(54.5,71.2), col="gray90", fill=TRUE) #plot the region of USA containing all sites  
-points(BSEA_coords$StartLonDD, BSEA_coords$StartLatDD, pch=c(rep(c(15,16,17,18),7), 15, 16), cex=1.5, col = alpha(color,0.7))  #plot my sample sites 
-text(BSEA_coords$StartLonDD, BSEA_coords$StartLatDD, labels = BSEA_coords$population, pos = 2, offset = 0.5)
+#### combine data
+
+``` r
+metadata_admx <- read_csv("/fs/cbsubscb16/storage/rkc/sample_lists/rkc_whitelist_1x_metadata.csv") %>% 
+  mutate(CollectionDate = parse_date(CollectionDate, format = "%m/%d/%Y")) %>% 
+  mutate(year = as.character(format(CollectionDate, "%Y"))) %>% 
+  mutate(month = as.character(format(CollectionDate, "%m"))) %>% 
+  mutate(day = as.character(format(CollectionDate, "%d"))) %>%
+  mutate(population = str_c(substr(Locality, 1, 3), year,sep="")) %>% 
+  dplyr::select(ABLG,k3_A,k3_B,k3_C,k4_A,k4_B,k4_C,k4_D,k5_A,k5_B,k5_C,k5_D,k5_E) %>% 
+  right_join(sample_table)
 ```
 
-![](data_analysis_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+    ## Rows: 183 Columns: 26
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (10): AltID, CommonName, SpeciesName, CollectionDate, Locality, Loc, Gen...
+    ## dbl (16): ABLG, notSEAK, StartLatDD, StartLonDD, k3_A, k3_B, k3_C, k4_A, k4_...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## Joining with `by = join_by(ABLG)`
+
+#### Admixture k=3
 
 ``` r
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/bering_sea_map.pdf", device = "pdf")
+metadata_admx_k3 <- metadata_admx %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% select(ABLG,Loc,k3_A,k3_B,k3_C) %>% 
+  gather(population,proportion,k3_A:k3_C,factor_key = T) %>% 
+  arrange(Loc) 
+metadata_admx_k3$ABLG <- as.character(metadata_admx_k3$ABLG)
+metadata_admx_k3$ABLG <- factor(metadata_admx_k3$ABLG, levels = unique(metadata_admx_k3$ABLG))
+ggplot(data = metadata_admx_k3, aes(x=factor(ABLG),y=proportion,fill=factor(population))) + 
+  geom_bar(stat="identity",position="stack") +  
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+![](data_analysis_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
+``` r
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/admix_k3.png", height = 5, width = 20, device = "png")
+```
+
+#### Admixture k=4
+
+``` r
+metadata_admx_k4 <- metadata_admx %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% select(ABLG,Loc,k4_A,k4_B,k4_C,k4_D) %>% 
+  gather(population,proportion,k4_A:k4_D,factor_key = T) %>% 
+  arrange(Loc) 
+metadata_admx_k4$ABLG <- as.character(metadata_admx_k4$ABLG)
+metadata_admx_k4$ABLG <- factor(metadata_admx_k4$ABLG, levels = unique(metadata_admx_k4$ABLG))
+
+ggplot(data = metadata_admx_k4, aes(x=factor(ABLG),y=proportion,fill=factor(population))) + 
+  geom_bar(stat="identity",position="stack") +  
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+![](data_analysis_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+``` r
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/admix_k4.png", height = 5, width = 20, device = "png")
+```
+
+#### Admixture k=5
+
+``` r
+metadata_admx_k5 <- metadata_admx %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>%  select(ABLG,Loc,k5_A,k5_B,k5_C,k5_D,k5_E) %>% 
+  gather(population,proportion,k5_A:k5_E,factor_key = T) %>% 
+  arrange(Loc) 
+metadata_admx_k5$ABLG <- as.character(metadata_admx_k5$ABLG)
+metadata_admx_k5$ABLG <- factor(metadata_admx_k5$ABLG, levels = unique(metadata_admx_k5$ABLG))
+
+ggplot(data = metadata_admx_k5, aes(x=factor(ABLG),y=proportion,fill=factor(population))) + 
+  geom_bar(stat="identity",position="stack") +  
+  theme(axis.text.x = element_text(angle = 90)) 
+```
+
+![](data_analysis_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+``` r
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/admix_k5.png", height = 5, width = 20, device = "png")
 ```
