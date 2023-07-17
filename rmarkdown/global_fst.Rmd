@@ -1,0 +1,23 @@
+---
+title: "Global Fst"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load libraries and files}
+library(tidyverse)
+library(cowplot)
+sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
+chrom_df <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.txt")
+```
+
+```{r}
+AI_EastBering <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-EastBering.fst.txt")
+head(AI_EastBering)
+mean(AI_EastBering$fst)
+```
+
+
