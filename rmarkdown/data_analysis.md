@@ -108,7 +108,7 @@ All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$Loc, 1, 2, show.e
 ![](data_analysis_files/figure-gfm/pca%20by%20locality-1.png)<!-- -->
 
 ``` r
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_pca.png", device = "png", height = 5, width = 7)
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_pca.png", device = "png", height = 5, width = 7, bg = 'transparent')
 ```
 
 -   All regions group together with some putative geneflow/migration
@@ -180,10 +180,23 @@ genome_cov_SEAK <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_SEAK_PCAM-P
 # Color by collection location and date
 alpha = 0.5
 size = 3
-PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude = c(23,24))
+SEAK_pca <- PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2, show.ellipse = T, show.line = F, show.label = F, index_exclude = c(23,24))
 ```
 
+    ## 
+    ## Attaching package: 'MASS'
+
+    ## The following object is masked from 'package:dplyr':
+    ## 
+    ##     select
+
 ![](data_analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+SEAK_pca
+```
+
+![](data_analysis_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
 
 ``` r
 # PCA_continuous_var(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2, "SEAK_label_pca", show.ellipse = F, show.line = F, show.label = F, index_exclude = c(23,24))
@@ -195,7 +208,7 @@ PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2,
 #     ylab(paste0("PC2 ",round(SEAK_label_pca_y_var,2),"%"))
 # SEAK_label_pca_plot
 
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/SEAK_pop_pca.png", SEAK_pca, device = "png")
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/SEAK_pop_pca.png", SEAK_pca, device = "png", bg = 'transparent')
 ```
 
 -   no obvious structure among southeast Alaska populations
@@ -230,7 +243,7 @@ BSEA_GOA_pop_pca <- PCA(genome_cov_BSEA_GOA, sample_table_BSEA_GOA$ABLG, sample_
 ![](data_analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_pop_pca.png", BSEA_pop_pca, device = "png")
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_pop_pca.png", BSEA_GOA_pop_pca, device = "png", bg = 'transparent')
 ```
 
 -   three obvious groups corresponding with North Bering, East Bering,
@@ -265,17 +278,14 @@ sample_table_AI <- sample_table_AI %>%
 
 alpha = 0.5
 size = 3
-AI_pop_pca <- PCA(genome_cov_AI, sample_table_AI$ABLG, sample_table_AI$geo_population, 1, 2, show.ellipse = F, show.line = T, show.label = F)
+AI_pop_pca <- PCA(genome_cov_AI, sample_table_AI$ABLG, sample_table_AI$geo_population, 1, 2, show.ellipse = T, show.line = F, show.label = F)
 ```
 
-    ## 
-    ## Attaching package: 'MASS'
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     select
-
 ![](data_analysis_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+``` r
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_pop_pca.png", AI_pop_pca, device = "png", bg = 'transparent')
+```
 
 -   No obvious structure between Cold Bay and Adak populations
 
@@ -317,10 +327,14 @@ sample_table_northbering <- sample_table_northbering %>%
 
 alpha = 0.5
 size = 3
-NorthBering_pop_pca <- PCA(genome_cov_NorthBering, sample_table_northbering$ABLG, sample_table_northbering$geo_population, 1, 2, show.ellipse = F, show.line = T, show.label = F)
+NorthBering_pop_pca <- PCA(genome_cov_NorthBering, sample_table_northbering$ABLG, sample_table_northbering$geo_population, 1, 2, show.ellipse = T, show.line = F, show.label = F)
 ```
 
 ![](data_analysis_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
+``` r
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/NorthBering_pop_pca.png", NorthBering_pop_pca, device = "png", bg = 'transparent')
+```
 
 -   Perhaps some difference between Chukchi and Norton Sound
     populations.
@@ -348,7 +362,7 @@ sample_table_GOA <- sample_table_GOA %>%
 
 alpha = 0.5
 size = 2
-GOA_pop_pca <- PCA(genome_cov_GOA, sample_table_GOA$ABLG, sample_table_GOA$geo_population, 1, 2, show.ellipse = T, show.line = F, show.label = T)
+GOA_pop_pca <- PCA(genome_cov_GOA, sample_table_GOA$ABLG, sample_table_GOA$geo_population, 1, 2, show.ellipse = T, show.line = F, show.label = F)
 ```
 
     ## Warning in cov.trob(cbind(data$x, data$y)): Probable convergence failure
@@ -357,13 +371,11 @@ GOA_pop_pca <- PCA(genome_cov_GOA, sample_table_GOA$ABLG, sample_table_GOA$geo_p
 
     ## Warning in cov.trob(cbind(data$x, data$y)): Probable convergence failure
 
-    ## Warning in cov.trob(df): Probable convergence failure
-
-    ## Warning in cov.trob(df): Probable convergence failure
-
-    ## Warning in cov.trob(df): Probable convergence failure
-
 ![](data_analysis_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+``` r
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_pop_pca.png", GOA_pop_pca, device = "png", bg = 'transparent')
+```
 
 -   no genetic differences between Gulf of Alaska populations
 
@@ -393,13 +405,13 @@ sample_table_eastbering_prib <- sample_table_eastbering %>%
 
 alpha = 0.5
 size = 2
-EastBering_pop_pca <- PCA(genome_cov_EastBering, sample_table_eastbering_prib$ABLG, sample_table_eastbering_prib$Loc, 1, 2, show.ellipse = T, show.line = F, show.label = T)
+EastBering_pop_pca <- PCA(genome_cov_EastBering, sample_table_eastbering_prib$ABLG, sample_table_eastbering_prib$Loc, 1, 2, show.ellipse = T, show.line = F, show.label = F)
 ```
 
 ![](data_analysis_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_pop_pca.png", BSEA_pop_pca, device = "png")
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_pop_pca.png", EastBering_pop_pca, device = "png", bg = 'transparent')
 ```
 
 -   definite genetic differences between Pribilof Island and Bristol Bay
