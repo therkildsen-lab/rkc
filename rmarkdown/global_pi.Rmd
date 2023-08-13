@@ -1,0 +1,89 @@
+---
+title: "Per pop Nucleotide Diversity"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load relevant libraries
+```{r}
+library(tidyverse)
+```
+
+## Load file lists
+```{r message=FALSE}
+POPLIST <- c("AI", "SEAK", "NorthBering", "EastBering", "GOA")
+setwd("/fs/cbsubscb16/storage/rkc/")
+
+for(p in POPLIST){
+  assign(paste(p,"_list", sep = ""), read_table(paste("sample_lists/", p, "_thetas_list.txt", sep = ""), col_names = F))
+}
+sample_table <- read_tsv("sample_lists/sample_table.tsv")
+```
+
+## Read data
+```{r, message=FALSE}
+setwd("/fs/cbsubscb16/storage/rkc/")
+
+AI_thetas <- read_table(AI_list$X1[1], col_names = T, na = "-inf")
+for(f in 2:length(AI_list$X1)){
+  AI_thetas <- rbind(AI_thetas, read_table(AI_list$X1[f], col_names = T, na = "-inf"))
+}
+AI_thetas <- AI_thetas %>% 
+  mutate(untrans_pairwise = exp(Pairwise)) %>% mutate(pop = "AI")
+mean(AI_thetas$untrans_pairwise, na.rm = T)
+ 
+EastBering_thetas <- read_table(EastBering_list$X1[1], col_names = T, na = "-inf")
+for(f in 2:length(EastBering_list$X1)){
+  EastBering_thetas <- rbind(EastBering_thetas, read_table(EastBering_list$X1[f], col_names = T, na = "-inf"))
+}
+EastBering_thetas <- EastBering_thetas %>% 
+  mutate(untrans_pairwise = exp(Pairwise)) %>% mutate(pop = "EastBering")
+mean(EastBering_thetas$untrans_pairwise, na.rm = T)
+
+GOA_thetas <- read_table(GOA_list$X1[1], col_names = T, na = "-inf")
+for(f in 2:length(GOA_list$X1)){
+  GOA_thetas <- rbind(GOA_thetas, read_table(GOA_list$X1[f], col_names = T, na = "-inf"))
+}
+GOA_thetas <- GOA_thetas %>% 
+  mutate(untrans_pairwise = exp(Pairwise)) %>% mutate(pop = "GOA")
+mean(GOA_thetas$untrans_pairwise, na.rm = T)
+
+NorthBering_thetas <- read_table(NorthBering_list$X1[1], col_names = T, na = "-inf")
+for(f in 2:length(NorthBering_list$X1)){
+  NorthBering_thetas <- rbind(NorthBering_thetas, read_table(NorthBering_list$X1[f], col_names = T, na = "-inf"))
+}
+NorthBering_thetas <- NorthBering_thetas %>% 
+  mutate(untrans_pairwise = exp(Pairwise)) %>% mutate(pop = "NorthBering")
+mean(NorthBering_thetas$untrans_pairwise, na.rm = T)
+
+SEAK_thetas <- read_table(SEAK_list$X1[1], col_names = T, na = "-inf")
+for(f in 2:length(SEAK_list$X1)){
+  SEAK_thetas <- rbind(SEAK_thetas, read_table(SEAK_list$X1[f], col_names = T, na = "-inf"))
+}
+SEAK_thetas <- SEAK_thetas %>% 
+  mutate(untrans_pairwise = exp(Pairwise)) %>% mutate(pop = "SEAK")
+mean(SEAK_thetas$untrans_pairwise, na.rm = T)
+
+thetas_raw <- rbind(AI_thetas,EastBering_thetas,GOA_thetas,NorthBering_thetas,SEAK_thetas)
+```
+
+```{r}
+# Estimators are contained in the thetas.idx file
+chr1_thetas <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/diversity/PCAM-PPLA_CM023253.1_AI_polymorphic_folded.thetas.txt")
+chr1_thetas_untrans_pi <- chr1_thetas %>% 
+  mutate(untrans_pairwise = exp(Pairwise))
+mean(chr1_thetas_untrans_pi$untrans_pairwise)
+```
+## Plot pi per population
+```{r}
+ggplot(data = thetas_raw, aes(x = pop, y = untrans_pairwise)) +
+  geom_boxplot() +
+  labs(x = "Population", y = "Nucleotide Diversity (pi)") +
+  cowplot::theme_cowplot()
+
+ggsave("/fs/cbsubscb16/storage/rkc/figures/pi_per_pop.png", device = "png", height = 5, width = 7)
+```
+
