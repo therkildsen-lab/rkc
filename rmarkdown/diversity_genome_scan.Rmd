@@ -1,0 +1,97 @@
+---
+title: "Diversity genome scan"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## load necessary libraries
+```{r}
+library(tidyverse)
+library(cowplot)
+```
+
+## Define plotting functions
+
+```{r}
+get_cum_pos <- function(x){
+  x_new <- group_by(x, lgN) %>%
+    # Compute lg size
+    summarise(lg_length=max(pos)) %>%
+    # Calculate cumulative position of each chromosome
+    mutate(tot=cumsum(lg_length)-lg_length) %>%
+    # Add this info to the initial dataset
+    left_join(x, ., by=c("lgN")) %>%
+    # Add a cumulative position of each SNP
+    arrange(lgN, pos) %>%
+    group_by(lgN) %>%
+    mutate(pos_cum=pos+tot)
+  return(x_new)
+}
+
+plot_stat_per_snp <- function(x){
+  ggplot(x, aes(x=pos/10^6, y=untrans_pairwise)) +
+    geom_point(color = "black", size=size, alpha=0.5) +
+    scale_color_manual(values = c("black","red")) +
+    geom_smooth(color='skyblue', se=F) +
+    scale_x_continuous(breaks=seq(0, 50, 5)) +
+    coord_cartesian(ylim=c(0, 1), expand = F) +
+    xlab('position (Mbp)') +
+    ylab('Nucleotide Diversity') +
+    facet_grid(.~lgN, scales='free_x', space='free_x') +
+    theme_cowplot() +
+    theme(panel.spacing = unit(0.1, 'lines'),
+          axis.title.x=element_text(),
+          legend.position='none',
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank(),
+          text = element_text(size=13),
+          axis.text = element_text(size=10))
+}
+
+plot_stat_per_snp_test <- function(x){
+  ggplot(x, aes(x=pos/10^6, y=correct_fst)) +
+    geom_point(color = "black", size=size, alpha=0.5) +
+    scale_color_manual(values = c("black","red")) +
+    geom_smooth(color='skyblue', se=F) +
+    scale_x_continuous(breaks=seq(0, 50, 5)) +
+    coord_cartesian(ylim=c(0, 1), expand = F) +
+    xlab('position (Mbp)') +
+    ylab('Fst') +
+    facet_grid(.~lgN, scales='free_x', space='free_x') +
+    theme_cowplot() +
+    theme(panel.spacing = unit(0.1, 'lines'),
+          axis.title.x=element_text(),
+          legend.position='none',
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank(),
+          text = element_text(size=13),
+          axis.text = element_text(size=10))
+}
+```
+
+## Read in data
+```{r}
+chr100_div <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/diversity/PCAM-PPLA_CM023352.1_SEAK_polymorphic_folded.thetas.txt") %>% rename(lgN = '#Chromo', pos = Pos) %>% mutate(untrans_pairwise = exp(Pairwise)) %>% filter(pos > 10744898, pos < 11050174)
+size = 2
+
+chr100_div_plot <- get_cum_pos(chr100_div) %>% 
+  plot_stat_per_snp()
+chr100_div_plot
+```
+
+#### Plot fst scan for reference
+```{r}
+chr100_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EastBering-GOA.fst.txt") %>%
+  filter(chr == "CM023352.1", midPos > 10744898, midPos < 11050174) %>% rename(lgN = chr, pos = midPos) %>% mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>% select(lgN, pos, correct_fst)
+
+chr100_fst %>% arrange(desc(correct_fst))
+
+chr100_fst_plot <- get_cum_pos(chr100_fst) %>% plot_stat_per_snp_test()
+chr100_fst_plot
+
+#  
+```
+

@@ -19,7 +19,7 @@ chrom_df <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.tx
 ## identify outlier region on Chr 100
 
 ```{r}
-chr100_Fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_CM023352.1_EastBering-GOA_polymorphic_folded.sfs.pbs.fst.txt")
+chr100_Fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/PCAM-PPLA_CM023352.1_EastBering-GOA_polymorphic_folded.sfs.pbs.fst.txt")
 
 chr100_Fst %>% arrange(desc(fst))
 # chr 100 peak is 10744898-11050174

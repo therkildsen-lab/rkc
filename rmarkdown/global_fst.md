@@ -339,6 +339,7 @@ ggplot(melted_globmat, aes(x = Var1, y = Var2, fill = value)) +
    scale_fill_gradient2(low = "blue", high = "red", mid = "white",
     midpoint = 0.0075, limit = c(0,0.015), space = "Lab",
     name="Pairwise Fst") +
+  geom_text(aes(Var1, Var2, label = value)) +
   theme_minimal() + 
  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
     size = 12, hjust = 1), axis.title = element_blank()) +

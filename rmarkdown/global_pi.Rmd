@@ -84,6 +84,10 @@ ggplot(data = thetas_raw, aes(x = pop, y = untrans_pairwise)) +
   labs(x = "Population", y = "Nucleotide Diversity (pi)") +
   cowplot::theme_cowplot()
 
-ggsave("/fs/cbsubscb16/storage/rkc/figures/pi_per_pop.png", device = "png", height = 5, width = 7)
+# ggsave("/fs/cbsubscb16/storage/rkc/figures/pi_per_pop.png", device = "png", height = 5, width = 7)
 ```
-
+## Means
+```{r}
+means <- c(mean(AI_thetas$untrans_pairwise, na.rm = T), mean(EastBering_thetas$untrans_pairwise, na.rm = T), mean(GOA_thetas$untrans_pairwise, na.rm = T), mean(NorthBering_thetas$untrans_pairwise, na.rm = T), mean(SEAK_thetas$untrans_pairwise, na.rm = T))
+means
+```
