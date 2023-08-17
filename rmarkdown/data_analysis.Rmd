@@ -57,6 +57,7 @@ All_pop_pca
 ```
 
 * The following individuals are considered outliers: ABLG5617, ABLG5618, ABLG5637, ABLG5644, ABLG5648, ABLG5650, ABLG5651, ABLG5663, ABLG5667, ABLG5669, ABLG5670
+* The Gulf of Alaska individuals grouping with Bristol Bay are from Uga2002 and Chi1991
 
 
 Plot of every site to see if there are any strange outliers. Nothing obvious here
