@@ -32,10 +32,12 @@ get_cum_pos <- function(x){
 }
 
 plot_stat_per_snp <- function(x){
-  ggplot(x, aes(x=pos/10^6, y=untrans_pairwise)) +
+  ggplot(x, aes(x=pos, y=untrans_pairwise)) +
     geom_point(color = "black", size=size, alpha=0.5) +
     scale_color_manual(values = c("black","red")) +
     geom_smooth(color='skyblue', se=F) +
+    geom_vline(xintercept = c(10744898, 10745093, 10747909, 10749198, 10749404, 10749513, 10749636, 10749663, 10750169, 10767542, 10767560, 10767619, 10767683, 10767684, 10805120, 10841536, 10855605, 10869842, 10872551, 10892267, 10894263, 10948534, 10972255, 11049895, 11050165, 11050174)) +
+    scale_x_continuous(breaks=seq(0, 50, 5)) +
     scale_x_continuous(breaks=seq(0, 50, 5)) +
     coord_cartesian(ylim=c(0, 1), expand = F) +
     xlab('position (Mbp)') +
@@ -52,10 +54,11 @@ plot_stat_per_snp <- function(x){
 }
 
 plot_stat_per_snp_test <- function(x){
-  ggplot(x, aes(x=pos/10^6, y=correct_fst)) +
+  ggplot(x, aes(x=pos, y=correct_fst)) +
     geom_point(color = "black", size=size, alpha=0.5) +
     scale_color_manual(values = c("black","red")) +
     geom_smooth(color='skyblue', se=F) +
+    geom_vline(xintercept = c(10744898, 10745093, 10747909, 10749198, 10749404, 10749513, 10749636, 10749663, 10750169, 10767542, 10767560, 10767619, 10767683, 10767684, 10805120, 10841536, 10855605, 10869842, 10872551, 10892267, 10894263, 10948534, 10972255, 11049895, 11050165, 11050174)) +
     scale_x_continuous(breaks=seq(0, 50, 5)) +
     coord_cartesian(ylim=c(0, 1), expand = F) +
     xlab('position (Mbp)') +
@@ -65,7 +68,6 @@ plot_stat_per_snp_test <- function(x){
     theme(panel.spacing = unit(0.1, 'lines'),
           axis.title.x=element_text(),
           legend.position='none',
-          axis.ticks.x = element_blank(),
           axis.text.x = element_blank(),
           text = element_text(size=13),
           axis.text = element_text(size=10))
@@ -91,7 +93,7 @@ chr100_fst_EastBering_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/East
 
 chr100_fst_EastBering_GOA %>% arrange(desc(correct_fst))
 
-chr100_fst_plot <- get_cum_pos(chr100_fst) %>% plot_stat_per_snp_test()
+chr100_fst_plot <- get_cum_pos(chr100_fst_EastBering_GOA) %>% plot_stat_per_snp_test()
 chr100_fst_plot
 ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA-EastBering_chr100_fst.png", device = "png", height = 3, width = 7)
 ```
@@ -102,7 +104,7 @@ chr100_fst_AI_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/PCAM-PPLA_CM
 
 chr100_fst_AI_GOA %>% arrange(desc(correct_fst))
 
-chr100_fst_plot <- get_cum_pos(chr100_fst) %>% plot_stat_per_snp_test()
+chr100_fst_plot <- get_cum_pos(chr100_fst_AI_GOA) %>% plot_stat_per_snp_test()
 chr100_fst_plot
 ggsave("/fs/cbsubscb16/storage/rkc/figures/AI-GOA_chr100_fst.png", device = "png", height = 3, width = 7)
 ```
@@ -114,7 +116,7 @@ chr100_fst_NorthBering_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/PCA
 
 chr100_fst_NorthBering_GOA %>% arrange(desc(correct_fst))
 
-chr100_fst_plot <- get_cum_pos(chr100_fst) %>% plot_stat_per_snp_test()
+chr100_fst_plot <- get_cum_pos(chr100_fst_NorthBering_GOA) %>% plot_stat_per_snp_test()
 chr100_fst_plot
 ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA-NorthBering_chr100_fst.png", device = "png", height = 3, width = 7)
 ```
@@ -126,7 +128,7 @@ chr100_fst_SEAK_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/PCAM-PPLA_
 
 chr100_fst_SEAK_GOA %>% arrange(desc(correct_fst))
 
-chr100_fst_plot <- get_cum_pos(chr100_fst) %>% plot_stat_per_snp_test()
+chr100_fst_plot <- get_cum_pos(chr100_fst_SEAK_GOA) %>% plot_stat_per_snp_test()
 chr100_fst_plot
 ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA-SEAK_chr100_fst.png", device = "png", height = 3, width = 7)
 ```

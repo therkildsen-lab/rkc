@@ -1,0 +1,30 @@
+---
+title: "Data Processing mito"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## load relevent libraries and data
+
+```{r}
+library(tidyverse)
+library(knitr)
+sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
+```
+
+#### Sample lists and tables
+
+```{r Make sample list}
+bam_list <- read.delim("/fs/cbsubscb16/storage/rkc/sample_lists/bam_list_mito.txt", header = F) %>% mutate(ABLG = as.double(substr(V1,46,49))) %>% inner_join(sample_table, by = "ABLG") %>% dplyr::select(V1) %>% as.matrix()
+
+write_lines(bam_list, "/fs/cbsubscb16/storage/rkc/sample_lists/bam_list_mito.txt")
+
+sample_table_mito <- read.delim("/fs/cbsubscb16/storage/rkc/sample_lists/bam_list_mito.txt", header = F) %>% mutate(ABLG = as.double(substr(V1,46,49))) %>% inner_join(sample_table, by = "ABLG") %>% select(-1) 
+
+write_tsv(sample_table_mito, "/fs/cbsubscb16/storage/rkc/sample_lists/sample_table_mito.tsv")
+```
+
+#### No need to deduplicate and overlap clip. Laura did this already. Data is ready for angsd

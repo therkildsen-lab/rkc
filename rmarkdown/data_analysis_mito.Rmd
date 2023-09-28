@@ -1,0 +1,215 @@
+---
+title: "data_analysis_mito"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## load libraries and read in necessary files
+```{r, include=F}
+library(tidyverse)
+library(cowplot)
+library(ape)
+library(pegas)
+library(RColorBrewer)
+library(knitr)
+library(insect)
+
+sample_table_mt <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table_mito.tsv")
+```
+
+## Count alleles and make vcf
+
+```{bash}
+## Get allele count
+nohup /programs/angsd-0.940/angsd -bam /fs/cbsubscb16/storage/rkc/sample_lists/bam_list_mito.txt -doCounts 1 -minQ 20 -dumpCounts 4 -doBcf 1 -gl 1 -dopost 1 -domajorminor 1 -domaf 1 -out /fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20 > /fs/cbsubscb16/storage/rkc/nohups/bam_list_mito_minq20.nohup &
+
+mv /fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.counts.gz /fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.allele_counts.gz
+
+## Get depth count
+nohup /programs/angsd-0.940/angsd -bam /fs/cbsubscb16/storage/rkc/sample_lists/bam_list_mito.txt -doCounts 1 -minQ 20 -dumpCounts 2 -out /fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20 > /fs/cbsubscb16/storage/rkc/nohups/bam_list_mito_minq20.nohup &
+
+mv /fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.counts.gz /fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.depth_counts.gz
+```
+## Get depth count
+
+#### Depth per populations
+```{r}
+ind_label <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table_mito.tsv")$ABLG
+pop_label <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table_mito.tsv") %>%
+  dplyr::select(population)
+depth_count <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.depth_counts.gz", col_select = 1:176) %>%
+  t() %>%
+  as_tibble() %>%
+  bind_cols(ind=ind_label, population=pop_label, .) %>%
+  gather(key = position, value="depth", 3:16627) %>%
+  mutate(position=as.numeric(substring(position, 2)))
+group_by(depth_count, ind, population) %>%
+  summarise(average_depth=mean(depth)) %>%
+  ggplot(mapping=aes(x=population, y=average_depth, group=population)) +
+  geom_boxplot() +
+  geom_jitter() +
+  theme_cowplot() +
+  coord_flip()
+```
+
+#### Depth by position 
+```{r}
+group_by(depth_count, population, position) %>%
+  summarise(average_depth=mean(depth)) %>%
+  ggplot(aes(x=position, y=average_depth, color=population)) +
+  geom_line() +
+  theme_cowplot()
+
+```
+
+## Get fasta file
+```{r}
+
+concensus_to_fasta_2 <- function(concensus, ind_label, out_path){
+  ## This function is used to convert the output from convert_count_to_concensus() into a fasta file
+  # concensus should be a data frame outputted by convert_count_to_concensus()
+  # ind_label should be a vector with the same length as the number of rows in concensus, containing the individual labels for each sequence
+  # out_path should be the output path of the fasta file
+  for (i in seq_along(ind_label)){
+    if (i==1) {
+      write_lines(paste0(">", ind_label[i]), out_path, append = F, sep = " ")
+    } else {
+      write_lines(paste0(">", ind_label[i]), out_path, append = T, sep = " ")
+    }
+    write_lines(paste0(concensus[i,], collapse = ""), out_path, append = T)
+  }
+}
+library(tidyverse)
+source("/workdir/genomic-data-analysis/scripts/mtgenome_functions.R")
+
+# minimum depth 1, minimum major allele frequency 0.75
+concensus <- convert_count_to_concensus(x="/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.allele_counts.gz", min_depth=1, min_maf=0.75)
+concensus_to_fasta(concensus, ind_label, "/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20_mindepth1_minmaf75.fasta")
+
+# minimum depth 2, minimum major allele frequency 0.75
+concensus <- convert_count_to_concensus(x="/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.allele_counts.gz", min_depth=2, min_maf=0.75)
+concensus_to_fasta(concensus, ind_label, "/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20_mindepth2_minmaf75.fasta")
+
+# minimum depth 4, minimum major allele frequency 0.75
+concensus <- convert_count_to_concensus(x="/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.allele_counts.gz", min_depth=4, min_maf=0.75)
+concensus_to_fasta(concensus, ind_label, "/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20_mindepth4_minmaf75.fasta")
+```
+
+## Plot haplotype network (relaxed filter)
+```{r}
+fasta <- read.dna("/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20_mindepth1_minmaf75.fasta", format="fasta")
+fasta
+SEAK_list <- c(5570:5580, 5593:5597, 5626:5630, 5649:5651, 5653, 5655:5658, 5717:5722)
+
+hap <- haplotype(fasta)
+hap_net <- haploNet(hap, d=dist.dna(hap, model = "N"))
+
+ind_hap <- with(stack(setNames(attr(hap, "index"), rownames(hap))), table(hap=ind, individuals=rownames(fasta)[values])) %>%
+  as_tibble() %>%
+  mutate(population=paste(substr(individuals,1,nchar(individuals)-4), read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table_mito.tsv")$Loc))
+
+## number of positions retained
+t(as.character(fasta)) %>% 
+  as_tibble() %>%
+  filter_all(all_vars(. != "n")) %>%
+  dim() %>%
+  .[1]
+```
+
+```{r}
+pop_hap <- ind_hap %>%
+  group_by(hap, population) %>%
+  summarise(n=sum(n, na.rm = T)) %>%
+  ungroup() %>%
+  spread(population, n) %>%
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  mutate(hap=as.roman(hap)) %>%
+  arrange(hap) %>%
+  select(-hap) %>%
+  as.matrix()
+pie_color <- brewer.pal(n = 7, name = "Accent")
+set.seed(1)
+plot(hap_net, size=sqrt(attr(hap_net, "freq"))*1.5, fast = F, scale.ratio = 1, pie=pop_hap, bg=pie_color, show.mutation=1, labels=F, threshold=c(0))
+legend("topleft", c(colnames(pop_hap)), fill=pie_color, cex=0.8)
+
+```
+
+## Plot haplotype network (stringent filter)
+```{r}
+fasta <- read.dna("/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20_mindepth4_minmaf75.fasta", format="fasta")
+fasta
+SEAK_list <- c(5570:5580, 5593:5597, 5626:5630, 5649:5651, 5653, 5655:5658, 5717:5722)
+
+hap <- haplotype(fasta)
+hap_net <- haploNet(hap, d=dist.dna(hap, model = "N"))
+
+ind_hap <- with(stack(setNames(attr(hap, "index"), rownames(hap))), table(hap=ind, individuals=rownames(fasta)[values])) %>%
+  as_tibble() %>%
+  mutate(population=paste(substr(individuals,1,nchar(individuals)-4), read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table_mito.tsv")$Loc))
+
+## number of positions retained
+t(as.character(fasta)) %>% 
+  as_tibble() %>%
+  filter_all(all_vars(. != "n")) %>%
+  dim() %>%
+  .[1]
+```
+
+```{r}
+pop_hap <- ind_hap %>%
+  group_by(hap, population) %>%
+  summarise(n=sum(n, na.rm = T)) %>%
+  ungroup() %>%
+  spread(population, n) %>%
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  mutate(hap=as.roman(hap)) %>%
+  arrange(hap) %>%
+  select(-hap) %>%
+  as.matrix()
+pie_color <- brewer.pal(n = 7, name = "Accent")
+set.seed(1)
+plot(hap_net, size=sqrt(attr(hap_net, "freq"))*1.5, fast = F, scale.ratio = 1, pie=pop_hap, bg=pie_color, show.mutation=1, labels=F, threshold=c(0))
+legend("bottomleft", c(colnames(pop_hap)), fill=pie_color, cex=0.8)
+```
+
+## Haplotype network of Southeast AK
+
+```{r}
+fasta_SEAK <- read.dna("/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20_mindepth1_minmaf75_SEAK.fasta", format="fasta")
+fasta_SEAK
+SEAK_list <- c(5570:5580, 5593:5597, 5626:5630, 5649:5651, 5653, 5655:5658, 5717:5722)
+
+hap <- haplotype(fasta_SEAK)
+hap_net <- haploNet(hap, d=dist.dna(hap, model = "N"))
+
+ind_hap <- with(stack(setNames(attr(hap, "index"), rownames(hap))), table(hap=ind, individuals=rownames(fasta_SEAK)[values])) %>%
+  as_tibble() %>%
+  mutate(population=paste(substr(individuals,1,nchar(individuals)-4), (read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table_mito.tsv") %>% filter(Loc == "SEAK"))$population))
+
+## number of positions retained
+t(as.character(fasta_SEAK)) %>% 
+  as_tibble() %>%
+  filter_all(all_vars(. != "n")) %>%
+  dim() %>%
+  .[1]
+```
+
+```{r}
+pop_hap <- ind_hap %>%
+  group_by(hap, population) %>%
+  summarise(n=sum(n, na.rm = T)) %>%
+  ungroup() %>%
+  spread(population, n) %>%
+  mutate_all(~replace(., is.na(.), 0)) %>%
+  mutate(hap=as.roman(hap)) %>%
+  arrange(hap) %>%
+  select(-hap) %>%
+  as.matrix()
+pie_color <- brewer.pal(n = 7, name = "Accent")
+set.seed(1)
+plot(hap_net, size=sqrt(attr(hap_net, "freq"))*1.5, fast = F, scale.ratio = 1, pie=pop_hap, bg=pie_color, show.mutation=1, labels=F, threshold=c(0))
+legend("bottomleft", c(colnames(pop_hap)), fill=pie_color, cex=0.8)
+```

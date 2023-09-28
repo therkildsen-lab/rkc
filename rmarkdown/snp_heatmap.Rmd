@@ -242,7 +242,7 @@ dosage_cand_long_plot
 dosage_cand_long_plot <- dosage_cand_long %>% 
   ggplot(aes(x=as_factor(pos), y=ABLG, fill = allele_dosage)) +
   geom_tile() +
-  scale_fill_distiller(type = "div", palette = 1) +
+  scale_fill_distiller(type = "seq", palette = 18) +
   facet_grid(Loc~lg, scales = "free", space = "free") +
   theme_bw() +
   theme(axis.text.y = element_blank(),
@@ -254,5 +254,5 @@ dosage_cand_long_plot <- dosage_cand_long %>%
         strip.text.y = element_text(angle = 0))
 dosage_cand_long_plot
 
-# ggsave("/fs/cbsubscb16/storage/rkc/figures/snp_heatmap_chr100_outlierCandidates.png", device = "png",width = 11, height = 8.5)
+ggsave("/fs/cbsubscb16/storage/rkc/figures/snp_heatmap_chr100_outlierCandidates.png", device = "png",width = 11, height = 8.5)
 ```
