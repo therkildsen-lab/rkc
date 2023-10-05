@@ -297,3 +297,28 @@ set.seed(1)
 plot(hap_net, size=sqrt(attr(hap_net, "freq"))*0.3, fast = F, scale.ratio = 1, pie=pop_hap, bg=pie_color, show.mutation=1, labels=F, threshold=c(0))
 legend("bottomleft", c(colnames(pop_hap)), fill=pie_color, cex=0.8)
 ```
+## include Grant and Zheng study individuals
+```{r}
+gz_fasta.coi <- read.dna("/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20_mindepth4_minmaf75_grant_zheng_coi_align.fas", format = "fasta")
+
+hap_coi <- haplotype(gz_fasta.coi)
+
+net_coi <- haploNet(hap_coi)
+freqs_coi <- haploFreq(gz_fasta.coi, what = 3, haplo = hap_coi)
+freq <- attr(net_coi, "freq")
+plot(net_coi, size = freq*3, pie = freqs_coi, labels = F)
+
+x <- as.data.frame(freqs_coi) %>% mutate(hap = seq(1:144))
+
+x1 <- x %>% select(AI,hap) %>% filter(AI != 0)
+x2 <- x %>% select(EastBering,hap) %>% filter(EastBering != 0)
+x3 <- x %>% select(GOA,hap) %>% filter(GOA != 0)
+x4 <- x %>% select(NorthBering,hap) %>% filter(NorthBering != 0)
+x5 <- x %>% select(SEAK,hap) %>% filter(SEAK != 0)
+
+ggplot(x, aes(x="", y = camtschaticus, fill=as.character(hap))) +
+  geom_bar(stat="identity", width=1, color = "black") +
+  coord_polar("y", start=0) +
+  labs(title = "Aleutian Islands")
+```
+
