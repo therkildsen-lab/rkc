@@ -103,7 +103,7 @@ dosage_long_plot
 #ggsave("/fs/cbsubscb16/storage/rkc/figures/snp_heatmap_chr100_outlier.png", device = "png",width = 11, height = 8.5)
 ```
 
-## Zoom in on outlier area only
+## Zoom in on outlier area only (chr100 (CM023352.1) positions 10744898-11050174)
 
 ```{bash eval=F, include=T}
 ## subset outlier region on chromosome 100
