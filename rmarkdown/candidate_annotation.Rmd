@@ -1,0 +1,26 @@
+---
+title: "Candidate region annotation"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Annotation hits for candiate regions
+
+- We will search only within the candidate regions
+
+```{r}
+library(tidyverse)
+library(Rgff)
+library(ape)
+chr100_gff <- read.gff("/fs/cbsubscb16/storage/rkc/genome/king_crab_annotation_chr100.gff3")
+
+chr100_gff_outliers <- chr49_gff %>% filter(start > 10744000 & end < 11051000) %>% arrange(start)
+```
+
+```{r}
+
+```
+

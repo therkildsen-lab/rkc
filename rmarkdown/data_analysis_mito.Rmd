@@ -34,7 +34,7 @@ nohup /programs/angsd-0.940/angsd -bam /fs/cbsubscb16/storage/rkc/sample_lists/b
 
 mv /fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.counts.gz /fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.depth_counts.gz
 ```
-## Get depth count
+## Visualize depth statistics 
 
 #### Depth per populations
 ```{r}
@@ -65,6 +65,7 @@ group_by(depth_count, population, position) %>%
   theme_cowplot()
 
 ```
+- Depths look reasonable across samples and loci
 
 ## Get fasta file
 ```{r}
@@ -86,6 +87,7 @@ concensus_to_fasta_2 <- function(concensus, ind_label, out_path){
 
 source("/workdir/genomic-data-analysis/scripts/mtgenome_functions.R")
 
+## Produce fastas with increasingly stringent depth filters to test in downstream analyses
 # minimum depth 1, minimum major allele frequency 0.75
 concensus <- convert_count_to_concensus(x="/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.allele_counts.gz", min_depth=1, min_maf=0.75)
 concensus_to_fasta_2(concensus, ind_label, "/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20_mindepth1_minmaf75.fasta")
@@ -121,6 +123,7 @@ t(as.character(fasta)) %>%
 ```
 
 ```{r}
+## plotting 
 pop_hap <- ind_hap %>%
   group_by(hap, population) %>%
   summarise(n=sum(n, na.rm = T)) %>%
@@ -135,14 +138,12 @@ pie_color <- brewer.pal(n = 7, name = "Accent")
 set.seed(1)
 plot(hap_net, size=sqrt(attr(hap_net, "freq"))*1.5, fast = F, scale.ratio = 1, pie=pop_hap, bg=pie_color, show.mutation=1, labels=F, threshold=c(0))
 legend("topleft", c(colnames(pop_hap)), fill=pie_color, cex=0.8)
-
 ```
 
 ## Plot haplotype network (stringent filter)
 ```{r}
 fasta <- read.dna("/fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20_mindepth4_minmaf75.fasta", format="fasta")
 fasta
-SEAK_list <- c(5570:5580, 5593:5597, 5626:5630, 5649:5651, 5653, 5655:5658, 5717:5722)
 
 hap <- haplotype(fasta)
 hap_net <- haploNet(hap, d=dist.dna(hap, model = "N"))
@@ -290,7 +291,7 @@ pop_hap <- ind_hap %>%
   mutate_all(~replace(., is.na(.), 0)) %>%
   mutate(hap=as.roman(hap)) %>%
   arrange(hap) %>%
-  select(-hap) %>%
+  dplyr::select(-hap) %>%
   as.matrix()
 pie_color <- brewer.pal(n = 7, name = "Accent")
 set.seed(1)
@@ -310,11 +311,11 @@ plot(net_coi, size = freq*3, pie = freqs_coi, labels = F)
 
 x <- as.data.frame(freqs_coi) %>% mutate(hap = seq(1:144))
 
-x1 <- x %>% select(AI,hap) %>% filter(AI != 0)
-x2 <- x %>% select(EastBering,hap) %>% filter(EastBering != 0)
-x3 <- x %>% select(GOA,hap) %>% filter(GOA != 0)
-x4 <- x %>% select(NorthBering,hap) %>% filter(NorthBering != 0)
-x5 <- x %>% select(SEAK,hap) %>% filter(SEAK != 0)
+x1 <- x %>% dplyr::select(AI,hap) %>% filter(AI != 0)
+x2 <- x %>% dplyr::select(EastBering,hap) %>% filter(EastBering != 0)
+x3 <- x %>% dplyr::select(GOA,hap) %>% filter(GOA != 0)
+x4 <- x %>% dplyr::select(NorthBering,hap) %>% filter(NorthBering != 0)
+x5 <- x %>% dplyr::select(SEAK,hap) %>% filter(SEAK != 0)
 
 ggplot(x, aes(x="", y = camtschaticus, fill=as.character(hap))) +
   geom_bar(stat="identity", width=1, color = "black") +

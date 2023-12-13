@@ -1,0 +1,229 @@
+---
+title: "Count 2 localscore"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## What this script does
+- doCounts dumpCounts 3 output file
+- expect output file with A C G T counts
+
+Steps
+1. Convert doCounts output to usable count file with Total, Minor Counts and Major Counts
+2. Fisher's exact test for every locus resulting in p-value.
+3. Local score uses p-values to determine peaks.
+
+## Load necessary packages
+```{r}
+packages_needed <- c("plyr", "ggplot2", "tidyverse", "data.table", "RColorBrewer")
+
+
+for(i in 1:length(packages_needed)){
+  if(!(packages_needed[i] %in% installed.packages())){install.packages(packages_needed[i])}
+  library(packages_needed[i], character.only = TRUE)
+}
+```
+## Read in data
+
+```{r}
+# set Pops (just for determining file location and file names)
+#POP1 <- "NBS"; POP2 <- "GOA"
+#POP1 <- "NBS"; POP2 <- "AI"
+#POP1 <- "NBS"; POP2 <- "EBS"
+#POP1 <- "NBS"; POP2 <- "SEAK"
+#POP1 <- "AI"; POP2 <- "EBS"
+POP1 <- "AI"; POP2 <- "GOA" # Gumbel function not producing I(rho) statistic. need to fix
+#POP1 <- "AI"; POP2 <- "SEAK"
+#POP1 <- "EBS"; POP2 <- "GOA"
+#POP1 <- "EBS"; POP2 <- "SEAK"
+#POP1 <- "GOA"; POP2 <- "SEAK"
+
+
+# table for chromosome name and number
+# two columns: chr (numbered) and chrName (what your chromosomes are called in your angsd output file)
+  chrom_df <- read.table("/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.txt", header = TRUE, col.names = c("chrName","chrNewName")) %>% mutate(chr = seq(1,104,1)) %>% select(-chrNewName)
+
+# read in doCounts output for each population
+  pop1_df <- read_delim(paste0("/fs/cbsubscb16/storage/rkc/angsd/counts/PCAM-PPLA_",POP1,"_polymorphic.pos_counts"), col_names = TRUE) %>% select(-totDepth) 
+  pop2_df <- read_delim(paste0("/fs/cbsubscb16/storage/rkc/angsd/counts/PCAM-PPLA_",POP2,"_polymorphic.pos_counts"), col_names = TRUE) %>% select(-totDepth)
+```
+
+## Edit docounts output 
+
+```{r}
+# change column names
+  colnames(pop1_df) <- c("chrName", "pos", "A", "C", "G", "T")
+  colnames(pop2_df) <- c("chrName", "pos", "A", "C", "G", "T")
+
+#change chrName to chr number
+  pop1_df <- left_join(pop1_df, chrom_df, by = "chrName") %>%
+    subset(select = -c(chrName)) %>%
+    select("chr", everything())
+  pop2_df <- left_join(pop2_df, chrom_df, by = "chrName") %>%
+    subset(select = -c(chrName)) %>%
+    select("chr", everything())
+
+# make values of 0 == NA for each nucleotide
+  pop1_df[pop1_df == 0] <- NA
+  pop2_df[pop2_df == 0] <- NA
+
+  # create columns for al2 and al2 (al = allele), plus total and sum columns
+  pop1_df <- pop1_df %>%
+    mutate(check1 = pmax(A, C, G, T, na.rm = TRUE)) %>%
+    mutate(check2 = pmin(A, C, G, T, na.rm = TRUE))
+  pop1_df$Total <- rowSums(pop1_df[,c("A", "C", "G", "T")], na.rm=TRUE)
+  pop1_df$Al_Sum <- rowSums(pop1_df[,c("check1", "check2")], na.rm=TRUE)
+  #pop2
+  pop2_df <- pop2_df %>%
+    mutate(check1 = pmax(A, C, G, T, na.rm = TRUE)) %>%
+    mutate(check2 = pmin(A, C, G, T, na.rm = TRUE))
+  pop2_df$Total <- rowSums(pop2_df[,c("A", "C", "G", "T")], na.rm=TRUE)
+  pop2_df$Al_Sum <- rowSums(pop2_df[,c("check1", "check2")], na.rm=TRUE)
+  
+  # remove triallelic (or monoallelic) by seeing if sum and total don't match
+  pop1_df <- pop1_df[-(which(pop1_df$Al_Sum != pop1_df$Total)), ]
+  #pop2
+  pop2_df <- pop2_df[-(which(pop2_df$Al_Sum != pop2_df$Total)), ]
+  
+  # remove tri-/mono-allelic columns
+  pop1_df <- pop1_df %>%
+    subset(select = -c(check1, check2, Al_Sum))
+  pop2_df <- pop2_df %>%
+    subset(select = -c(check1, check2, Al_Sum))
+  
+  # combine pop datasets
+  count_df <- inner_join(pop1_df, pop2_df, by = c("chr", "pos"))
+  
+  rm(pop1_df, pop2_df) # to save space
+  
+  # first: remove loci with any mismatch of alleles across pops
+  count_df <- count_df %>%
+    mutate(
+      remove = case_when(
+        is.na(A.x) != is.na(A.y) ~ "RM",
+        is.na(C.x) != is.na(C.y) ~ "RM",
+        is.na(G.x) != is.na(G.y) ~ "RM",
+        is.na(T.x) != is.na(T.y) ~ "RM",
+        TRUE ~ "")) %>%
+    filter(remove == "") %>%
+    subset(select = -c(remove))
+  
+  # assign counts for pop1 alleles
+  count_df <- count_df %>%
+    mutate(al1.x = pmax(A.x, C.x, G.x, T.x, na.rm = TRUE),
+           al2.x = pmin(A.x, C.x, G.x, T.x, na.rm = TRUE))
+  
+  # determine which alleles are max and min
+    # have to account for sites where the min and max are the same bc the allele
+    # count is equal.
+  count_df <- count_df %>%
+    mutate(
+      N1 = case_when(
+        A.x == al1.x ~ "A",
+        C.x == al1.x ~ "C",
+        G.x == al1.x ~ "G",
+        T.x == al1.x ~ "T"),
+      N2 = case_when(
+        # have to make N2 different than N1 when al1 == al2
+        al1.x == al2.x & N1 == "A" & al2.x == C.x ~ "C",
+        al1.x == al2.x & N1 == "A" & al2.x == G.x ~ "G",
+        al1.x == al2.x & N1 == "A" & al2.x == T.x ~ "T",
+        al1.x == al2.x & N1 == "C" & al2.x == G.x ~ "G",
+        al1.x == al2.x & N1 == "C" & al2.x == T.x ~ "T",
+        al1.x == al2.x & N1 == "G" & al2.x == T.x ~ "T",
+        # when al1 != al2
+        A.x == al2.x ~ "A",
+        C.x == al2.x ~ "C",
+        G.x == al2.x ~ "G",
+        T.x == al2.x ~ "T"))
+  
+  # then match pop2 alleles with pop1 alleles & assign count value
+  count_df <- count_df %>%
+    mutate(
+      al1.y = case_when(
+        N1 == "A" ~ A.y,
+        N1 == "C" ~ C.y,
+        N1 == "G" ~ G.y,
+        N1 == "T" ~ T.y),
+      al2.y = case_when(
+        N2 == "A" ~ A.y,
+        N2 == "C" ~ C.y,
+        N2 == "G" ~ G.y,
+        N2 == "T" ~ T.y))
+
+  # determine which alleles are max and min for pop2
+    # just for visualizing --> not used for any calculation
+  count_df <- count_df %>%
+    mutate(
+      N1_ycheck = case_when(
+        A.y == al1.y ~ "A",
+        C.y == al1.y ~ "C",
+        G.y == al1.y ~ "G",
+        T.y == al1.y ~ "T"),
+      N2_ycheck = case_when(
+        A.y == al2.y ~ "A",
+        C.y == al2.y ~ "C",
+        G.y == al2.y ~ "G",
+        T.y == al2.y ~ "T"))
+```
+
+## Check and clean combined counts file
+```{r}
+# checks
+  if(nrow(count_df %>% filter(Total.x != al1.x + al2.x)) > 0){
+    print(" WARNING! ERROR! ALLELE 1 + ALLELE 2 != TOTAL ALLELE COUNT IN POP 1!")
+  }else if(nrow(count_df %>% filter(Total.y != al1.y + al2.y)) > 0){
+    print(" WARNING! ERROR! ALLELE 1 + ALLELE 2 != TOTAL ALLELE COUNT IN POP 2!")
+  }else if(nrow(count_df %>% filter(N1 == N2)) > 0){
+    print(" WARNING! ERROR! SAME ALLELE BEING ACCOUNTED FOR IN POP 1.
+          LIKELY BECAUSE THE ALLELE COUNT OF THE MAJOR AND MINOR ARE EQUAL.")
+  }
+  
+# remove unnecessary columns
+  count_df <- count_df %>%
+    subset(select = -c(A.x, C.x, G.x, T.x, N1, N2, A.y, C.y, G.y, T.y, N1_ycheck, N2_ycheck))
+```
+
+## Write output for localscore 
+```{r}
+  ### write output for localscore.R script ####
+  
+  # remove unnecessary columns for fishers exact test, which will then lead to local score
+  fet_df <- count_df %>%
+    subset(select = -c(Total.x, Total.y))
+  
+  # do not need
+  # recommend if planning to run local score script more than once
+  write.table(fet_df, file = paste0("/fs/cbsubscb16/storage/rkc/localscore/",POP1,"-",POP2,"_localscore_input.txt"), 
+              sep = "\t", row.names = FALSE, col.names = TRUE)
+```
+
+## Fishers exact test 
+
+#### ONLY DOING THAT IF FISHERS TEST ISNT INCLUDED
+#### FISHERS TEST TAKES FOREVER SO DON'T ACCIDENTALLY RUN IT!!!!!!!!!!!!
+```{r}
+# fet_df <- fread(paste0("input/",POP2,"_localscore_input.txt"), head=T)
+head(fet_df)
+
+# conduct fishers exact test on each row (locus)
+fet_df$pval <- apply(fet_df, 1, 
+                     function(x){
+                       tbl <- matrix(as.numeric(x[3:6]), ncol=2, byrow=T)
+                       fisher.test(tbl, alternative="two.sided")$p.value
+                     })
+
+# remove unnecessary columns for local score
+fet_df <- fet_df %>%
+  subset(select = -c(al1.x, al2.x, al1.y, al2.y))
+
+#colnames(fet_df) <- c("chr", "pos", "pval")
+
+# write table because fishers exact test if wanting to save at this point
+write.table(fet_df, file = paste0("/fs/cbsubscb16/storage/rkc/localscore/",POP1,"-",POP2,"_postFET.txt"), 
+            sep = "\t", row.names = FALSE, col.names = TRUE, quote = F)
+```
+

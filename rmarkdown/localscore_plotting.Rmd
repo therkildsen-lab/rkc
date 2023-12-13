@@ -1,0 +1,29 @@
+---
+title: "Localscore plotting"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load required packages
+```{r}
+library(tidyverse)
+library(cowplot)
+```
+
+## Load data
+```{r}
+pop_list <- c("NBS", "AI", "EBS", "GOA", "SEAK")
+for(a in 1:4){
+  for(b in 1:5){
+    tmp <- paste0("/fs/cbsubscb16/storage/rkc/localscore/output/",pop_list[a],"-",pop_list[b],"_xi2.ls")
+    if(file.exists(tmp) == T){
+      assign(paste0(pop_list[a],"_",pop_list[b],"_out"), read_delim(tmp, col_names = F, delim = " "))
+    }
+  }
+}
+```
+
+

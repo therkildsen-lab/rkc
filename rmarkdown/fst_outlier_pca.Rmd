@@ -47,7 +47,7 @@ chr100_outlier_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-who
 
 alpha = 0.7
 size = 3
-PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = T, show.line = F, show.label = T, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = F, show.line = F, show.label = T, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 
 # ggsave("/fs/cbsubscb16/storage/rkc/figures/chr100_outlier_PCA.png", device = "png", width = 8, height = 6.5)
 
