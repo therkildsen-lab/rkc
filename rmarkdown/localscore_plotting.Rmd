@@ -14,16 +14,250 @@ library(cowplot)
 ```
 
 ## Load data
-```{r}
+```{r, message=F}
 pop_list <- c("NBS", "AI", "EBS", "GOA", "SEAK")
+pairs_list <- c()
 for(a in 1:4){
-  for(b in 1:5){
-    tmp <- paste0("/fs/cbsubscb16/storage/rkc/localscore/output/",pop_list[a],"-",pop_list[b],"_xi2.ls")
+  for(b in 1:5){ # sorry for the nested for loops...
+    tmp <- paste0("/fs/cbsubscb16/storage/rkc/localscore/output/",pop_list[a],"-",pop_list[b],"_xi2.ls") # local score values
+    tmp2 <- paste0("/fs/cbsubscb16/storage/rkc/localscore/output/",pop_list[a],"-",pop_list[b],"_xi2_01sig.txt") # list of significant regions
+    tmp3 <- paste0("/fs/cbsubscb16/storage/rkc/localscore/output/",pop_list[a],"-",pop_list[b],"_xi2_chr_sig.txt") # per chromosome significance values
     if(file.exists(tmp) == T){
-      assign(paste0(pop_list[a],"_",pop_list[b],"_out"), read_delim(tmp, col_names = F, delim = " "))
+      tmp3_df <- read_delim(tmp3, col_names = T, delim = " ") %>% rename(chr = Chr)
+      assign(paste0(pop_list[a],"_",pop_list[b],"_out"), read_delim(tmp, col_names = c("chr", "pos", "ls"), delim = " ") %>% left_join(tmp3_df, by = "chr")) # join significance values with local score values
+      assign(paste0(pop_list[a],"_",pop_list[b],"_sig"), read_delim(tmp2, col_names = T, delim = "\t")) # read in significant regions
+      
     }
   }
 }
+
+## chromosome names and numbers
+chrom_df <- read.table("/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.txt", header = TRUE, col.names = c("chrName","chrNewName")) %>% mutate(chr = seq(1,104,1)) %>% select(-chrNewName)
 ```
 
+## Filter out data for chrs with significant peaks
+
+```{r, message=F}
+sig_list <- list(NBS_AI_sig, NBS_EBS_sig, NBS_GOA_sig, NBS_SEAK_sig, AI_EBS_sig, AI_GOA_sig, AI_SEAK_sig, EBS_GOA_sig, EBS_SEAK_sig, GOA_SEAK_sig)
+out_list <- list(NBS_AI_out, NBS_EBS_out, NBS_GOA_out, NBS_SEAK_out, AI_EBS_out, AI_GOA_out, AI_SEAK_out, EBS_GOA_out, EBS_SEAK_out, GOA_SEAK_out)
+name_list <- c("NBS_AI", "NBS_EBS", "NBS_GOA", "NBS_SEAK", "AI_EBS", "AI_GOA", "AI_SEAK", "EBS_GOA", "EBS_SEAK", "GOA_SEAK")
+
+for(s in 1:10){
+  tmp <- unique(sig_list[[s]]$chr)
+  assign(paste0(name_list[s],"_outSig"), out_list[[s]] %>% filter(chr == tmp))
+}
+```
+
+## Merge local score with Fst file
+
+```{r, message=F}
+## Read in Fst files
+## correct negative values of fst to 0
+## rename chromosomes to chromosome numbers
+## join fst to localscore dataset. 
+
+AI_EBS_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-EastBering.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
+  left_join(chrom_df, by = "chrName") %>%
+    subset(select = -c(chrName)) %>%
+    select(chr, pos, correct_fst)
+AI_EBS_outSig <- AI_EBS_outSig %>% left_join(AI_EBS_fst, by = c("chr" = "chr", "pos" = "pos"))
+
+AI_GOA_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-GOA.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
+  left_join(chrom_df, by = "chrName") %>%
+    subset(select = -c(chrName)) %>%
+    select(chr, pos, correct_fst)
+AI_GOA_outSig <- AI_GOA_outSig %>% left_join(AI_GOA_fst, by = c("chr" = "chr", "pos" = "pos"))
+
+NBS_AI_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-NorthBering.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
+  left_join(chrom_df, by = "chrName") %>%
+    subset(select = -c(chrName)) %>%
+    select(chr, pos, correct_fst)
+NBS_AI_outSig <- NBS_AI_outSig %>% left_join(NBS_AI_fst, by = c("chr" = "chr", "pos" = "pos"))
+
+AI_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-SEAK.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
+  left_join(chrom_df, by = "chrName") %>%
+    subset(select = -c(chrName)) %>%
+    select(chr, pos, correct_fst)
+AI_SEAK_outSig <- AI_SEAK_outSig %>% left_join(AI_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
+
+EBS_GOA_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EastBering-GOA.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
+  left_join(chrom_df, by = "chrName") %>%
+    subset(select = -c(chrName)) %>%
+    select(chr, pos, correct_fst)
+EBS_GOA_outSig <- EBS_GOA_outSig %>% left_join(EBS_GOA_fst, by = c("chr" = "chr", "pos" = "pos"))
+
+NBS_EBS_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EastBering-NorthBering.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
+  left_join(chrom_df, by = "chrName") %>%
+    subset(select = -c(chrName)) %>%
+    select(chr, pos, correct_fst)
+NBS_EBS_outSig <- NBS_EBS_outSig %>% left_join(NBS_EBS_fst, by = c("chr" = "chr", "pos" = "pos"))
+
+EBS_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EastBering-SEAK.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
+  left_join(chrom_df, by = "chrName") %>%
+    subset(select = -c(chrName)) %>%
+    select(chr, pos, correct_fst)
+EBS_SEAK_outSig <- EBS_SEAK_outSig %>% left_join(EBS_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
+
+NBS_GOA_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-NorthBering.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
+  left_join(chrom_df, by = "chrName") %>%
+    subset(select = -c(chrName)) %>%
+    select(chr, pos, correct_fst)
+NBS_GOA_outSig <- NBS_GOA_outSig %>% left_join(NBS_GOA_fst, by = c("chr" = "chr", "pos" = "pos"))
+
+GOA_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-SEAK.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
+  left_join(chrom_df, by = "chrName") %>%
+    subset(select = -c(chrName)) %>%
+    select(chr, pos, correct_fst)
+GOA_SEAK_outSig <- GOA_SEAK_outSig %>% left_join(GOA_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
+
+NBS_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/NorthBering-SEAK.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
+  left_join(chrom_df, by = "chrName") %>%
+    subset(select = -c(chrName)) %>%
+    select(chr, pos, correct_fst)
+NBS_SEAK_outSig <- NBS_SEAK_outSig %>% left_join(NBS_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
+```
+
+## Facet plot each pair
+
+#### NBS vs others
+```{r}
+p_NBS_AI <- ggplot(NBS_AI_outSig, aes(x = pos/10^6, y = ls)) + facet_wrap(chr ~.) +
+  coord_cartesian(ylim=c(0, max(NBS_AI_outSig$sig.01*1.1)), xlim = c(0,92), expand = F) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_line(linewidth=0.4, alpha=0.5) +
+  geom_point(aes(y = correct_fst*max(NBS_AI_outSig$sig.01*1.1)), alpha = 0.3, color = "dodgerblue") +
+  scale_y_continuous(sec.axis = sec_axis(~./max(NBS_AI_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = NBS_AI_outSig$sig.01), color = "blue", lty = 2)
+p_NBS_AI
+
+p_NBS_EBS <- ggplot(NBS_EBS_outSig, aes(x = pos/10^6, y = ls)) + facet_wrap(chr ~.) +
+  coord_cartesian(ylim=c(0, max(NBS_EBS_outSig$sig.01*1.1)), xlim = c(0,92), expand = F) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_line(linewidth=0.4, alpha=0.5) +
+  geom_point(aes(y = correct_fst*max(NBS_EBS_outSig$sig.01*1.1)), alpha = 0.3, color = "dodgerblue") +
+  scale_y_continuous(sec.axis = sec_axis(~./max(NBS_EBS_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = NBS_EBS_outSig$sig.01), color = "blue", lty = 2)
+p_NBS_EBS
+
+p_NBS_GOA <- ggplot(NBS_GOA_outSig, aes(x = pos/10^6, y = ls)) + facet_wrap(chr ~.) +
+  coord_cartesian(ylim=c(0, max(NBS_GOA_outSig$sig.01*1.1)), xlim = c(0,92), expand = F) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_line(linewidth=0.4, alpha=0.5) +
+  geom_point(aes(y = correct_fst*max(NBS_GOA_outSig$sig.01*1.1)), alpha = 0.3, color = "dodgerblue") +
+  scale_y_continuous(sec.axis = sec_axis(~./max(NBS_GOA_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = NBS_GOA_outSig$sig.01), color = "blue", lty = 2)
+p_NBS_GOA
+
+p_NBS_SEAK <- ggplot(NBS_SEAK_outSig, aes(x = pos/10^6, y = ls)) + facet_wrap(chr ~.) +
+  coord_cartesian(ylim=c(0, max(NBS_SEAK_outSig$sig.01*1.1)), xlim = c(0,92), expand = F) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_line(linewidth=0.4, alpha=0.5) +
+  geom_point(aes(y = correct_fst*max(NBS_SEAK_outSig$sig.01*1.1)), alpha = 0.3, color = "dodgerblue") +
+  scale_y_continuous(sec.axis = sec_axis(~./max(NBS_SEAK_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = NBS_SEAK_outSig$sig.01), color = "blue", lty = 2)
+p_NBS_SEAK
+
+```
+
+#### AI vs others
+
+```{r}
+p_AI_EBS <- ggplot(AI_EBS_outSig, aes(x = pos/10^6, y = ls)) + facet_wrap(chr ~.) +
+  coord_cartesian(ylim=c(0, max(AI_EBS_outSig$sig.01*1.1)), xlim = c(0,92), expand = F) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_point(aes(y = correct_fst*max(AI_EBS_outSig$sig.01*1.1)), alpha = 0.3, color = "dodgerblue") +
+  geom_line(linewidth=0.4, alpha=0.5) +
+  scale_y_continuous(sec.axis = sec_axis(~./max(AI_EBS_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = AI_EBS_outSig$sig.01), color = "blue", lty = 2)
+p_AI_EBS
+
+p_AI_GOA <- ggplot(AI_GOA_outSig, aes(x = pos/10^6, y = ls)) + facet_wrap(chr ~.) +
+  coord_cartesian(ylim=c(0, max(AI_GOA_outSig$sig.01*1.1)), xlim = c(0,92), expand = F) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_point(aes(y = correct_fst*max(AI_GOA_outSig$sig.01*1.1)), alpha = 0.3, color = "dodgerblue") +
+  geom_line(linewidth=0.4, alpha=0.5) +
+  scale_y_continuous(sec.axis = sec_axis(~./max(AI_GOA_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = AI_GOA_outSig$sig.01), color = "blue", lty = 2)
+p_AI_GOA
+
+p_AI_SEAK <- ggplot(AI_SEAK_outSig, aes(x = pos/10^6, y = ls)) + facet_wrap(chr ~.) +
+  coord_cartesian(ylim=c(0, max(AI_SEAK_outSig$sig.01*1.1)), xlim = c(0,92), expand = F) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_point(aes(y = correct_fst*max(AI_SEAK_outSig$sig.01*1.1)), alpha = 0.3, color = "dodgerblue") +
+  geom_line(linewidth=0.4, alpha=0.5) +
+  scale_y_continuous(sec.axis = sec_axis(~./max(AI_SEAK_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = AI_SEAK_outSig$sig.01), color = "blue", lty = 2)
+p_AI_SEAK
+```
+
+#### EBS vs others
+
+```{r}
+p_EBS_GOA <- ggplot(EBS_GOA_outSig, aes(x = pos/10^6, y = ls)) + facet_wrap(chr ~.) +
+  coord_cartesian(ylim=c(0, max(EBS_GOA_outSig$sig.01*1.1)), xlim = c(0,92), expand = F) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_point(aes(y = correct_fst*max(EBS_GOA_outSig$sig.01*1.1)), alpha = 0.3, color = "dodgerblue") +
+  geom_line(linewidth=0.4, alpha=0.5) +
+  scale_y_continuous(sec.axis = sec_axis(~./max(EBS_GOA_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = EBS_GOA_outSig$sig.01), color = "blue", lty = 2)
+p_EBS_GOA
+
+p_EBS_SEAK <- ggplot(EBS_SEAK_outSig, aes(x = pos/10^6, y = ls)) + facet_wrap(chr ~.) +
+  coord_cartesian(ylim=c(0, max(EBS_SEAK_outSig$sig.01*1.1)), xlim = c(0,92), expand = F) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_point(aes(y = correct_fst*max(EBS_SEAK_outSig$sig.01*1.1)), alpha = 0.3, color = "dodgerblue") +
+  geom_line(linewidth=0.4, alpha=0.5) +
+  scale_y_continuous(sec.axis = sec_axis(~./max(EBS_SEAK_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = EBS_SEAK_outSig$sig.01), color = "blue", lty = 2)
+p_EBS_SEAK
+```
+
+## GOA vs others
+
+```{r}
+p_GOA_SEAK <- ggplot(GOA_SEAK_outSig, aes(x = pos/10^6, y = ls)) + facet_wrap(chr ~.) +
+  coord_cartesian(ylim=c(0, max(GOA_SEAK_outSig$sig.01*1.1)), xlim = c(0,92), expand = F) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_point(aes(y = correct_fst*max(GOA_SEAK_outSig$sig.01*1.1)), alpha = 0.3, color = "dodgerblue") +
+  geom_line(linewidth=0.4, alpha=0.5) +
+  scale_y_continuous(sec.axis = sec_axis(~./max(GOA_SEAK_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = GOA_SEAK_outSig$sig.01), color = "blue", lty = 2)
+p_GOA_SEAK
+```
+
+## Export all plots as png
+
+```{r}
+ggsave("/fs/cbsubscb16/storage/rkc/localscore/plots/NBS_AI_localscore_sig.png", plot = p_NBS_AI, device = "png", height = 2.5, width = 7, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/localscore/plots/NBS_EBS_localscore_sig.png", plot = p_NBS_EBS, device = "png", height = 5, width = 7, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/localscore/plots/NBS_GOA_localscore_sig.png", plot = p_NBS_GOA, device = "png", height = 5, width = 7, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/localscore/plots/NBS_SEAK_localscore_sig.png", plot = p_NBS_SEAK, device = "png", height = 2.5, width = 7, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/localscore/plots/AI_EBS_localscore_sig.png", plot = p_AI_EBS, device = "png", height = 5, width = 7, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/localscore/plots/AI_GOA_localscore_sig.png", plot = p_AI_GOA, device = "png", height = 5, width = 7, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/localscore/plots/AI_SEAK_localscore_sig.png", plot = p_AI_SEAK, device = "png", height = 5, width = 5.5, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/localscore/plots/EBS_GOA_localscore_sig.png", plot = p_EBS_GOA, device = "png", height = 2.5, width = 5.5, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/localscore/plots/EBS_SEAK_localscore_sig.png", plot = p_EBS_SEAK, device = "png", height = 2.5, width = 5.5, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/localscore/plots/GOA_SEAK_localscore_sig.png", plot = p_GOA_SEAK, device = "png", height = 2.5, width = 7, units = "in")
+
+```
 
