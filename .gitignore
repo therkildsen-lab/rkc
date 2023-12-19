@@ -21,3 +21,5 @@ sample_lists/*bai
 species_stats/
 genome/
 figures/
+figures/fst/
+localscore/
