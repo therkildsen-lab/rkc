@@ -44,7 +44,7 @@ name_list <- c("NBS_AI", "NBS_EBS", "NBS_GOA", "NBS_SEAK", "AI_EBS", "AI_GOA", "
 
 for(s in 1:10){
   tmp <- unique(sig_list[[s]]$chr)
-  assign(paste0(name_list[s],"_outSig"), out_list[[s]] %>% filter(chr == tmp))
+  assign(paste0(name_list[s],"_outSig"), out_list[[s]] %>% filter(chr %in% tmp))
 }
 ```
 
@@ -260,4 +260,130 @@ ggsave("/fs/cbsubscb16/storage/rkc/localscore/plots/EBS_SEAK_localscore_sig.png"
 ggsave("/fs/cbsubscb16/storage/rkc/localscore/plots/GOA_SEAK_localscore_sig.png", plot = p_GOA_SEAK, device = "png", height = 2.5, width = 7, units = "in")
 
 ```
+
+## Plot all interesting chromosomes
+
+#### Prepare data
+```{r}
+tot_sig <- unique(c(sig_list[[1]]$chr, sig_list[[2]]$chr, sig_list[[3]]$chr, sig_list[[4]]$chr, sig_list[[5]]$chr, sig_list[[6]]$chr, sig_list[[7]]$chr, sig_list[[8]]$chr, sig_list[[9]]$chr,sig_list[[10]]$chr)) %>% sort()
+
+## filter all out files for all significant chr
+for(s in 1:10){
+  assign(paste0(name_list[s],"_outSigAll"), out_list[[s]] %>% filter(chr %in% tot_sig) %>% mutate(outlier = F))
+}
+
+## create outlier column to id outliers in each population
+for(s in 1:length(NBS_AI_sig$chr)){
+  NBS_AI_outSigAll$outlier <- ifelse(NBS_AI_outSigAll$chr == NBS_AI_sig$chr[s] & NBS_AI_outSigAll$pos > NBS_AI_sig$beg[s] & NBS_AI_outSigAll$pos < NBS_AI_sig$end[s], T, NBS_AI_outSigAll$outlier)
+}
+
+for(s in 1:length(NBS_EBS_sig$chr)){
+  NBS_EBS_outSigAll$outlier <- ifelse(NBS_EBS_outSigAll$chr == NBS_EBS_sig$chr[s] & NBS_EBS_outSigAll$pos > NBS_EBS_sig$beg[s] & NBS_EBS_outSigAll$pos < NBS_EBS_sig$end[s], T, NBS_EBS_outSigAll$outlier)
+}
+
+for(s in 1:length(NBS_GOA_sig$chr)){
+  NBS_GOA_outSigAll$outlier <- ifelse(NBS_GOA_outSigAll$chr == NBS_GOA_sig$chr[s] & NBS_GOA_outSigAll$pos > NBS_GOA_sig$beg[s] & NBS_GOA_outSigAll$pos < NBS_GOA_sig$end[s], T, NBS_GOA_outSigAll$outlier)
+}
+
+for(s in 1:length(NBS_SEAK_sig$chr)){
+  NBS_SEAK_outSigAll$outlier <- ifelse(NBS_SEAK_outSigAll$chr == NBS_SEAK_sig$chr[s] & NBS_SEAK_outSigAll$pos > NBS_SEAK_sig$beg[s] & NBS_SEAK_outSigAll$pos < NBS_SEAK_sig$end[s], T, NBS_SEAK_outSigAll$outlier)
+}
+
+for(s in 1:length(AI_EBS_sig$chr)){
+  AI_EBS_outSigAll$outlier <- ifelse(AI_EBS_outSigAll$chr == AI_EBS_sig$chr[s] & AI_EBS_outSigAll$pos > AI_EBS_sig$beg[s] & AI_EBS_outSigAll$pos < AI_EBS_sig$end[s], T, AI_EBS_outSigAll$outlier)
+}
+
+for(s in 1:length(AI_GOA_sig$chr)){
+  AI_GOA_outSigAll$outlier <- ifelse(AI_GOA_outSigAll$chr == AI_GOA_sig$chr[s] & AI_GOA_outSigAll$pos > AI_GOA_sig$beg[s] & AI_GOA_outSigAll$pos < AI_GOA_sig$end[s], T, AI_GOA_outSigAll$outlier)
+}
+
+for(s in 1:length(AI_SEAK_sig$chr)){
+  AI_SEAK_outSigAll$outlier <- ifelse(AI_SEAK_outSigAll$chr == AI_SEAK_sig$chr[s] & AI_SEAK_outSigAll$pos > AI_SEAK_sig$beg[s] & AI_SEAK_outSigAll$pos < AI_SEAK_sig$end[s], T, AI_SEAK_outSigAll$outlier)
+}
+
+for(s in 1:length(EBS_GOA_sig$chr)){
+  EBS_GOA_outSigAll$outlier <- ifelse(EBS_GOA_outSigAll$chr == EBS_GOA_sig$chr[s] & EBS_GOA_outSigAll$pos > EBS_GOA_sig$beg[s] & EBS_GOA_outSigAll$pos < EBS_GOA_sig$end[s], T, EBS_GOA_outSigAll$outlier)
+}
+
+for(s in 1:length(EBS_SEAK_sig$chr)){
+  EBS_SEAK_outSigAll$outlier <- ifelse(EBS_SEAK_outSigAll$chr == EBS_SEAK_sig$chr[s] & EBS_SEAK_outSigAll$pos > EBS_SEAK_sig$beg[s] & EBS_SEAK_outSigAll$pos < EBS_SEAK_sig$end[s], T, EBS_SEAK_outSigAll$outlier)
+}
+
+for(s in 1:length(GOA_SEAK_sig$chr)){
+  GOA_SEAK_outSigAll$outlier <- ifelse(GOA_SEAK_outSigAll$chr == GOA_SEAK_sig$chr[s] & GOA_SEAK_outSigAll$pos > GOA_SEAK_sig$beg[s] & GOA_SEAK_outSigAll$pos < GOA_SEAK_sig$end[s], T, GOA_SEAK_outSigAll$outlier)
+}
+
+## Merge with Fst
+AI_EBS_outSigAll <- AI_EBS_outSigAll %>% left_join(AI_EBS_fst, by = c("chr" = "chr", "pos" = "pos"))
+AI_GOA_outSigAll <- AI_GOA_outSigAll %>% left_join(AI_GOA_fst, by = c("chr" = "chr", "pos" = "pos"))
+NBS_AI_outSigAll <- NBS_AI_outSigAll %>% left_join(NBS_AI_fst, by = c("chr" = "chr", "pos" = "pos"))
+AI_SEAK_outSigAll <- AI_SEAK_outSigAll %>% left_join(AI_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
+EBS_GOA_outSigAll <- EBS_GOA_outSigAll %>% left_join(EBS_GOA_fst, by = c("chr" = "chr", "pos" = "pos"))
+NBS_EBS_outSigAll <- NBS_EBS_outSigAll %>% left_join(NBS_EBS_fst, by = c("chr" = "chr", "pos" = "pos"))
+EBS_SEAK_outSigAll <- EBS_SEAK_outSigAll %>% left_join(EBS_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
+NBS_GOA_outSigAll <- NBS_GOA_outSigAll %>% left_join(NBS_GOA_fst, by = c("chr" = "chr", "pos" = "pos"))
+GOA_SEAK_outSigAll <- GOA_SEAK_outSigAll %>% left_join(GOA_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
+NBS_SEAK_outSigAll <- NBS_SEAK_outSigAll %>% left_join(NBS_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
+```
+
+## Plot Fst manhattan plots
+```{r}
+get_cum_pos <- function(x){
+  x_new <- group_by(x, chr) %>%
+    # Compute lg size
+    summarise(lg_length=max(pos)) %>%
+    # Calculate cumulative position of each chromosome
+    mutate(tot=cumsum(lg_length)-lg_length) %>%
+    # Add this info to the initial dataset
+    left_join(x, ., by=c("chr")) %>%
+    # Add a cumulative position of each SNP
+    arrange(chr, pos) %>%
+    group_by(chr) %>%
+    mutate(pos_cum=pos+tot)
+  return(x_new)
+}
+# add option to define y  limit #    
+my_color = c("#9ecae1","#3182bd")
+plot_gwas_per_snp <- function(x){
+  ggplot(x, aes(x=pos_cum/10^6, y=correct_fst, color=as.factor(chr))) +
+    geom_point(size=0.2, alpha=0.5) +
+    scale_color_manual(values=rep(my_color, 100000)) +
+    geom_point(data = x %>% filter(outlier == T), aes(x = pos_cum/10^6, y = correct_fst), color = "red", size = 0.4) +
+    coord_cartesian(ylim=c(0, max(x$correct_fst*0.1)), expand = F) +
+    xlab("position (Mbp)") +
+    ylab("fst") +
+    theme_cowplot() +
+    theme(axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          legend.position="none",
+          text = element_text(size=20),
+          axis.text = element_text(size=12),
+          strip.text.x = element_blank())
+}
+
+
+
+get_cum_pos(NBS_AI_outSigAll) %>% plot_gwas_per_snp()
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_AI_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+get_cum_pos(NBS_EBS_outSigAll) %>% plot_gwas_per_snp()
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_EBS_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+get_cum_pos(NBS_GOA_outSigAll) %>% plot_gwas_per_snp()
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_GOA_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+get_cum_pos(NBS_SEAK_outSigAll) %>% plot_gwas_per_snp()
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+get_cum_pos(AI_EBS_outSigAll) %>% plot_gwas_per_snp()
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_EBS_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+get_cum_pos(AI_GOA_outSigAll) %>% plot_gwas_per_snp()
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_GOA_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+get_cum_pos(AI_SEAK_outSigAll) %>% plot_gwas_per_snp()
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+get_cum_pos(EBS_GOA_outSigAll) %>% plot_gwas_per_snp()
+ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_GOA_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+get_cum_pos(EBS_SEAK_outSigAll) %>% plot_gwas_per_snp()
+ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+get_cum_pos(GOA_SEAK_outSigAll) %>% plot_gwas_per_snp()
+ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+```
+
 
