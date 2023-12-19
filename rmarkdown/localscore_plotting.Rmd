@@ -343,47 +343,138 @@ get_cum_pos <- function(x){
   return(x_new)
 }
 # add option to define y  limit #    
-my_color = c("#9ecae1","#3182bd")
+my_color = c("#7fcdbb", "#2c7fb8")
 plot_gwas_per_snp <- function(x){
   ggplot(x, aes(x=pos_cum/10^6, y=correct_fst, color=as.factor(chr))) +
     geom_point(size=0.2, alpha=0.5) +
     scale_color_manual(values=rep(my_color, 100000)) +
     geom_point(data = x %>% filter(outlier == T), aes(x = pos_cum/10^6, y = correct_fst), color = "red", size = 0.4) +
-    coord_cartesian(ylim=c(0, max(x$correct_fst*0.1)), expand = F) +
-    xlab("position (Mbp)") +
-    ylab("fst") +
+    coord_cartesian(ylim=c(0, 0.8), expand = F) +
+    scale_y_continuous(breaks=c(0,0.3,0.6)) +
     theme_cowplot() +
     theme(axis.title.x = element_blank(),
           axis.text.x = element_blank(),
+          axis.title.y = element_blank(),
           axis.ticks.x = element_blank(),
+          axis.line = element_line(linewidth = 0.2),
           legend.position="none",
           text = element_text(size=20),
-          axis.text = element_text(size=12),
+          axis.text = element_text(size=8),
           strip.text.x = element_blank())
 }
 
 
 
 get_cum_pos(NBS_AI_outSigAll) %>% plot_gwas_per_snp()
-ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_AI_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_AI_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(NBS_EBS_outSigAll) %>% plot_gwas_per_snp()
-ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_EBS_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_EBS_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(NBS_GOA_outSigAll) %>% plot_gwas_per_snp()
-ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_GOA_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_GOA_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(NBS_SEAK_outSigAll) %>% plot_gwas_per_snp()
-ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(AI_EBS_outSigAll) %>% plot_gwas_per_snp()
-ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_EBS_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_EBS_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(AI_GOA_outSigAll) %>% plot_gwas_per_snp()
-ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_GOA_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_GOA_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(AI_SEAK_outSigAll) %>% plot_gwas_per_snp()
-ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(EBS_GOA_outSigAll) %>% plot_gwas_per_snp()
-ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_GOA_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_GOA_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(EBS_SEAK_outSigAll) %>% plot_gwas_per_snp()
-ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(GOA_SEAK_outSigAll) %>% plot_gwas_per_snp()
-ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1.25, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 ```
 
+## plot chr 100 for all pops
+```{r}
+p100_NBS_GOA <- ggplot(NBS_GOA_outSigAll %>% filter(chr == 100), aes(x = pos/10^6, y = ls)) + 
+  coord_cartesian(ylim=c(0, max(NBS_GOA_outSig$sig.01*1.1)), expand = F, xlim = c(0,67)) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_point(aes(y = correct_fst*max(NBS_GOA_outSig$sig.01*1.1)), alpha = 0.3, color = "#2c7fb8", size = 3) + 
+  geom_line(linewidth=0.4) +
+  geom_point(data = NBS_GOA_outSigAll %>% filter(chr == 100 & outlier == T), aes(x = pos/10^6, y = correct_fst*max(NBS_GOA_outSig$sig.01*1.1)), color = "red", size = 3) +
+  geom_line(linewidth=0.4) +
+  scale_y_continuous(sec.axis = sec_axis(~./max(NBS_GOA_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = NBS_GOA_outSigAll$sig.01[1]), color = "blue", lty = 2) +
+  theme(axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          legend.position="none",
+          text = element_text(size=20),
+          axis.text = element_text(size=20),
+          strip.text.x = element_blank())
+p100_NBS_GOA
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_GOA_ls_fst_outlier_scan_100.png", width = 9, height = 3, units = "in")
+
+p100_AI_GOA <- ggplot(AI_GOA_outSigAll %>% filter(chr == 100), aes(x = pos/10^6, y = ls)) + 
+  coord_cartesian(ylim=c(0, max(AI_GOA_outSig$sig.01*1.1)), expand = F, xlim = c(0,67)) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_point(aes(y = correct_fst*max(AI_GOA_outSig$sig.01*1.1)), alpha = 0.3, color = "#2c7fb8", size = 3) + 
+  geom_line(linewidth=0.4) +
+  geom_point(data = AI_GOA_outSigAll %>% filter(chr == 100 & outlier == T), aes(x = pos/10^6, y = correct_fst*max(AI_GOA_outSig$sig.01*1.1)), color = "red", size = 3) +
+  geom_line(linewidth=0.4) +
+  scale_y_continuous(sec.axis = sec_axis(~./max(AI_GOA_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = AI_GOA_outSigAll$sig.01[1]), color = "blue", lty = 2) +
+  theme(axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          legend.position="none",
+          text = element_text(size=20),
+          axis.text = element_text(size=20),
+          strip.text.x = element_blank())
+p100_AI_GOA
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_GOA_ls_fst_outlier_scan_100.png", width = 9, height = 3, units = "in")
+
+p100_EBS_GOA <- ggplot(EBS_GOA_outSigAll %>% filter(chr == 100), aes(x = pos/10^6, y = ls)) + 
+  coord_cartesian(ylim=c(0, max(EBS_GOA_outSig$sig.01*1.1)), expand = F, xlim = c(0,67)) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_point(aes(y = correct_fst*max(EBS_GOA_outSig$sig.01*1.1)), alpha = 0.3, color = "#2c7fb8", size = 3) + 
+  geom_line(linewidth=0.4) +
+  geom_point(data = EBS_GOA_outSigAll %>% filter(chr == 100 & outlier == T), aes(x = pos/10^6, y = correct_fst*max(EBS_GOA_outSig$sig.01*1.1)), color = "red", size = 3) +
+  geom_line(linewidth=0.3) +
+  scale_y_continuous(sec.axis = sec_axis(~./max(EBS_GOA_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = EBS_GOA_outSigAll$sig.01[1]), color = "blue", lty = 2) +
+  theme(axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          legend.position="none",
+          text = element_text(size=20),
+          axis.text = element_text(size=20),
+          strip.text.x = element_blank())
+p100_EBS_GOA
+ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_GOA_ls_fst_outlier_scan_100.png", width = 9, height = 3, units = "in")
+
+p100_GOA_SEAK <- ggplot(GOA_SEAK_outSigAll %>% filter(chr == 100), aes(x = pos/10^6, y = ls)) + 
+  coord_cartesian(ylim=c(0, max(GOA_SEAK_outSig$sig.01*1.1)), expand = F, xlim = c(0,67)) +
+  xlab("position (Mbp)") +
+  ylab("local score") +
+  theme_cowplot() +
+  geom_point(aes(y = correct_fst*max(GOA_SEAK_outSig$sig.01*1.1)), alpha = 0.3, color = "#2c7fb8", size = 3) + 
+  geom_line(linewidth=0.4) +
+  geom_point(data = GOA_SEAK_outSigAll %>% filter(chr == 100 & outlier == T), aes(x = pos/10^6, y = correct_fst*max(GOA_SEAK_outSig$sig.01*1.1)), color = "red", size = 3) +
+  geom_line(linewidth=0.4) +
+  scale_y_continuous(sec.axis = sec_axis(~./max(GOA_SEAK_outSig$sig.01*1.1), name = "Fst")) +
+  geom_hline(aes(yintercept = GOA_SEAK_outSigAll$sig.01[1]), color = "blue", lty = 2) +
+  theme(axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          legend.position="none",
+          text = element_text(size=20),
+          axis.text = element_text(size=20),
+          strip.text.x = element_blank())
+p100_GOA_SEAK
+ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_SEAK_ls_fst_outlier_scan_100.png", width =9, height = 3, units = "in")
+```
 
