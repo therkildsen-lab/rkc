@@ -337,7 +337,7 @@ alpha = 0.5
 size = 3
 AI_pop_pca <- PCA(genome_cov_AI, sample_table_AI$ABLG, sample_table_AI$geo_population, 1, 2, show.ellipse = T, show.line = F, show.label = F)
 
-ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_pop_pca.png", AI_pop_pca, device = "png", bg = 'transparent')
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_pop_pca.png", AI_pop_pca, device = "png", bg = 'transparent')
 ```
 
 - No obvious structure between Cold Bay and Adak populations
@@ -553,8 +553,10 @@ metadata_admx_k3 <- metadata_admx %>% filter(ABLG != 5617, ABLG != 5618, ABLG !=
 metadata_admx_k3$ABLG <- as.character(metadata_admx_k3$ABLG)
 metadata_admx_k3$ABLG <- factor(metadata_admx_k3$ABLG, levels = unique(metadata_admx_k3$ABLG))
 ggplot(data = metadata_admx_k3, aes(x=factor(ABLG),y=proportion,fill=factor(population))) + 
-  geom_bar(stat="identity",position="stack") +  
-  theme(axis.text.x = element_text(angle = 90))
+  geom_bar(stat="identity",position="stack") +
+  scale_fill_brewer(type = "div", palette = 5) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  cowplot::theme_cowplot()
 
 #ggsave("/fs/cbsubscb16/storage/rkc/figures/admix_k3.png", height = 5, width = 20, device = "png")
 ```
@@ -569,8 +571,10 @@ metadata_admx_k4$ABLG <- as.character(metadata_admx_k4$ABLG)
 metadata_admx_k4$ABLG <- factor(metadata_admx_k4$ABLG, levels = unique(metadata_admx_k4$ABLG))
 
 ggplot(data = metadata_admx_k4, aes(x=factor(ABLG),y=proportion,fill=factor(population))) + 
-  geom_bar(stat="identity",position="stack") +  
-  theme(axis.text.x = element_text(angle = 90))
+  geom_bar(stat="identity",position="stack") + 
+  scale_fill_brewer(type = "div", palette = 5) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  cowplot::theme_cowplot()
 
 #ggsave("/fs/cbsubscb16/storage/rkc/figures/admix_k4.png", height = 5, width = 20, device = "png")
 ```
@@ -585,8 +589,10 @@ metadata_admx_k5$ABLG <- as.character(metadata_admx_k5$ABLG)
 metadata_admx_k5$ABLG <- factor(metadata_admx_k5$ABLG, levels = unique(metadata_admx_k5$ABLG))
 
 ggplot(data = metadata_admx_k5, aes(x=factor(ABLG),y=proportion,fill=factor(population))) + 
-  geom_bar(stat="identity",position="stack") +  
-  theme(axis.text.x = element_text(angle = 90)) 
+  geom_bar(stat="identity",position="stack") + 
+  scale_fill_brewer(type = "div", palette = 5) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  cowplot::theme_cowplot()
 
 #ggsave("/fs/cbsubscb16/storage/rkc/figures/admix_k5.png", height = 5, width = 20, device = "png")
 ```
