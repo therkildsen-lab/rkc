@@ -337,7 +337,7 @@ alpha = 0.5
 size = 3
 AI_pop_pca <- PCA(genome_cov_AI, sample_table_AI$ABLG, sample_table_AI$geo_population, 1, 2, show.ellipse = T, show.line = F, show.label = F)
 
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_pop_pca.png", AI_pop_pca, device = "png", bg = 'transparent')
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_pop_pca.png", AI_pop_pca, device = "png", bg = 'transparent')
 ```
 
 - No obvious structure between Cold Bay and Adak populations
