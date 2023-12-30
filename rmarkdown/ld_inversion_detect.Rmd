@@ -17,16 +17,19 @@ library(LDheatmap)
 source("/fs/cbsubscb16/storage/rkc/scripts/plotLDnetwork_csj.R")
 ```
 
-## Make LD matrix for chromosome 54 (most likely inversion)
+## Make LD matrix for chromosome 54 and chr 100 (most likely inversion)
 
 ```{bash eval = F, include = T}
 zcat angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306.1.beagle.gz | cut -f 1 | sed 's/_/\t/1' | gzip > angsd/global_snp_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1.txt.gz
+
+zcat angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1.beagle.gz | cut -f 1 | sed 's/_/\t/1' | gzip > angsd/global_snp_list_PCAM-PPLA-wholegenome_polymorphic_CM023352.1.txt.gz
 ```
 
 ### Downsample the mafs file and then the beagle file
 ```{r downsample}
 ## Read in mafs file
 mafs <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_CM023306.1_global.mafs.gz")
+mafs <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_CM023352.1_global.mafs.gz")
 ## Total number of SNPs
 nrow(mafs)
 ```
@@ -50,9 +53,12 @@ mafs_filteredEM %>%
 (which(mafs_filteredEM$keep)+1) %>% # +1 is necessary because the beagle file has a title line
   as.integer() %>%
   write_lines("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_CM023306.1_global_downsampledEM.pos.idx")
+
+## Using full outlier region from chr 100 so just directly filter global snp list
+# zcat angsd/global_snp_list_PCAM-PPLA-wholegenome_polymorphic_CM023352.1.txt.gz | sed -n -e '1p' -e '14635,15268p;15269q' | gzip > angsd/global_snp_list_PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlierPlus.txt.gz
 ```
 
-select sites from beagle file
+#### select sites from beagle file and remove chr and pos info
 ```{bash eval = F, include = T}
 zcat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306.1.beagle.gz | cut -f 4- | awk 'NR==FNR{ pos[$1]; next }FNR in pos' /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_CM023306.1_global_downsampledEM.pos.idx - | sed 's/_/\t/1' | gzip > /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306.1_downsampledEM.beagle.gz
 
@@ -61,6 +67,9 @@ zcat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306
 
 # remove first line
 #zcat angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306.1_downsampledEM.beagle.gz | tail -n +2 | gzip > #angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306.1_downsampledEM_noheader.beagle.gz 
+
+## Chr 100
+zcat angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlierPlus.beagle.gz | tail -n +2 | cut -f 4- | gzip > angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlierPlus_noheader.beagle.gz
 ```
 
 #### Run ngsLD 
@@ -71,7 +80,11 @@ zcat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306
 
 export APPTAINER_BINDPATH=/fs/cbsubscb16/storage/rkc/
 
-nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/get_ld.sh /fs/cbsubscb16/storage/rkc/angsd/ PCAM-PPLA-wholegenome_polymorphic_CM023306.1_noheader.beagle.gz global_snp_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1.txt.gz 125 16 '/programs/ngsLD-1.1.1/ngsld.sif /ngsLD-1.1.1/ngsLD' > /fs/cbsubscb16/storage/rkc/nohups/run_ngsLD_bam_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1_125.nohup &
+nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/get_ld.sh /fs/cbsubscb16/storage/rkc/angsd/ PCAM-PPLA-wholegenome_polymorphic_CM023306.1_outlierPlus_noheader.beagle.gz global_snp_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1.txt.gz 125 16 '/programs/ngsLD-1.1.1/ngsld.sif /ngsLD-1.1.1/ngsLD' > /fs/cbsubscb16/storage/rkc/nohups/run_ngsLD_bam_list_PCAM-PPLA-wholegenome_polymorphic_CM023306.1_125.nohup &
+
+## Chr 100
+nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/get_ld.sh /fs/cbsubscb16/storage/rkc/angsd/ PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlierPlus_noheader.beagle.gz global_snp_list_PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlierPlus_nh.txt.gz 100 16 '/programs/ngsLD-1.1.1/ngsld.sif /ngsLD-1.1.1/ngsLD' > /fs/cbsubscb16/storage/rkc/nohups/run_ngsLD_bam_list_PCAM-PPLA-wholegenome_polymorphic_CM023352.1_100.nohup &
+
 ```
 
 ```{bash eval = F, include = T}
@@ -93,6 +106,14 @@ cat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023306.
 CM023306.1 \
 19000000 \
 36000000
+```
+
+#### Plot Chr 100 LD 
+```{bash eval=F, include=T}
+cat /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.ld | bash /fs/cbsubscb16/storage/rkc/scripts/ld_blocks.sh \
+CM023352.1 \
+10600773 \
+11192083
 ```
 
 Do not see the start of an ld block here. 
