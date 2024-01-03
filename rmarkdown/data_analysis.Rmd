@@ -554,7 +554,7 @@ metadata_admx_k3$ABLG <- as.character(metadata_admx_k3$ABLG)
 metadata_admx_k3$ABLG <- factor(metadata_admx_k3$ABLG, levels = unique(metadata_admx_k3$ABLG))
 ggplot(data = metadata_admx_k3, aes(x=factor(ABLG),y=proportion,fill=factor(population))) + 
   geom_bar(stat="identity",position="stack") +
-  scale_fill_brewer(type = "div", palette = 5) +
+  scale_fill_brewer(type = "qual", palette = 3) +
   theme(axis.text.x = element_text(angle = 90)) +
   cowplot::theme_cowplot()
 
@@ -572,7 +572,7 @@ metadata_admx_k4$ABLG <- factor(metadata_admx_k4$ABLG, levels = unique(metadata_
 
 ggplot(data = metadata_admx_k4, aes(x=factor(ABLG),y=proportion,fill=factor(population))) + 
   geom_bar(stat="identity",position="stack") + 
-  scale_fill_brewer(type = "div", palette = 5) +
+  scale_fill_brewer(type = "qual", palette = 3) +
   theme(axis.text.x = element_text(angle = 90)) +
   cowplot::theme_cowplot()
 
@@ -590,7 +590,7 @@ metadata_admx_k5$ABLG <- factor(metadata_admx_k5$ABLG, levels = unique(metadata_
 
 ggplot(data = metadata_admx_k5, aes(x=factor(ABLG),y=proportion,fill=factor(population))) + 
   geom_bar(stat="identity",position="stack") + 
-  scale_fill_brewer(type = "div", palette = 5) +
+  scale_fill_brewer(type = "qual", palette = 3) +
   theme(axis.text.x = element_text(angle = 90)) +
   cowplot::theme_cowplot()
 
