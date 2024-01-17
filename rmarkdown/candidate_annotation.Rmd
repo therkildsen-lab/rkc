@@ -15,12 +15,33 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(Rgff)
 library(ape)
-chr100_gff <- read.gff("/fs/cbsubscb16/storage/rkc/genome/king_crab_annotation_chr100.gff3")
+#chr100_gff <- read.gff("/fs/cbsubscb16/storage/rkc/genome/king_crab_annotation_chr100.gff3")
+gff <- read.gff("/fs/cbsubscb16/storage/rkc/genome/king_crab_annotation.gff3") %>% tibble()
+gff <- gff %>% mutate(chr = as.numeric(str_sub(seqid,14,18), .keep = "unused", .before = source)) %>% filter(chr <= 104) %>% arrange(chr)
+outliers_list <- read_tsv("/fs/cbsubscb16/storage/rkc/localscore/output/sig01.txt")
 
-chr100_gff_outliers <- chr49_gff %>% filter(start > 10744000 & end < 11051000) %>% arrange(start)
+# chr100_gff_outliers <- chr49_gff %>% filter(start > 10744000 & end < 11051000) %>% arrange(start)
 ```
 
 ```{r}
+gff_outliers <- data.frame(seqid=character(),
+                           beg=double(),
+                           end=double(),
+                           hit=character())
+
+for(i in 1:length(outliers_list$chr)){
+  tmp <- gff %>% filter(chr == outliers_list$chr[i] & start >= outliers_list$beg[i] & end <= outliers_list$end[i])
+      gff_outliers <- rbind(gff_outliers,tmp)
+      #print(lambda_tab[i,])
+}
+
+# gff_outliers %>% select(-chr) %>% write_tsv("/fs/cbsubscb16/storage/rkc/genome/RKC_annotation_outliers.gff3")
+```
+
+#### Get only parent feature
+```{r}
+gff_outliers_p <- gff_outliers %>% filter(!grepl("Parent",attributes))
 
 ```
+
 

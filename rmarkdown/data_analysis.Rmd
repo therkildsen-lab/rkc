@@ -115,7 +115,7 @@ alpha = 0.7
 size = 2
 All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$Loc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_pca.png", device = "png", height = 5, width = 7, bg = 'transparent')
+ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_pca.png", device = "png", height = 5, width = 7, bg = 'transparent')
 ```
 - All regions group together with some putative geneflow/migration between Gulf of Alaska (Kodiak) and East Bering Sea (Bristol Bay and Pribilof islands)
 - this is consistent with previous studies using mtDNA and nuclear markers.

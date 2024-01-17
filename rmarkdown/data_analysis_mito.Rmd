@@ -112,7 +112,7 @@ hap_net <- haploNet(hap, d=dist.dna(hap, model = "N"))
 
 ind_hap <- with(stack(setNames(attr(hap, "index"), rownames(hap))), table(hap=ind, individuals=rownames(fasta)[values])) %>%
   as_tibble() %>%
-  mutate(population=paste(substr(individuals,1,nchar(individuals)-4), read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table_mito.tsv")$Loc))
+  mutate(population=substr(individuals,14,nchar(individuals)))
 
 ## number of positions retained
 t(as.character(fasta)) %>% 
@@ -134,7 +134,7 @@ pop_hap <- ind_hap %>%
   arrange(hap) %>%
   select(-hap) %>%
   as.matrix()
-pie_color <- brewer.pal(n = 7, name = "Accent")
+pie_color <- brewer.pal(n = 5, name = "Paired")
 set.seed(1)
 plot(hap_net, size=sqrt(attr(hap_net, "freq"))*1.5, fast = F, scale.ratio = 1, pie=pop_hap, bg=pie_color, show.mutation=1, labels=F, threshold=c(0))
 legend("topleft", c(colnames(pop_hap)), fill=pie_color, cex=0.8)
@@ -150,7 +150,7 @@ hap_net <- haploNet(hap, d=dist.dna(hap, model = "N"))
 
 ind_hap <- with(stack(setNames(attr(hap, "index"), rownames(hap))), table(hap=ind, individuals=rownames(fasta)[values])) %>%
   as_tibble() %>%
-  mutate(population=paste(substr(individuals,1,nchar(individuals)-4), read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table_mito.tsv")$Loc))
+  mutate(population=substr(individuals,14,nchar(individuals)))
 
 ## number of positions retained
 t(as.character(fasta)) %>% 
@@ -171,10 +171,12 @@ pop_hap <- ind_hap %>%
   arrange(hap) %>%
   select(-hap) %>%
   as.matrix()
-pie_color <- brewer.pal(n = 7, name = "Accent")
+pie_color <- brewer.pal(n = 5, name = "Paired")
 set.seed(1)
+png("/fs/cbsubscb16/storage/rkc/figures/hapnet_mitogenome.png", height = 5, width = 8, units = "in", res = 200)
 plot(hap_net, size=sqrt(attr(hap_net, "freq"))*1.5, fast = F, scale.ratio = 1, pie=pop_hap, bg=pie_color, show.mutation=1, labels=F, threshold=c(0))
 legend("bottomleft", c(colnames(pop_hap)), fill=pie_color, cex=0.8)
+dev.off()
 ```
 
 ## Haplotype network of Southeast AK
@@ -293,10 +295,12 @@ pop_hap <- ind_hap %>%
   arrange(hap) %>%
   dplyr::select(-hap) %>%
   as.matrix()
-pie_color <- brewer.pal(n = 7, name = "Accent")
+pie_color <- brewer.pal(n = 5, name = "Paired")
 set.seed(1)
+png("/fs/cbsubscb16/storage/rkc/figures/hapnet_COI.png", height = 5, width = 8, units = "in", res = 200)
 plot(hap_net, size=sqrt(attr(hap_net, "freq"))*0.3, fast = F, scale.ratio = 1, pie=pop_hap, bg=pie_color, show.mutation=1, labels=F, threshold=c(0))
 legend("bottomleft", c(colnames(pop_hap)), fill=pie_color, cex=0.8)
+dev.off()
 ```
 ## include Grant and Zheng study individuals
 ```{r}
