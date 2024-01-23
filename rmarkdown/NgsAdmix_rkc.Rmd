@@ -1,0 +1,62 @@
+---
+title: "NgsAdmix"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Run NgsAdmix
+```{bash}
+echo '#!/bin/bash
+#SBATCH --job-name=ngsadmix_rkc
+#SBATCH --output=/home/cas399/rkc/log/ngsadmix_1-8_rkc.log
+#SBATCH --partition=regular
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --array=1-8
+#SBATCH --mem=75G
+#SBATCH --mail-user=cas399@cornell.edu  
+#SBATCH --mail-type=ALL
+
+## Mount the storage
+/programs/bin/labutils/mount_server cbsunt246 /workdir
+/programs/bin/labutils/mount_server cbsubscb16 /storage
+
+## Define some variables
+INPUT_PATH=/fs/cbsubscb16/storage/rkc/angsd/
+BEAGLE=PCAM-PPLA-wholegenome_polymorphic.beagle.gz
+MINMAF=0.05
+THREADS=16
+NGSADMIX=/programs/NGSadmix/NGSadmix
+SCRIPT=/fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_ngsadmix.sh
+
+##################################################
+
+## Keep a record of the Job ID
+echo $SLURM_JOB_ID
+
+## Create and move to working directory for job
+WORKDIR=/workdir/$USER/$SLURM_JOB_ID-$SLURM_ARRAY_TASK_ID/
+mkdir -p $WORKDIR
+cd $WORKDIR
+
+## Transfer the input files
+cp $INPUT_PATH$BEAGLE $WORKDIR
+
+## Run the run_ngsadmix.sh script
+bash $SCRIPT \
+$WORKDIR \
+$BEAGLE \
+$MINMAF \
+$SLURM_ARRAY_TASK_ID \
+$SLURM_ARRAY_TASK_ID \
+$THREADS \
+$NGSADMIX
+
+## Move output files back
+rm $WORKDIR$BEAGLE
+cp * $INPUT_PATH' | sbatch
+```
+
