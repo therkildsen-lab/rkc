@@ -55,7 +55,7 @@ PCA <- function(cov_matrix, ind_label, pop_label, x_axis, y_axis, show.point=T, 
   PCA_plot<-ggplot(data=e[,],aes(x=e[,x_axis+2], y=e[,y_axis+2], color=population,label=population, shape=population), alpha=alpha) + 
     geom_enterotype(alpha=alpha, size=size, show.point=show.point, show.label=show.label, show.ellipse=show.ellipse, show.line=show.line) +
     scale_shape_manual(values = c(rep(c(15,16,17,18),7), 15, 16)) +
-    scale_color_brewer(type = "qual", palette = 3) +
+    scale_color_brewer(type = "qual", palette = 6) +
     theme_cowplot() +
     theme(
       axis.text.x = element_blank(),
@@ -100,7 +100,7 @@ genome_cov <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_PCAM-PPLA-wholeg
 # Color by collection location and date
 alpha = 0.7
 size = 3
-All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$population, 1, 2, show.ellipse = F, show.line = F, show.label = F, size = 4, alpha = 0.2, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 All_pop_pca
 ```
 
@@ -113,7 +113,7 @@ Plot of every site to see if there are any strange outliers. Nothing obvious her
 ```{r pca by locality, include=T}
 alpha = 0.7
 size = 2
-All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$Loc, 1, 2, show.ellipse = F, show.line = F, show.label = F, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$Loc, 1, 2, show.ellipse = F, show.line = F, show.label = F, size = 4, alpha = 0.2, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 
 ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_pca.png", device = "png", height = 5, width = 7, bg = 'transparent')
 ```
@@ -222,7 +222,7 @@ genome_cov_SEAK <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_SEAK_PCAM-P
 # Color by collection location and date
 alpha = 0.5
 size = 3
-SEAK_pca <- PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2, show.ellipse = T, show.line = F, show.label = F, index_exclude = c(23,24))
+SEAK_pca <- PCA(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2, show.ellipse = T, show.line = F, size = 4, alpha = 0, show.label = F, index_exclude = c(23,24))
 SEAK_pca
 
 # PCA_continuous_var(genome_cov_SEAK, sample_table_SEAK$ABLG, sample_table_SEAK$population, 1, 2, "SEAK_label_pca", show.ellipse = F, show.line = F, show.label = F, index_exclude = c(23,24))
@@ -335,7 +335,7 @@ sample_table_AI <- sample_table_AI %>%
 
 alpha = 0.5
 size = 3
-AI_pop_pca <- PCA(genome_cov_AI, sample_table_AI$ABLG, sample_table_AI$geo_population, 1, 2, show.ellipse = T, show.line = F, show.label = F)
+AI_pop_pca <- PCA(genome_cov_AI, sample_table_AI$ABLG, sample_table_AI$geo_population, 1, 2, show.ellipse = T, show.line = F, size = 4, alpha = 0, show.label = F)
 
 ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_pop_pca.png", AI_pop_pca, device = "png", bg = 'transparent')
 ```
@@ -395,7 +395,7 @@ sample_table_northbering <- sample_table_northbering %>%
 
 alpha = 0.5
 size = 3
-NorthBering_pop_pca <- PCA(genome_cov_NorthBering, sample_table_northbering$ABLG, sample_table_northbering$geo_population, 1, 2, show.ellipse = T, show.line = F, show.label = F)
+NorthBering_pop_pca <- PCA(genome_cov_NorthBering, sample_table_northbering$ABLG, sample_table_northbering$geo_population, 1, 2, show.ellipse = T, show.line = F, show.label = F, size = 4, alpha = 0,)
 
 ggsave("/fs/cbsubscb16/storage/rkc/figures/NorthBering_pop_pca.png", NorthBering_pop_pca, device = "png", bg = 'transparent')
 ```
@@ -444,7 +444,7 @@ sample_table_GOA <- sample_table_GOA %>%
 
 alpha = 0.5
 size = 2
-GOA_pop_pca <- PCA(genome_cov_GOA, sample_table_GOA$ABLG, sample_table_GOA$geo_population, 1, 2, show.ellipse = T, show.line = F, show.label = F)
+GOA_pop_pca <- PCA(genome_cov_GOA, sample_table_GOA$ABLG, sample_table_GOA$geo_population, 1, 2, show.ellipse = T, show.line = F, show.label = F, size = 4, alpha = 0)
 
 ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_pop_pca.png", GOA_pop_pca, device = "png", bg = 'transparent')
 ```
@@ -498,7 +498,7 @@ sample_table_eastbering_prib <- sample_table_eastbering %>%
 
 alpha = 0.5
 size = 2
-EastBering_pop_pca <- PCA(genome_cov_EastBering, sample_table_eastbering_prib$ABLG, sample_table_eastbering_prib$Loc, 1, 2, show.ellipse = T, show.line = F, show.label = F)
+EastBering_pop_pca <- PCA(genome_cov_EastBering, sample_table_eastbering_prib$ABLG, sample_table_eastbering_prib$Loc, 1, 2, show.ellipse = T, show.line = F, size = 4, alpha = 0, show.label = F)
 
 ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_pop_pca.png", EastBering_pop_pca, device = "png", bg = 'transparent')
 ```
@@ -554,7 +554,7 @@ metadata_admx_k3$ABLG <- as.character(metadata_admx_k3$ABLG)
 metadata_admx_k3$ABLG <- factor(metadata_admx_k3$ABLG, levels = unique(metadata_admx_k3$ABLG))
 ggplot(data = metadata_admx_k3, aes(x=factor(ABLG),y=proportion,fill=factor(population))) + 
   geom_bar(stat="identity",position="stack") +
-  scale_fill_brewer(type = "qual", palette = 3) +
+  scale_fill_brewer(type = "qual", palette = 6) +
   theme(axis.text.x = element_text(angle = 90)) +
   cowplot::theme_cowplot()
 
@@ -572,7 +572,7 @@ metadata_admx_k4$ABLG <- factor(metadata_admx_k4$ABLG, levels = unique(metadata_
 
 ggplot(data = metadata_admx_k4, aes(x=factor(ABLG),y=proportion,fill=factor(population))) + 
   geom_bar(stat="identity",position="stack") + 
-  scale_fill_brewer(type = "qual", palette = 3) +
+  scale_fill_brewer(type = "qual", palette = 6) +
   theme(axis.text.x = element_text(angle = 90)) +
   cowplot::theme_cowplot()
 
@@ -590,7 +590,7 @@ metadata_admx_k5$ABLG <- factor(metadata_admx_k5$ABLG, levels = unique(metadata_
 
 ggplot(data = metadata_admx_k5, aes(x=factor(ABLG),y=proportion,fill=factor(population))) + 
   geom_bar(stat="identity",position="stack") + 
-  scale_fill_brewer(type = "qual", palette = 3) +
+  scale_fill_brewer(type = "qual", palette = 6) +
   theme(axis.text.x = element_text(angle = 90)) +
   cowplot::theme_cowplot()
 
