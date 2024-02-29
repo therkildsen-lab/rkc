@@ -43,7 +43,7 @@ dosage <- as.data.frame(matrix(ncol = (ncol(beagle)-3)/3+3, nrow = nrow(beagle))
 dosage[,1:3]=beagle[,1:3]
 
 ## Get allele dosage iteratively from each individual
-# 4 columns are extracted for each individual. the 1st of the four columns is the GL for the major allele for the polarizing individual. Choose the reference column according to the individual you want to polarize from. In our case, that is column 67 (ABLG5418)
+# 4 columns are extracted for each individual. the 1st of the four columns is the GL for the major allele for the polarizing individual. Choose the reference column according to the individual you want to polarize from.
 for (j in 1:((ncol(beagle)-3)/3)){
   temp_ind <- beagle[,c(67, (1+3*j):(3+3*j))]
   dosage[,3+j] <- apply(temp_ind, 1, get_allele_dosage)
@@ -51,16 +51,16 @@ for (j in 1:((ncol(beagle)-3)/3)){
 
 # rename columns to match sample names
 
-colnames(dosage) <- c("V1","V2","V3",as.double(sample_table$ABLG))
+colnames(dosage) <- c("V1","V2","V3",as.double(sample_table$ID_COLUMN))
 ```
 
 #### Convert to long format for plotting
 
 ```{r}
-dosage_long <- pivot_longer(dosage, cols = 4:ncol(dosage), names_to = "ABLG", values_to = "allele_dosage") %>% 
+dosage_long <- pivot_longer(dosage, cols = 4:ncol(dosage), names_to = "ID_COLUMN", values_to = "allele_dosage") %>% 
   dplyr::select(-V3) %>% 
   rename(lg = V1, pos = V2) %>% 
-  left_join(dplyr::select(sample_table, population, Loc, ABLG), by = "ABLG")
+  left_join(dplyr::select(sample_table, population, Loc, ID_COLUMN), by = "ID_COLUMN")
 ```
 
 ## Plot genotype heatmaps
@@ -68,7 +68,7 @@ dosage_long <- pivot_longer(dosage, cols = 4:ncol(dosage), names_to = "ABLG", va
 ```{r}
 dosage_long_plot <- dosage_long %>% 
   mutate(allele_dosage_rounded = as.character(round(allele_dosage))) %>% 
-  ggplot(aes(x=as_factor(pos), y=ABLG, fill = allele_dosage_rounded)) +
+  ggplot(aes(x=as_factor(pos), y=ID_COLUMN, fill = allele_dosage_rounded)) +
   geom_tile() +
   scale_fill_manual(values = c("gold","darkorange3","firebrick4"), na.value = "grey80") +
   facet_grid(Loc~lg, scales = "free", space = "free") +
