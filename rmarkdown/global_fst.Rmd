@@ -17,13 +17,14 @@ chrom_df <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.tx
 ```{r}
 # Issue: negative Fst values. dev solution: these are method of moments estimators so they can become negative unlike ML estimators. I would just cap them at zero
 AI_EastBering <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-EastBering.fst.txt") %>% 
-  mutate(corrected_fst = ifelse(fst < 0, 0, fst))
+  mutate(corrected_fst = ifelse(fst < 0, 0, fst), comp = "AI_EBS")
 head(AI_EastBering)
 mean(AI_EastBering$corrected_fst)
+sd(AI_EastBering$corrected_fst)
 ```
 ```{r}
 AI_SEAK <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-SEAK.fst.txt") %>% 
-  mutate(corrected_fst = ifelse(fst < 0, 0, fst))
+  mutate(corrected_fst = ifelse(fst < 0, 0, fst), comp = "AI_SEAK")
 head(AI_SEAK)
 mean(AI_SEAK$corrected_fst)
 ```
@@ -31,6 +32,7 @@ mean(AI_SEAK$corrected_fst)
 AI_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-GOA.fst.txt") %>% 
   mutate(corrected_fst = ifelse(fst < 0, 0, fst))
 mean(AI_GOA$corrected_fst)
+sd(AI_GOA$corrected_fst)
 ```
 
 ```{r}
@@ -38,36 +40,43 @@ AI_NorthBering <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-NorthBering.
   mutate(corrected_fst = ifelse(fst < 0, 0, fst))
 head(AI_NorthBering)
 mean(AI_NorthBering$corrected_fst)
+sd(AI_NorthBering$corrected_fst)
 ```
 ```{r}
 EastBering_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EastBering-GOA.fst.txt") %>% 
   mutate(corrected_fst = ifelse(fst < 0, 0, fst))
 mean(EastBering_GOA$corrected_fst)
+sd(EastBering_GOA$corrected_fst)
 ```
 ```{r}
 EastBering_NorthBering <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EastBering-NorthBering.fst.txt") %>% 
   mutate(corrected_fst = ifelse(fst < 0, 0, fst))
 mean(EastBering_NorthBering$corrected_fst)
+sd(EastBering_NorthBering$corrected_fst)
 ```
 ```{r}
 EastBering_SEAK <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EastBering-SEAK.fst.txt") %>% 
   mutate(corrected_fst = ifelse(fst < 0, 0, fst))
 mean(EastBering_SEAK$corrected_fst)
+sd(EastBering_SEAK$corrected_fst)
 ```
 ```{r}
 GOA_NorthBering <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-NorthBering.fst.txt") %>% 
   mutate(corrected_fst = ifelse(fst < 0, 0, fst))
 mean(GOA_NorthBering$corrected_fst)
+sd(GOA_NorthBering$corrected_fst)
 ```
 ```{r}
 GOA_SEAK <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-SEAK.fst.txt") %>% 
   mutate(corrected_fst = ifelse(fst < 0, 0, fst))
 mean(GOA_SEAK$corrected_fst)
+sd(GOA_SEAK$corrected_fst)
 ```
 ```{r}
 NorthBering_SEAK <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/NorthBering-SEAK.fst.txt") %>% 
   mutate(corrected_fst = ifelse(fst < 0, 0, fst))
 mean(NorthBering_SEAK$corrected_fst)
+sd(NorthBering_SEAK$corrected_fst)
 ```
 ## Fst heatmap
 ```{r}
@@ -91,6 +100,14 @@ ggplot(melted_globmat, aes(x = Var1, y = Var2, fill = value)) +
  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
     size = 12, hjust = 1), axis.title = element_blank()) +
  coord_fixed()
-ggsave("/fs/cbsubscb16/storage/rkc/figures/global_fst.png", device = "png", width = 7, height = 7, units = "in")
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/global_fst.png", device = "png", width = 7, height = 7, units = "in")
 ```
 
+## Fst boxplots and significance testing
+```{r}
+glob_loci_fst <- rbind(AI_EastBering, AI_SEAK)
+
+glob_loci_fst %>% ggplot(aes(x = comp, y = corrected_fst)) + 
+  geom_boxplot(outlier.shape = NA) +
+  ylim(0,0.01)
+```

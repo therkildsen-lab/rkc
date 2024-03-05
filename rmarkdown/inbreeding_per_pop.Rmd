@@ -82,9 +82,11 @@ plot(predict(FIS_anova), residuals(FIS_anova))
 
 ## FIS boxplot
 ```{r}
-inbreeding_raw %>% ggplot(aes(x = Loc, y = ind_mean)) +
-  geom_boxplot() +
-  geom_point(position = position_jitter(width = 0.1), alpha = 0.5, size = 1.5) +
+inbreeding_raw %>% ggplot(aes(x = factor(Loc,levels = c("NorthBering", "EastBering","GOA","SEAK","AI")), y = ind_mean)) +
+  geom_boxplot(aes(fill = Loc)) +
+  scale_fill_brewer(type = "qual", palette = 3) +
+  geom_point(aes(pch = Loc),position = position_jitter(width = 0.1), alpha = 0.5, size = 1.5) +
+  scale_shape_manual(values = c(15,16,17,18,15)) +
   labs(x = "Population", y = "Fis") +
   cowplot::theme_cowplot()
 

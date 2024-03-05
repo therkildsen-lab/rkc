@@ -26,7 +26,7 @@ echo '#!/bin/bash
 
 ## Define some variables
 INPUT_PATH=/fs/cbsubscb16/storage/rkc/angsd/
-BEAGLE=PCAM-PPLA-wholegenome_polymorphic.beagle.gz
+BEAGLE=PCAM-PPLA-wholegenome_polymorphic_R2.beagle.gz
 MINMAF=0.05
 THREADS=16
 NGSADMIX=/programs/NGSadmix/NGSadmix
@@ -68,49 +68,49 @@ sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.t
 
 ## load datasets with kmeans 1-8
 ```{r}
-k1 <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k1.qopt", col_names = c("anc1")) %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$Loc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1) %>% 
+k1 <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/NGSadmix/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k1.qopt", col_names = c("anc1")) %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$Loc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1) %>% 
   gather(population,proportion,anc1,factor_key = T) %>% 
   arrange(pop)
 k1$ABLG <- as.character(k1$ABLG)
 k1$ABLG <- factor(k1$ABLG, levels = unique(k1$ABLG))
 
-k2 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k2.qopt", col_names = c("anc1","anc2"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$Loc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2) %>% 
+k2 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/NGSadmix/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k2.qopt", col_names = c("anc1","anc2"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$Loc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2) %>% 
   gather(population,proportion,anc1:anc2,factor_key = T) %>% 
   arrange(pop)
 k2$ABLG <- as.character(k2$ABLG)
 k2$ABLG <- factor(k2$ABLG, levels = unique(k2$ABLG))
 
-k3 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k3.qopt", col_names = c("anc1","anc2","anc3"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$Loc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2,anc3) %>% 
+k3 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/NGSadmix/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k3.qopt", col_names = c("anc1","anc2","anc3"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$Loc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2,anc3) %>% 
   gather(population,proportion,anc1:anc3,factor_key = T) %>% 
   arrange(pop)
 k3$ABLG <- as.character(k3$ABLG)
 k3$ABLG <- factor(k3$ABLG, levels = unique(k3$ABLG))
 
-k4 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k4.qopt", col_names = c("anc1","anc2","anc3","anc4"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$GeneralLoc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2,anc3,anc4) %>% 
+k4 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/NGSadmix/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k4.qopt", col_names = c("anc1","anc2","anc3","anc4"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$GeneralLoc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2,anc3,anc4) %>% 
   gather(population,proportion,anc1:anc4,factor_key = T) %>% 
   arrange(pop)
 k4$ABLG <- as.character(k4$ABLG)
 k4$ABLG <- factor(k4$ABLG, levels = unique(k4$ABLG))
 
-k5 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k5.qopt", col_names = c("anc1","anc2","anc3","anc4","anc5"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$Loc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2,anc3,anc4,anc5) %>% 
+k5 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/NGSadmix/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k5.qopt", col_names = c("anc1","anc2","anc3","anc4","anc5"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$Loc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2,anc3,anc4,anc5) %>% 
   gather(population,proportion,anc1:anc5,factor_key = T) %>% 
   arrange(pop)
 k5$ABLG <- as.character(k5$ABLG)
 k5$ABLG <- factor(k5$ABLG, levels = unique(k5$ABLG))
 
-k6 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k6.qopt", col_names = c("anc1","anc2","anc3","anc4","anc5","anc6"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$GeneralLoc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2,anc3,anc4,anc5,anc6) %>% 
+k6 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/NGSadmix/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k6.qopt", col_names = c("anc1","anc2","anc3","anc4","anc5","anc6"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$GeneralLoc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2,anc3,anc4,anc5,anc6) %>% 
   gather(population,proportion,anc1:anc6,factor_key = T) %>% 
   arrange(pop)
 k6$ABLG <- as.character(k6$ABLG)
 k6$ABLG <- factor(k6$ABLG, levels = unique(k6$ABLG))
 
-k7 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k7.qopt", col_names = c("anc1","anc2","anc3","anc4","anc5","anc6","anc7"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$Loc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2,anc3,anc4,anc5,anc6,anc7) %>% 
+k7 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/NGSadmix/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k7.qopt", col_names = c("anc1","anc2","anc3","anc4","anc5","anc6","anc7"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$Loc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2,anc3,anc4,anc5,anc6,anc7) %>% 
   gather(population,proportion,anc1:anc7,factor_key = T) %>% 
   arrange(pop)
 k7$ABLG <- as.character(k7$ABLG)
 k7$ABLG <- factor(k7$ABLG, levels = unique(k7$ABLG))
 
-k8 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k8.qopt", col_names = c("anc1","anc2","anc3","anc4","anc5","anc6","anc7","anc8"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$Loc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2,anc3,anc4,anc5,anc6,anc7,anc8) %>% 
+k8 <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/NGSadmix/ngsadmix_PCAM-PPLA-wholegenome_polymorphic_k8.qopt", col_names = c("anc1","anc2","anc3","anc4","anc5","anc6","anc7","anc8"), delim = " ") %>% mutate(ABLG = sample_table$ABLG, pop = sample_table$Loc) %>% filter(ABLG != 5617, ABLG != 5618, ABLG != 5637, ABLG != 5644, ABLG != 5648, ABLG != 5650, ABLG != 5651, ABLG != 5663, ABLG != 5667, ABLG != 5669, ABLG != 5670) %>% dplyr::select(ABLG,pop,anc1,anc2,anc3,anc4,anc5,anc6,anc7,anc8) %>% 
   gather(population,proportion,anc1:anc8,factor_key = T) %>% 
   arrange(pop)
 k8$ABLG <- as.character(k8$ABLG)
@@ -164,7 +164,7 @@ ggplot(data = k8, aes(x=factor(ABLG),y=proportion,fill=factor(population))) +
 
 ## Chose best K
 ```{r}
-likes <- list.files("/fs/cbsubscb16/storage/rkc/angsd/", pattern = ".log", full.names = T)
+likes <- list.files("/fs/cbsubscb16/storage/rkc/angsd/NGSadmix", pattern = ".log", full.names = T)
 likes
 ```
 
@@ -175,11 +175,20 @@ likes_data <- lapply(1:8, FUN = function(i) readLines(likes[i]))
 log_likes <- data.frame(K = rep(1:8))
 temp_set <- sapply(1:8, function(x) likes_data[[x]][which(str_sub(likes_data[[x]], 1, 1) == 'b')])
 
-log_likes <- log_likes %>% mutate(ML = as.numeric(sub("\\D*(\\d+).*", "\\1", temp_set)))
+log_likes <- log_likes %>% mutate(LL = as.numeric(sub("\\D*(\\d+).*", "\\1", temp_set))*-1)
+
 ```
 #### Calculate AIC
 ```{r}
-log_likes <- log_likes %>% mutate(aic = 2*K-(2*ML))
+log_likes <- log_likes %>% mutate(aic = 2*K-(2*LL)) %>% 
+  mutate(AICc = aic + (2*K^2+2*K)/(172-K-1)) %>% 
+  mutate(delta_AICc = (AICc - 2710132533)) %>% 
+  mutate(AICcrl =  exp(-0.5*(AICc - 2710132533))) %>%
+  mutate(AICcwt = AICcrl/sum(AICcrl)) %>% 
+  arrange(AICc)
+  
+  
+plot(log_likes$K,log_likes$AICc, type = "l")
 plot(log_likes$K,log_likes$aic, type = "l")
 ```
 
