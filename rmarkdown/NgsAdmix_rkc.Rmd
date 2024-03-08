@@ -10,8 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Run NgsAdmix
 ```{bash}
 echo '#!/bin/bash
-#SBATCH --job-name=ngsadmix_rkc
-#SBATCH --output=/home/cas399/rkc/log/ngsadmix_1-8_rkc.log
+#SBATCH --job-name=ngsadmix_rkcR3
+#SBATCH --output=/home/cas399/rkc/log/ngsadmix_R3_1-8_rkc.log
 #SBATCH --partition=regular
 #SBATCH --nodes=1
 #SBATCH --ntasks=16
@@ -26,11 +26,12 @@ echo '#!/bin/bash
 
 ## Define some variables
 INPUT_PATH=/fs/cbsubscb16/storage/rkc/angsd/
-BEAGLE=PCAM-PPLA-wholegenome_polymorphic_R2.beagle.gz
+BEAGLE=PCAM-PPLA-wholegenome_polymorphic_R3.beagle.gz
 MINMAF=0.05
+MININD=86
 THREADS=16
 NGSADMIX=/programs/NGSadmix/NGSadmix
-SCRIPT=/fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_ngsadmix.sh
+SCRIPT=/fs/cbsubscb16/storage/rkc/scripts/run_ngsadmix_csj.sh
 
 ##################################################
 
@@ -50,6 +51,7 @@ bash $SCRIPT \
 $WORKDIR \
 $BEAGLE \
 $MINMAF \
+$MININD \
 $SLURM_ARRAY_TASK_ID \
 $SLURM_ARRAY_TASK_ID \
 $THREADS \
@@ -179,17 +181,82 @@ log_likes <- log_likes %>% mutate(LL = as.numeric(sub("\\D*(\\d+).*", "\\1", tem
 
 ```
 #### Calculate AIC
+
+#BIC = https://wikimedia.org/api/rest_v1/media/math/render/svg/9fb26ce833300f98a6df6039624fc7ffaf4ce7fb
+  - works best with simple model extract
+    - 
+  - AIC works better with lots of weak affects
+    - what model would be most predictive for new data (sequence data)
+
+    
 ```{r}
-log_likes <- log_likes %>% mutate(aic = 2*K-(2*LL)) %>% 
-  mutate(AICc = aic + (2*K^2+2*K)/(172-K-1)) %>% 
-  mutate(delta_AICc = (AICc - 2710132533)) %>% 
-  mutate(AICcrl =  exp(-0.5*(AICc - 2710132533))) %>%
-  mutate(AICcwt = AICcrl/sum(AICcrl)) %>% 
-  arrange(AICc)
-  
-  
+log_likes <- log_likes %>% mutate(params = K*8973301+K*183) %>% 
+  mutate(aic = 2*params-(2*LL)) %>% 
+  mutate(AICc = aic + (2*K^2+2*params)/(183-K-1)) %>% 
+  mutate(delta_AICc = (AICc - 2801357575)) %>%
+  mutate(bic = params*log(183)-2*LL) %>% 
+  mutate(evannoAIC = AICc-lag(AICc)) %>% 
+  mutate(evannoBIC = bic -lag(bic)) %>% 
+  mutate(AICcrl =  exp(-0.5*(AICc - 2801357575))) %>%
+  mutate(AICcwt = AICcrl/sum(AICcrl)) 
+
 plot(log_likes$K,log_likes$AICc, type = "l")
-plot(log_likes$K,log_likes$aic, type = "l")
+plot(log_likes$K[2:8],log_likes$evannoAIC[2:8], type = "l")
+plot(log_likes$K,log_likes$bic, type = "l")
+plot(log_likes$K[2:8], log_likes$evannoBIC[2:8], type = "l")
 ```
 
+## NGS Admix for BSEA and GOA
+```{bash}
+echo '#!/bin/bash
+#SBATCH --job-name=ngsadmix_BSEAGOA
+#SBATCH --output=/home/cas399/rkc/log/ngsadmix_BSEAGOA_T2_1-5_rkc.log
+#SBATCH --partition=regular
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --array=1-5
+#SBATCH --mem=75G
+#SBATCH --mail-user=cas399@cornell.edu  
+#SBATCH --mail-type=ALL
 
+## Mount the storage
+/programs/bin/labutils/mount_server cbsunt246 /workdir
+/programs/bin/labutils/mount_server cbsubscb16 /storage
+
+## Define some variables
+INPUT_PATH=/fs/cbsubscb16/storage/rkc/angsd/
+BEAGLE=BSEA_GOA_PCAM-PPLA-wholegenome_polymorphic.beagle.gz
+MINMAF=0.05
+MININD=86
+THREADS=16
+NGSADMIX=/programs/NGSadmix/NGSadmix
+SCRIPT=/fs/cbsubscb16/storage/rkc/scripts/run_ngsadmix_csj.sh
+
+##################################################
+
+## Keep a record of the Job ID
+echo $SLURM_JOB_ID
+
+## Create and move to working directory for job
+WORKDIR=/workdir/$USER/$SLURM_JOB_ID-$SLURM_ARRAY_TASK_ID/
+mkdir -p $WORKDIR
+cd $WORKDIR
+
+## Transfer the input files
+cp $INPUT_PATH$BEAGLE $WORKDIR
+
+## Run the run_ngsadmix.sh script
+bash $SCRIPT \
+$WORKDIR \
+$BEAGLE \
+$MINMAF \
+$MININD \
+$SLURM_ARRAY_TASK_ID \
+$SLURM_ARRAY_TASK_ID \
+$THREADS \
+$NGSADMIX
+
+## Move output files back
+rm $WORKDIR$BEAGLE
+cp * $INPUT_PATH' | sbatch
+```

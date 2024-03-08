@@ -49,6 +49,8 @@ alpha = 0.7
 size = 3
 PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 
+PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$Loc, 2, 3,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+
 
 
 # ggsave("/fs/cbsubscb16/storage/rkc/figures/chr100_outlier_PCA.png", device = "png", width = 8, height = 6)

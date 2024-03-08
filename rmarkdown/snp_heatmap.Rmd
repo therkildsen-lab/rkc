@@ -83,7 +83,7 @@ dosage_long <- pivot_longer(dosage, cols = 4:ncol(dosage), names_to = "ABLG", va
 ## Plot genotype heatmaps
 
 ```{r}
-#dosage_long <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlierPlus.alleledosage.tsv")
+# dosage_long <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlierPlus.alleledosage.tsv")
 
 dosage_long_plot <- dosage_long %>% 
   mutate(allele_dosage_rounded = as.character(round(allele_dosage))) %>% 
@@ -154,7 +154,7 @@ dosage_zoom_long <- pivot_longer(dosage_zoom, cols = 4:ncol(dosage_zoom), names_
 ## Plot genotype heatmaps
 
 ```{r}
-#dosage_zoom_long <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlierZoom.alleledosage.tsv")
+# dosage_zoom_long <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlierZoom.alleledosage.tsv")
 
 dosage_zoom_long_plot <- dosage_zoom_long %>% 
   mutate(allele_dosage_rounded = as.character(round(allele_dosage))) %>% 
@@ -256,3 +256,12 @@ dosage_cand_long_plot
 
 ggsave("/fs/cbsubscb16/storage/rkc/figures/snp_heatmap_chr100_outlierCandidates.png", device = "png", width = 5, height = 3)
 ```
+
+#### Dosage boxplot
+```{r}
+dosage_cand_long %>% group_by(Loc) %>% 
+  ggplot(aes(x=Loc, y=allele_dosage)) +
+    geom_violin() +
+    
+```
+
