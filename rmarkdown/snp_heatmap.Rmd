@@ -187,6 +187,15 @@ outlier_beagle_cand <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-whol
 outlier_beagle_cand <- outlier_beagle_cand %>% separate(marker, c(NA ,"lg", "pos")) %>% 
   dplyr::select(-allele2) %>% mutate(lg = "49")
 
+# make column for just mean GOA allele dosage
+GOA_majors <- GOA_beage %>% select(seq(4,ncol(GOA_beage), by = 3))
+GOA_majors[GOA_majors == 0.333333] <- NA
+ref_col <- matrix(NA, nrow = 26, ncol = 1)
+for(i in 1:nrow(GOA_majors)){
+  ref_col[i] <- mean(as.matrix(GOA_majors[i,]), na.rm = T)
+}
+
+outlier_beagle_cand <- outlier_beagle_cand %>% mutate(ref_col = ref_col[,1])
 # set up the data frame, ncols should equal the number of samples and nrows should equal the number of loci
 dosage_cand <- as.data.frame(matrix(ncol = (ncol(outlier_beagle_cand)-3)/3+3, nrow = nrow(outlier_beagle_cand)))
 dosage_cand[,1:3]=outlier_beagle_cand[,1:3]
@@ -194,7 +203,7 @@ dosage_cand[,1:3]=outlier_beagle_cand[,1:3]
 ## Get allele dosage iteratively from each individual
 # 4 columns are extracted for each individual. the 1st of the four columns is the GL for the major allele for the polarizing individual. Choose the reference column according to the individual you want to polarize from. In our case, that is column 67 (ABLG5418)
 for (j in 1:((ncol(outlier_beagle_cand)-3)/3)){
-  temp_ind <- outlier_beagle_cand[,c(67, (1+3*j):(3+3*j))]
+  temp_ind <- outlier_beagle_cand[,c(553, (1+3*j):(3+3*j))]
   dosage_cand[,3+j] <- apply(temp_ind, 1, get_allele_dosage)
 }
 
@@ -259,9 +268,12 @@ ggsave("/fs/cbsubscb16/storage/rkc/figures/snp_heatmap_chr100_outlierCandidates.
 
 #### Dosage boxplot
 ```{r}
-dosage_cand_long %>% group_by(Loc) %>% 
+dosage_cand_long %>% group_by(Loc, ABLG) %>% summarize(med = median(allele_dosage, na.rm = T))
+
+dosage_cand_long %>% group_by(Loc, ABLG) %>%  
   ggplot(aes(x=Loc, y=allele_dosage)) +
-    geom_violin() +
+    geom_violin()# +
+    geom_jitter(width = 0.1)
     
 ```
 
