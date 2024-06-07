@@ -188,7 +188,23 @@ outlier_beagle_cand <- outlier_beagle_cand %>% separate(marker, c(NA ,"lg", "pos
   dplyr::select(-allele2) %>% mutate(lg = "49")
 
 # make column for just mean GOA allele dosage
-GOA_majors <- GOA_beage %>% select(seq(4,ncol(GOA_beage), by = 3))
+# subsample for just GOA inds
+GOA_beagle_index <- sample_table %>% 
+  mutate(beagle_index = 1 + (3*(seq(0,182) +1))) %>% # converts individual ids to their index column names in beagle
+  filter(Loc == "GOA") %>% 
+  dplyr::select(beagle_index)
+x <- matrix(NA,1,1)
+
+for(i in GOA_beagle_index$beagle_index){
+  x <- rbind(x,i)
+  x <- rbind(x,i+1) 
+  x <- rbind(x,i+2)
+}
+x <- x[-1]
+
+GOA_beagle <- outlier_beagle_cand %>% select(all_of(x))
+
+GOA_majors <- GOA_beagle %>% select(seq(4,ncol(GOA_beagle), by = 3))
 GOA_majors[GOA_majors == 0.333333] <- NA
 ref_col <- matrix(NA, nrow = 26, ncol = 1)
 for(i in 1:nrow(GOA_majors)){
@@ -263,7 +279,7 @@ dosage_cand_long_plot <- dosage_cand_long %>%
         strip.text.y = element_text(angle = 0))
 dosage_cand_long_plot
 
-ggsave("/fs/cbsubscb16/storage/rkc/figures/snp_heatmap_chr100_outlierCandidates.png", device = "png", width = 5, height = 3)
+# ggsave("/fs/cbsubscb16/storage/rkc/figures/snp_heatmap_chr100_outlierCandidates.png", device = "png", width = 5, height = 3)
 ```
 
 #### Dosage boxplot

@@ -34,6 +34,7 @@ nohup /programs/angsd-0.940/angsd -bam /fs/cbsubscb16/storage/rkc/sample_lists/b
 
 mv /fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.counts.gz /fs/cbsubscb16/storage/rkc/angsd/bam_list_mito_minq20.depth_counts.gz
 ```
+
 ## Visualize depth statistics 
 
 #### Depth per populations
