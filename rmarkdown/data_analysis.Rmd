@@ -88,6 +88,9 @@ sample_table_pribs <- metadata %>%
 
 ```{bash eval = F, include = T}
 nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_pcangsd.sh /fs/cbsubscb16/storage/rkc/ /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic.beagle.gz 0.05 pca 1 8 > /fs/cbsubscb16/storage/rkc/nohups/run_pcangsd_pca.nohup &
+
+# NGSparalog dataset
+nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_pcangsd.sh /fs/cbsubscb16/storage/rkc/ /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph.beagle.gz 0.05 pca 1 8 > /fs/cbsubscb16/storage/rkc/nohups/run_pcangsd_pca_wgph.nohup &
 ```
 
 ## Plot all pop PCA
@@ -95,7 +98,7 @@ nohup bash /fs/cbsubscb16/storage/genomic-data-analysis/scripts/run_pcangsd.sh /
 ```{r, include = F}
 ## Read in data
 
-genome_cov <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_PCAM-PPLA-wholegenome_polymorphic.cov.npy")
+genome_cov <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_PCAM-PPLA_wgph.cov.npy")
 
 # Color by collection location and date
 alpha = 0.7

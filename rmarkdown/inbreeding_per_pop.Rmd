@@ -19,6 +19,12 @@ for(p in POPLIST){
 sample_table <- read_tsv("sample_lists/sample_table.tsv")
 ```
 
+## Estimate per individual inbreeding
+```{bash}
+% zcat PCAM-PPLA_wgph.beagle.gz | tail -n +2 | perl -an -e 'for($i=3; $i<=$#F; $i++){print(pack("d",($F[$i]==0 ? -inf : log($F[$i]))))}' > PCAM-PPLA_wgph.glf
+```
+
+
 ## Read data
 ```{r, message=FALSE}
 setwd("/fs/cbsubscb16/storage/rkc/")

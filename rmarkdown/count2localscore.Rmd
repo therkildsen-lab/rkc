@@ -26,16 +26,27 @@ for(i in 1:length(packages_needed)){
   library(packages_needed[i], character.only = TRUE)
 }
 ```
-## Read in data
+## Prep and read in data
+
+#### combine position and counts file
+
+```{bash, eval = F}
+paste PCAM-PPLA_AI_wgph.pos PCAM-PPLA_AI_wgph.counts | column -s $'\t' -t > PCAM-PPLA_AI_wgph.pos_counts
+paste PCAM-PPLA_EBS_wgph.pos PCAM-PPLA_EBS_wgph.counts | column -s $'\t' -t > PCAM-PPLA_EBS_wgph.pos_counts
+paste PCAM-PPLA_GOA_wgph.pos PCAM-PPLA_GOA_wgph.counts | column -s $'\t' -t > PCAM-PPLA_GOA_wgph.pos_counts
+paste PCAM-PPLA_NBS_wgph.pos PCAM-PPLA_NBS_wgph.counts | column -s $'\t' -t > PCAM-PPLA_NBS_wgph.pos_counts
+paste PCAM-PPLA_SEAK_wgph.pos PCAM-PPLA_SEAK_wgph.counts | column -s $'\t' -t > PCAM-PPLA_SEAK_wgph.pos_counts
+```
+
 
 ```{r}
 # set Pops (just for determining file location and file names)
-#POP1 <- "NBS"; POP2 <- "GOA"
+POP1 <- "NBS"; POP2 <- "GOA"
 #POP1 <- "NBS"; POP2 <- "AI"
 #POP1 <- "NBS"; POP2 <- "EBS"
 #POP1 <- "NBS"; POP2 <- "SEAK"
 #POP1 <- "AI"; POP2 <- "EBS"
-POP1 <- "AI"; POP2 <- "GOA" # Gumbel function not producing I(rho) statistic. need to fix
+#POP1 <- "AI"; POP2 <- "GOA" # Gumbel function not producing I(rho) statistic. need to fix
 #POP1 <- "AI"; POP2 <- "SEAK"
 #POP1 <- "EBS"; POP2 <- "GOA"
 #POP1 <- "EBS"; POP2 <- "SEAK"
@@ -47,8 +58,8 @@ POP1 <- "AI"; POP2 <- "GOA" # Gumbel function not producing I(rho) statistic. ne
   chrom_df <- read.table("/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.txt", header = TRUE, col.names = c("chrName","chrNewName")) %>% mutate(chr = seq(1,104,1)) %>% select(-chrNewName)
 
 # read in doCounts output for each population
-  pop1_df <- read_delim(paste0("/fs/cbsubscb16/storage/rkc/angsd/counts/PCAM-PPLA_",POP1,"_polymorphic.pos_counts"), col_names = TRUE) %>% select(-totDepth) 
-  pop2_df <- read_delim(paste0("/fs/cbsubscb16/storage/rkc/angsd/counts/PCAM-PPLA_",POP2,"_polymorphic.pos_counts"), col_names = TRUE) %>% select(-totDepth)
+  pop1_df <- read_delim(paste0("/fs/cbsubscb16/storage/rkc/angsd/counts/PCAM-PPLA_",POP1,"_wgph.pos_counts"), col_names = TRUE) %>% select(-totDepth) 
+  pop2_df <- read_delim(paste0("/fs/cbsubscb16/storage/rkc/angsd/counts/PCAM-PPLA_",POP2,"_wgph.pos_counts"), col_names = TRUE) %>% select(-totDepth)
 ```
 
 ## Edit docounts output 
