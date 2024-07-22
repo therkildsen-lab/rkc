@@ -161,7 +161,7 @@ alpha = 0.7
 size = 2
 All_pop_pca <- PCA(genome_cov, sample_table$ABLG, sample_table$Loc, 1, 2, show.ellipse = F, show.line = F, show.label = F, size = 4, alpha = 0.2, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_pca.png", device = "png", height = 5, width = 7, bg = 'transparent')
+ggsave("/fs/cbsubscb16/storage/rkc/figures/All_pop_pca.png", device = "png", height = 5, width = 7, bg = 'transparent')
 ```
 - All regions group together with some putative geneflow/migration between Gulf of Alaska (Kodiak) and East Bering Sea (Bristol Bay and Pribilof islands)
 - this is consistent with previous studies using mtDNA and nuclear markers.
@@ -466,8 +466,7 @@ cp angsd/* $INPUT_PATH' | sbatch
 
 ```{r}
 ## Read in data
-library(RcppCNPy)
-genome_cov_AI <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_AI_PCAM-PPLA-wholegenome_polymorphic.cov.npy")
+genome_cov_AI <- read_table("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_AI_PCAM-PPLA_wgph.cov", col_names = F)
 
 # Color by collection location
 sample_table_AI <- sample_table_AI %>% 
@@ -570,8 +569,7 @@ cp angsd/* $INPUT_PATH' | sbatch
 #### Plot PCA for North Bering
 ```{r}
 ## Read in data
-library(RcppCNPy)
-genome_cov_NorthBering <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_NorthBering_PCAM-PPLA-wholegenome_polymorphic.cov.npy")
+genome_cov_NorthBering <- read_table("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_NBS_PCAM-PPLA_wgph.cov", col_names = F)
 
 # Color by collection location
 sample_table_northbering <- sample_table_northbering %>% 
@@ -663,8 +661,7 @@ cp angsd/* $INPUT_PATH' | sbatch
 #### Plot PCA for GOA
 ```{r}
 ## Read in data
-library(RcppCNPy)
-genome_cov_GOA <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_GOA_PCAM-PPLA-wholegenome_polymorphic.cov.npy")
+genome_cov_GOA <- read_table("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_GOA_PCAM-PPLA_wgph.cov", col_names = F)
 
 # Color by collection location
 sample_table_GOA <- sample_table_GOA %>%
@@ -764,8 +761,7 @@ cp angsd/* $INPUT_PATH' | sbatch
 
 ```{r}
 ## Read in data
-library(RcppCNPy)
-genome_cov_EastBering <- npyLoad("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_EastBering_PCAM-PPLA-wholegenome_polymorphic.cov.npy")
+genome_cov_EastBering <- read_table("/fs/cbsubscb16/storage/rkc/angsd/pcangsd_EBS_PCAM-PPLA_wgph.cov", col_names = F)
 
 # Color by collection location
 sample_table_eastbering_prib <- sample_table_eastbering %>% 

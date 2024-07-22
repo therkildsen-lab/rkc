@@ -10,7 +10,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Load required packages
 ```{r}
 library(tidyverse)
-library(cowplot)
 ```
 
 ## Load data
@@ -23,7 +22,7 @@ for(a in 1:4){
     tmp2 <- paste0("/fs/cbsubscb16/storage/rkc/localscore/output/",pop_list[a],"-",pop_list[b],"_xi2_01sig.txt") # list of significant regions
     tmp3 <- paste0("/fs/cbsubscb16/storage/rkc/localscore/output/",pop_list[a],"-",pop_list[b],"_xi2_chr_sig.txt") # per chromosome significance values
     if(file.exists(tmp) == T){
-      tmp3_df <- read_delim(tmp3, col_names = T, delim = " ") %>% rename(chr = Chr)
+      tmp3_df <- read_delim(tmp3, col_names = T, delim = " ") %>% dplyr::rename(chr = Chr)
       assign(paste0(pop_list[a],"_",pop_list[b],"_out"), read_delim(tmp, col_names = c("chr", "pos", "ls"), delim = " ") %>% left_join(tmp3_df, by = "chr")) # join significance values with local score values
       assign(paste0(pop_list[a],"_",pop_list[b],"_sig"), read_delim(tmp2, col_names = T, delim = "\t")) # read in significant regions
       
@@ -32,7 +31,7 @@ for(a in 1:4){
 }
 
 ## chromosome names and numbers
-chrom_df <- read.table("/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.txt", header = TRUE, col.names = c("chrName","chrNewName")) %>% mutate(chr = seq(1,104,1)) %>% select(-chrNewName)
+chrom_df <- read.table("/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.txt", header = TRUE, col.names = c("chrName","chrNewName")) %>% mutate(chr = seq(1,104,1)) %>% dplyr::select(-chrNewName)
 ```
 
 ## Filter out data for chrs with significant peaks
@@ -56,64 +55,34 @@ for(s in 1:10){
 ## rename chromosomes to chromosome numbers
 ## join fst to localscore dataset. 
 
-AI_EBS_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-EastBering.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
-  left_join(chrom_df, by = "chrName") %>%
-    subset(select = -c(chrName)) %>%
-    select(chr, pos, correct_fst)
+AI_EBS_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-EBS_wgph.fst.txt")
 AI_EBS_outSig <- AI_EBS_outSig %>% left_join(AI_EBS_fst, by = c("chr" = "chr", "pos" = "pos"))
 
-AI_GOA_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-GOA.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
-  left_join(chrom_df, by = "chrName") %>%
-    subset(select = -c(chrName)) %>%
-    select(chr, pos, correct_fst)
+AI_GOA_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-GOA_wgph.fst.txt")
 AI_GOA_outSig <- AI_GOA_outSig %>% left_join(AI_GOA_fst, by = c("chr" = "chr", "pos" = "pos"))
 
-NBS_AI_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-NorthBering.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
-  left_join(chrom_df, by = "chrName") %>%
-    subset(select = -c(chrName)) %>%
-    select(chr, pos, correct_fst)
+NBS_AI_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-NBS_wgph.fst.txt")
 NBS_AI_outSig <- NBS_AI_outSig %>% left_join(NBS_AI_fst, by = c("chr" = "chr", "pos" = "pos"))
 
-AI_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-SEAK.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
-  left_join(chrom_df, by = "chrName") %>%
-    subset(select = -c(chrName)) %>%
-    select(chr, pos, correct_fst)
+AI_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-SEAK_wgph.fst.txt")
 AI_SEAK_outSig <- AI_SEAK_outSig %>% left_join(AI_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
 
-EBS_GOA_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EastBering-GOA.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
-  left_join(chrom_df, by = "chrName") %>%
-    subset(select = -c(chrName)) %>%
-    select(chr, pos, correct_fst)
+EBS_GOA_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-GOA_wgph.fst.txt")
 EBS_GOA_outSig <- EBS_GOA_outSig %>% left_join(EBS_GOA_fst, by = c("chr" = "chr", "pos" = "pos"))
 
-NBS_EBS_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EastBering-NorthBering.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
-  left_join(chrom_df, by = "chrName") %>%
-    subset(select = -c(chrName)) %>%
-    select(chr, pos, correct_fst)
+NBS_EBS_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-NBS_wgph.fst.txt")
 NBS_EBS_outSig <- NBS_EBS_outSig %>% left_join(NBS_EBS_fst, by = c("chr" = "chr", "pos" = "pos"))
 
-EBS_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EastBering-SEAK.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
-  left_join(chrom_df, by = "chrName") %>%
-    subset(select = -c(chrName)) %>%
-    select(chr, pos, correct_fst)
+EBS_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-SEAK_wgph.fst.txt")
 EBS_SEAK_outSig <- EBS_SEAK_outSig %>% left_join(EBS_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
 
-NBS_GOA_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-NorthBering.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
-  left_join(chrom_df, by = "chrName") %>%
-    subset(select = -c(chrName)) %>%
-    select(chr, pos, correct_fst)
+NBS_GOA_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-NBS_wgph.fst.txt")
 NBS_GOA_outSig <- NBS_GOA_outSig %>% left_join(NBS_GOA_fst, by = c("chr" = "chr", "pos" = "pos"))
 
-GOA_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-SEAK.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
-  left_join(chrom_df, by = "chrName") %>%
-    subset(select = -c(chrName)) %>%
-    select(chr, pos, correct_fst)
+GOA_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-SEAK_wgph.fst.txt")
 GOA_SEAK_outSig <- GOA_SEAK_outSig %>% left_join(GOA_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
 
-NBS_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/NorthBering-SEAK.fst.txt", col_names = c("region", "chrName", "pos", "Nsites","fst"), skip = 1) %>%  mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>%  
-  left_join(chrom_df, by = "chrName") %>%
-    subset(select = -c(chrName)) %>%
-    select(chr, pos, correct_fst)
+NBS_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/NBS-SEAK_wgph.fst.txt")
 NBS_SEAK_outSig <- NBS_SEAK_outSig %>% left_join(NBS_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
 ```
 
@@ -331,17 +300,33 @@ NBS_SEAK_outSigAll <- NBS_SEAK_outSigAll %>% left_join(NBS_SEAK_fst, by = c("chr
 get_cum_pos <- function(x){
   x_new <- group_by(x, chr) %>%
     # Compute lg size
-    summarise(lg_length=max(pos)) %>%
+    dplyr::summarise(lg_length=max(pos)) %>%
     # Calculate cumulative position of each chromosome
     mutate(tot=cumsum(lg_length)-lg_length) %>%
     # Add this info to the initial dataset
     left_join(x, ., by=c("chr")) %>%
     # Add a cumulative position of each SNP
-    arrange(chr, pos) %>%
+    dplyr::arrange(chr, pos) %>%
     group_by(chr) %>%
     mutate(pos_cum=pos+tot)
   return(x_new)
 }
+
+get_cum_pos_test <- function(x){
+  x_new <- group_by(x, chr) %>%
+    # Compute lg size
+    dplyr::summarise(lg_length=max(pos)) %>%
+    # Calculate cumulative position of each chromosome
+    mutate(tot=cumsum(lg_length)-lg_length)#%>%
+    # Add this info to the initial dataset
+    #left_join(x, ., by=c("chr")) %>%
+    # Add a cumulative position of each SNP
+    #arrange(chr, pos) %>%
+    #group_by(chr) %>%
+    #mutate(pos_cum=pos+tot)
+  return(x_new)
+}
+
 # add option to define y  limit #    
 my_color = c("#7fcdbb", "#2c7fb8")
 plot_gwas_per_snp <- function(x){
@@ -351,7 +336,7 @@ plot_gwas_per_snp <- function(x){
     geom_point(data = x %>% filter(outlier == T), aes(x = pos_cum/10^6, y = correct_fst), color = "red", size = 0.4) +
     coord_cartesian(ylim=c(0, 0.8), expand = F) +
     scale_y_continuous(breaks=c(0,0.3,0.6)) +
-    theme_cowplot() +
+    cowplot::theme_cowplot() +
     theme(axis.title.x = element_blank(),
           axis.text.x = element_blank(),
           axis.title.y = element_blank(),
@@ -366,25 +351,25 @@ plot_gwas_per_snp <- function(x){
 
 
 get_cum_pos(NBS_AI_outSigAll) %>% plot_gwas_per_snp()
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_AI_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_AI_ls_wgph_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(NBS_EBS_outSigAll) %>% plot_gwas_per_snp()
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_EBS_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_EBS_ls_wgph_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(NBS_GOA_outSigAll) %>% plot_gwas_per_snp()
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_GOA_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_GOA_ls_wgph_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(NBS_SEAK_outSigAll) %>% plot_gwas_per_snp()
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_SEAK_ls_wgph_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(AI_EBS_outSigAll) %>% plot_gwas_per_snp()
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_EBS_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_EBS_ls_wgph_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(AI_GOA_outSigAll) %>% plot_gwas_per_snp()
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_GOA_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_GOA_ls_wgph_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(AI_SEAK_outSigAll) %>% plot_gwas_per_snp()
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_SEAK_ls_wgph_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(EBS_GOA_outSigAll) %>% plot_gwas_per_snp()
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_GOA_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_GOA_ls_wgph_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(EBS_SEAK_outSigAll) %>% plot_gwas_per_snp()
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_SEAK_ls_wgph_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 get_cum_pos(GOA_SEAK_outSigAll) %>% plot_gwas_per_snp()
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_SEAK_ls_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_SEAK_ls_wgph_fst_outlier_scan.png", width = 7.5, height = 1, units = "in")
 ```
 
 ## plot chr 100 for all pops
@@ -409,7 +394,7 @@ p100_NBS_GOA <- ggplot(NBS_GOA_outSigAll %>% filter(chr == 100), aes(x = pos/10^
           axis.text = element_text(size=20),
           strip.text.x = element_blank())
 p100_NBS_GOA
-ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_GOA_ls_fst_outlier_scan_100.png", width = 9, height = 3, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/NBS_GOA_ls_wgph_fst_outlier_scan_100.png", width = 9, height = 3, units = "in")
 
 p100_AI_GOA <- ggplot(AI_GOA_outSigAll %>% filter(chr == 100), aes(x = pos/10^6, y = ls)) + 
   coord_cartesian(ylim=c(0, max(AI_GOA_outSig$sig.01*1.1)), expand = F, xlim = c(0,67)) +
@@ -431,7 +416,7 @@ p100_AI_GOA <- ggplot(AI_GOA_outSigAll %>% filter(chr == 100), aes(x = pos/10^6,
           axis.text = element_text(size=20),
           strip.text.x = element_blank())
 p100_AI_GOA
-ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_GOA_ls_fst_outlier_scan_100.png", width = 9, height = 3, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI_GOA_ls_wgph_fst_outlier_scan_100.png", width = 9, height = 3, units = "in")
 
 p100_EBS_GOA <- ggplot(EBS_GOA_outSigAll %>% filter(chr == 100), aes(x = pos/10^6, y = ls)) + 
   coord_cartesian(ylim=c(0, max(EBS_GOA_outSig$sig.01*1.1)), expand = F, xlim = c(0,67)) +
@@ -453,7 +438,7 @@ p100_EBS_GOA <- ggplot(EBS_GOA_outSigAll %>% filter(chr == 100), aes(x = pos/10^
           axis.text = element_text(size=20),
           strip.text.x = element_blank())
 p100_EBS_GOA
-ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_GOA_ls_fst_outlier_scan_100.png", width = 9, height = 3, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_GOA_ls_wgph_fst_outlier_scan_100.png", width = 9, height = 3, units = "in")
 
 p100_GOA_SEAK <- ggplot(GOA_SEAK_outSigAll %>% filter(chr == 100), aes(x = pos/10^6, y = ls)) + 
   coord_cartesian(ylim=c(0, max(GOA_SEAK_outSig$sig.01*1.1)), expand = F, xlim = c(0,67)) +
@@ -475,6 +460,6 @@ p100_GOA_SEAK <- ggplot(GOA_SEAK_outSigAll %>% filter(chr == 100), aes(x = pos/1
           axis.text = element_text(size=20),
           strip.text.x = element_blank())
 p100_GOA_SEAK
-ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_SEAK_ls_fst_outlier_scan_100.png", width =9, height = 3, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_SEAK_ls_wgph_fst_outlier_scan_100.png", width =9, height = 3, units = "in")
 ```
 

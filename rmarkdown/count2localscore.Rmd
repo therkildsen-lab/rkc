@@ -31,17 +31,18 @@ for(i in 1:length(packages_needed)){
 #### combine position and counts file
 
 ```{bash, eval = F}
-paste PCAM-PPLA_AI_wgph.pos PCAM-PPLA_AI_wgph.counts | column -s $'\t' -t > PCAM-PPLA_AI_wgph.pos_counts
-paste PCAM-PPLA_EBS_wgph.pos PCAM-PPLA_EBS_wgph.counts | column -s $'\t' -t > PCAM-PPLA_EBS_wgph.pos_counts
-paste PCAM-PPLA_GOA_wgph.pos PCAM-PPLA_GOA_wgph.counts | column -s $'\t' -t > PCAM-PPLA_GOA_wgph.pos_counts
-paste PCAM-PPLA_NBS_wgph.pos PCAM-PPLA_NBS_wgph.counts | column -s $'\t' -t > PCAM-PPLA_NBS_wgph.pos_counts
-paste PCAM-PPLA_SEAK_wgph.pos PCAM-PPLA_SEAK_wgph.counts | column -s $'\t' -t > PCAM-PPLA_SEAK_wgph.pos_counts
+# Problematic space separating the header so skip the header line when reading in. 
+paste PCAM-PPLA_AI_wgph.pos PCAM-PPLA_AI_wgph.counts | column -s '\t' -t > PCAM-PPLA_AI_wgph.pos_counts
+paste PCAM-PPLA_EBS_wgph.pos PCAM-PPLA_EBS_wgph.counts | column -s '\t' -t > PCAM-PPLA_EBS_wgph.pos_counts
+paste PCAM-PPLA_GOA_wgph.pos PCAM-PPLA_GOA_wgph.counts | column -s '\t' -t > PCAM-PPLA_GOA_wgph.pos_counts
+paste PCAM-PPLA_NBS_wgph.pos PCAM-PPLA_NBS_wgph.counts | column -s '\t' -t > PCAM-PPLA_NBS_wgph.pos_counts
+paste PCAM-PPLA_SEAK_wgph.pos PCAM-PPLA_SEAK_wgph.counts | column -s '\t' -t > PCAM-PPLA_SEAK_wgph.pos_counts
 ```
 
 
 ```{r}
 # set Pops (just for determining file location and file names)
-POP1 <- "NBS"; POP2 <- "GOA"
+#POP1 <- "NBS"; POP2 <- "GOA"
 #POP1 <- "NBS"; POP2 <- "AI"
 #POP1 <- "NBS"; POP2 <- "EBS"
 #POP1 <- "NBS"; POP2 <- "SEAK"
@@ -55,11 +56,11 @@ POP1 <- "NBS"; POP2 <- "GOA"
 
 # table for chromosome name and number
 # two columns: chr (numbered) and chrName (what your chromosomes are called in your angsd output file)
-  chrom_df <- read.table("/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.txt", header = TRUE, col.names = c("chrName","chrNewName")) %>% mutate(chr = seq(1,104,1)) %>% select(-chrNewName)
+chrom_df <- read.table("/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.txt", header = TRUE, col.names = c("chrName","chrNewName")) %>% mutate(chr = seq(1,104,1)) %>% dplyr::select(-chrNewName)
 
 # read in doCounts output for each population
-  pop1_df <- read_delim(paste0("/fs/cbsubscb16/storage/rkc/angsd/counts/PCAM-PPLA_",POP1,"_wgph.pos_counts"), col_names = TRUE) %>% select(-totDepth) 
-  pop2_df <- read_delim(paste0("/fs/cbsubscb16/storage/rkc/angsd/counts/PCAM-PPLA_",POP2,"_wgph.pos_counts"), col_names = TRUE) %>% select(-totDepth)
+  pop1_df <- read_delim(paste0("/fs/cbsubscb16/storage/rkc/angsd/counts/PCAM-PPLA_",POP1,"_wgph.pos_counts"),skip = 1, trim_ws = T, col_names = F) %>% dplyr::select(-3) 
+  pop2_df <- read_delim(paste0("/fs/cbsubscb16/storage/rkc/angsd/counts/PCAM-PPLA_",POP2,"_wgph.pos_counts"),skip = 1, trim_ws = T, col_names = F) %>% dplyr::select(-3)
 ```
 
 ## Edit docounts output 
@@ -72,10 +73,10 @@ POP1 <- "NBS"; POP2 <- "GOA"
 #change chrName to chr number
   pop1_df <- left_join(pop1_df, chrom_df, by = "chrName") %>%
     subset(select = -c(chrName)) %>%
-    select("chr", everything())
+    dplyr::select("chr", everything())
   pop2_df <- left_join(pop2_df, chrom_df, by = "chrName") %>%
     subset(select = -c(chrName)) %>%
-    select("chr", everything())
+    dplyr::select("chr", everything())
 
 # make values of 0 == NA for each nucleotide
   pop1_df[pop1_df == 0] <- NA

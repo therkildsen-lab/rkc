@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{bash}
 echo '#!/bin/bash
 #SBATCH --job-name=ngsadmix_rkcR3
-#SBATCH --output=/home/cas399/rkc/log/ngsadmix_R3_1-8_rkc.log
+#SBATCH --output=/home/cas399/rkc/log/ngsadmix_wgph_1-8_rkc.log
 #SBATCH --partition=regular
 #SBATCH --nodes=1
 #SBATCH --ntasks=16
@@ -26,7 +26,7 @@ echo '#!/bin/bash
 
 ## Define some variables
 INPUT_PATH=/fs/cbsubscb16/storage/rkc/angsd/
-BEAGLE=PCAM-PPLA-wholegenome_polymorphic_R3.beagle.gz
+BEAGLE=PCAM-PPLA_wgph.beagle.gz
 MINMAF=0.05
 MININD=86
 THREADS=16
