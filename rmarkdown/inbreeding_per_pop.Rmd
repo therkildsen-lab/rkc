@@ -21,7 +21,40 @@ sample_table <- read_tsv("sample_lists/sample_table.tsv")
 
 ## Estimate per individual inbreeding
 ```{bash}
+# translate beagle to glf - author says this method may not work
 % zcat PCAM-PPLA_wgph.beagle.gz | tail -n +2 | perl -an -e 'for($i=3; $i<=$#F; $i++){print(pack("d",($F[$i]==0 ? -inf : log($F[$i]))))}' > PCAM-PPLA_wgph.glf
+
+## run ngsF on cluster
+# Job ID 1803940
+# ERROR: error while loading shared libraries: libgsl.so.0: cannot open shared object file: No such file or directory
+
+echo '#!/bin/bash
+#SBATCH --job-name=ngsF_RKC
+#SBATCH --output=/home/cas399/rkc/log/ngsF_inbreeding.log
+#SBATCH --partition=regular
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=75G
+#SBATCH --mail-user=cas399@cornell.edu  
+#SBATCH --mail-type=END
+
+## Mount the storage
+/programs/bin/labutils/mount_server cbsubscb16 /storage
+
+## create temp workdir and move files 
+WORKDIR=/workdir/$USER/$SLURM_JOB_ID/
+mkdir -p $WORKDIR
+cd $WORKDIR
+
+## Transfer the input files
+cp /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph.glf $WORKDIR
+
+## Run ngsF
+/programs/ngsF-1.2.0/ngsF --n_threads 16 --n_ind 183 --n_sites 8016901 --glf PCAM-PPLA_wgph.glf --out PCAM-PPLA_wgph_inbreeding
+
+## copy output back to cbsubscb16
+rm *.glf
+cp * /fs/cbsubscb16/storage/rkc/angsd/'| sbatch
 ```
 
 

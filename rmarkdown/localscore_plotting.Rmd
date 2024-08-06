@@ -378,7 +378,7 @@ p100_NBS_GOA <- ggplot(NBS_GOA_outSigAll %>% filter(chr == 100), aes(x = pos/10^
   coord_cartesian(ylim=c(0, max(NBS_GOA_outSig$sig.01*1.1)), expand = F, xlim = c(0,67)) +
   xlab("position (Mbp)") +
   ylab("local score") +
-  theme_cowplot() +
+  cowplot::theme_cowplot() +
   geom_point(aes(y = correct_fst*max(NBS_GOA_outSig$sig.01*1.1)), alpha = 0.3, color = "#2c7fb8", size = 3) + 
   geom_line(linewidth=0.4) +
   geom_point(data = NBS_GOA_outSigAll %>% filter(chr == 100 & outlier == T), aes(x = pos/10^6, y = correct_fst*max(NBS_GOA_outSig$sig.01*1.1)), color = "red", size = 3) +
@@ -400,7 +400,7 @@ p100_AI_GOA <- ggplot(AI_GOA_outSigAll %>% filter(chr == 100), aes(x = pos/10^6,
   coord_cartesian(ylim=c(0, max(AI_GOA_outSig$sig.01*1.1)), expand = F, xlim = c(0,67)) +
   xlab("position (Mbp)") +
   ylab("local score") +
-  theme_cowplot() +
+  cowplot::theme_cowplot() +
   geom_point(aes(y = correct_fst*max(AI_GOA_outSig$sig.01*1.1)), alpha = 0.3, color = "#2c7fb8", size = 3) + 
   geom_line(linewidth=0.4) +
   geom_point(data = AI_GOA_outSigAll %>% filter(chr == 100 & outlier == T), aes(x = pos/10^6, y = correct_fst*max(AI_GOA_outSig$sig.01*1.1)), color = "red", size = 3) +
@@ -422,7 +422,7 @@ p100_EBS_GOA <- ggplot(EBS_GOA_outSigAll %>% filter(chr == 100), aes(x = pos/10^
   coord_cartesian(ylim=c(0, max(EBS_GOA_outSig$sig.01*1.1)), expand = F, xlim = c(0,67)) +
   xlab("position (Mbp)") +
   ylab("local score") +
-  theme_cowplot() +
+  cowplot::theme_cowplot() +
   geom_point(aes(y = correct_fst*max(EBS_GOA_outSig$sig.01*1.1)), alpha = 0.3, color = "#2c7fb8", size = 3) + 
   geom_line(linewidth=0.4) +
   geom_point(data = EBS_GOA_outSigAll %>% filter(chr == 100 & outlier == T), aes(x = pos/10^6, y = correct_fst*max(EBS_GOA_outSig$sig.01*1.1)), color = "red", size = 3) +
@@ -444,7 +444,7 @@ p100_GOA_SEAK <- ggplot(GOA_SEAK_outSigAll %>% filter(chr == 100), aes(x = pos/1
   coord_cartesian(ylim=c(0, max(GOA_SEAK_outSig$sig.01*1.1)), expand = F, xlim = c(0,67)) +
   xlab("position (Mbp)") +
   ylab("local score") +
-  theme_cowplot() +
+  cowplot::theme_cowplot() +
   geom_point(aes(y = correct_fst*max(GOA_SEAK_outSig$sig.01*1.1)), alpha = 0.3, color = "#2c7fb8", size = 3) + 
   geom_line(linewidth=0.4) +
   geom_point(data = GOA_SEAK_outSigAll %>% filter(chr == 100 & outlier == T), aes(x = pos/10^6, y = correct_fst*max(GOA_SEAK_outSig$sig.01*1.1)), color = "red", size = 3) +

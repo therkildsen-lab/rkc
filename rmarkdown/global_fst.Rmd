@@ -34,7 +34,6 @@ AI_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-GOA.fst.txt") %>%
 mean(AI_GOA$corrected_fst)
 sd(AI_GOA$corrected_fst)
 ```
-
 ```{r}
 AI_NorthBering <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-NorthBering.fst.txt") %>% 
   mutate(corrected_fst = ifelse(fst < 0, 0, fst))
@@ -110,4 +109,83 @@ glob_loci_fst <- rbind(AI_EastBering, AI_SEAK)
 glob_loci_fst %>% ggplot(aes(x = comp, y = corrected_fst)) + 
   geom_boxplot(outlier.shape = NA) +
   ylim(0,0.01)
+```
+
+## ngsParalogs dataset
+```{r}
+AI_EastBering <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-EBS_wgph.fst.txt")
+mean(AI_EastBering$correct_fst)
+sd(AI_EastBering$correct_fst)
+```
+```{r}
+AI_SEAK <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-SEAK_wgph.fst.txt") 
+head(AI_SEAK)
+mean(AI_SEAK$correct_fst)
+sd(AI_SEAK$correct_fst)
+```
+```{r}
+AI_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-GOA_wgph.fst.txt")
+mean(AI_GOA$correct_fst)
+sd(AI_GOA$correct_fst)
+```
+```{r}
+AI_NorthBering <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-NBS_wgph.fst.txt")
+head(AI_NorthBering)
+mean(AI_NorthBering$correct_fst)
+sd(AI_NorthBering$correct_fst)
+```
+```{r}
+EastBering_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-GOA_wgph.fst.txt")
+mean(EastBering_GOA$correct_fst)
+sd(EastBering_GOA$correct_fst)
+```
+```{r}
+EastBering_NorthBering <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-NBS_wgph.fst.txt")
+mean(EastBering_NorthBering$correct_fst)
+sd(EastBering_NorthBering$correct_fst)
+```
+```{r}
+EastBering_SEAK <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-SEAK_wgph.fst.txt")
+mean(EastBering_SEAK$correct_fst)
+sd(EastBering_SEAK$correct_fst)
+```
+```{r}
+GOA_NorthBering <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-NBS_wgph.fst.txt")
+mean(GOA_NorthBering$correct_fst)
+sd(GOA_NorthBering$correct_fst)
+```
+```{r}
+GOA_SEAK <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-SEAK_wgph.fst.txt")
+mean(GOA_SEAK$correct_fst)
+sd(GOA_SEAK$correct_fst)
+```
+```{r}
+NorthBering_SEAK <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/NBS-SEAK_wgph.fst.txt")
+mean(NorthBering_SEAK$correct_fst)
+sd(NorthBering_SEAK$correct_fst)
+```
+
+## Fst heatmap
+```{r}
+library(reshape2)
+#glob_fst <- read_csv("/fs/cbsubscb16/storage/rkc/angsd/fst/global_fst_matrix.csv")
+globmat <- matrix(c(NA,mean(EastBering_GOA$correct_fst),mean(GOA_NorthBering$correct_fst),mean(AI_GOA$correct_fst),mean(GOA_SEAK$correct_fst), 
+                    rep(NA,2),mean(EastBering_NorthBering$correct_fst),mean(AI_EastBering$correct_fst),mean(EastBering_SEAK$correct_fst), 
+                    rep(NA,3),mean(AI_NorthBering$correct_fst),mean(NorthBering_SEAK$correct_fst),  
+                    rep(NA,4),mean(AI_SEAK$correct_fst), 
+                    rep(NA,5)), 
+                  nrow = 5, ncol = 5, dimnames = list(c("GOA","EastBering","NorthBering","AI","SEAK"),
+                                                      c("GOA","EastBering","NorthBering","AI","SEAK")))
+melted_globmat <- melt(globmat, na.rm = T)
+ggplot(melted_globmat, aes(x = Var1, y = Var2, fill = value)) + 
+  geom_tile(color="white") +
+   scale_fill_gradient2(low = "blue", high = "red", mid = "white",
+    midpoint = 0.0075, limit = c(0,0.015), space = "Lab",
+    name="Pairwise Fst") +
+  geom_text(aes(Var1, Var2, label = sprintf(value, fmt = '%#.5f'))) +
+  theme_minimal() + 
+ theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+    size = 12, hjust = 1), axis.title = element_blank()) +
+ coord_fixed()
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/global_fst_wgph.png", device = "png", width = 7, height = 7, units = "in")
 ```

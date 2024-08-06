@@ -35,13 +35,17 @@ zcat angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1.beagle.gz | sed -n '1482
 
 ```{bash eval=F, include=T}
 nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier.beagle.gz -o /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier --threads 16 &
+
+## Run PCA for ngsParalogs dataset
+# job_id 1311440
+nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph_chr100_outlier.beagle.gz -o /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph_chr100_outlier --threads 16 &
 ```
 
 ## Plot PCAs
 ```{r}
 sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
 ```
-
+## Original dataset PCA plot
 ```{r}
 chr100_outlier_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier.cov", delim = " ", col_names = F) %>% as.matrix()
 
@@ -60,8 +64,26 @@ PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$Loc, 2, 3,show.ellipse =
 PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$population, 1, 2,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 ```
 
+## ngsParalogs dataset PCA plot
+```{r}
+chr100_outlier_wgph_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph_chr100_outlier.cov", delim = " ", col_names = F) %>% as.matrix()
+
+alpha = 0.7
+size = 3
+PCA(chr100_outlier_wgph_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+
+# ggsave("/fs/cbsubscb16/storage/rkc/figures/chr100_outlier_PCA.png", device = "png", width = 8, height = 6)
+
+PCA(chr100_outlier_wgph_cov, sample_table$ABLG, sample_table$Loc, 2, 3,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+
+# Three populations on the margins of the PCA, SEAK, GOA, and Aleutian Islands. East Bering is dispersed but closer to GOA, and North Bering is dispersed but closer to SEAK. 
+
+PCA(chr100_outlier_wgph_cov, sample_table$ABLG, sample_table$population, 1, 2,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+```
+
 ```{r}
 fst_6_5_10 <- read_delim("/fs/cbsubscb16/storage/rkc/islands_fstcutoff_0.25_nloci6_stepSize5000_windSize10000.txt", col_names = c("position", "chr","start","end","compare")) %>% 
   left_join(chrom_df, by = "chr")
 fst_6_4_8 <- read_delim("/fs/cbsubscb16/storage/rkc/islands_fstcutoff_0.25_nloci6_stepSize4000_windSize8000.txt")
 ```
+

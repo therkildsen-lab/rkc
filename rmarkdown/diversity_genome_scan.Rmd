@@ -42,8 +42,8 @@ plot_stat_per_snp <- function(x){
     coord_cartesian(ylim=c(0, 1), expand = F) +
     xlab('position (Mbp)') +
     ylab('Nucleotide Diversity') +
-    facet_grid(.~lgN, scales='free_x', space='free_x') +
-    theme_cowplot() +
+    #facet_grid(.~lgN, scales='free_x', space='free_x') +
+    cowplot::theme_cowplot() +
     theme(panel.spacing = unit(0.1, 'lines'),
           axis.title.x=element_text(),
           legend.position='none',
@@ -63,8 +63,8 @@ plot_stat_per_snp_test <- function(x){
     coord_cartesian(ylim=c(0, 1), expand = F) +
     xlab('position (Mbp)') +
     ylab('Fst') +
-    facet_grid(.~lgN, scales='free_x', space='free_x') +
-    theme_cowplot() +
+    #facet_grid(.~lgN, scales='free_x', space='free_x') +
+    cowplot::theme_cowplot() +
     theme(panel.spacing = unit(0.1, 'lines'),
           axis.title.x=element_text(),
           legend.position='none',
@@ -76,61 +76,61 @@ plot_stat_per_snp_test <- function(x){
 
 ## Read in data
 ```{r}
-chr100_div <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/diversity/PCAM-PPLA_CM023352.1_GOA_polymorphic_folded.thetas.txt") %>% rename(lgN = '#Chromo', pos = Pos) %>% mutate(untrans_pairwise = exp(Pairwise)) %>% filter(pos > 10600000, pos < 11200000)
+chr100_div <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/diversity/PCAM-PPLA_CM023352.1_GOA_wgph_polymorphic_folded.thetas.txt") %>% rename(lgN = '#Chromo', pos = Pos) %>% mutate(untrans_pairwise = exp(Pairwise)) %>% filter(pos > 10600000, pos < 11200000)
 size = 3
 
 chr100_div_plot <- get_cum_pos(chr100_div) %>% 
   plot_stat_per_snp()
 chr100_div_plot
-ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_chr100_div.png", device = "png", width = 7, height = 3)
+ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_chr100_wgph_div.png", device = "png", width = 7, height = 3)
 ```
 
 #### Plot fst scan for reference
 EastBering-GOA
 ```{r}
-chr100_fst_EastBering_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EastBering-GOA.fst.txt") %>%
-  filter(chr == "CM023352.1", midPos > 10600000, midPos < 11200000) %>% rename(lgN = chr, pos = midPos) %>% mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>% select(lgN, pos, correct_fst)
+chr100_fst_EastBering_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-GOA_wgph.fst.txt") %>%
+  filter(chr == 100, pos > 10600000, pos < 11200000) %>% rename(lgN = chr) #%>% mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>% select(lgN, pos, correct_fst)
 
 chr100_fst_EastBering_GOA %>% arrange(desc(correct_fst))
 
 chr100_fst_plot <- get_cum_pos(chr100_fst_EastBering_GOA) %>% plot_stat_per_snp_test()
 chr100_fst_plot
-ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA-EastBering_chr100_fst.png", device = "png", height = 3, width = 7)
+ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA-EastBering_wgph_chr100_fst.png", device = "png", height = 3, width = 7)
 ```
 AI-GOA
 ```{r}
-chr100_fst_AI_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/PCAM-PPLA_CM023352.1_AI-GOA_polymorphic_folded.sfs.pbs.fst.txt") %>%
-  filter(chr == "CM023352.1", midPos > 10600000, midPos < 11200000) %>% rename(lgN = chr, pos = midPos) %>% mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>% select(lgN, pos, correct_fst)
+chr100_fst_AI_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/AI-GOA_wgph.fst.txt") %>%
+  filter(chr == 100, pos > 10600000, pos < 11200000) %>% rename(lgN = chr) #%>% mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>% select(lgN, pos, correct_fst)
 
 chr100_fst_AI_GOA %>% arrange(desc(correct_fst))
 
 chr100_fst_plot <- get_cum_pos(chr100_fst_AI_GOA) %>% plot_stat_per_snp_test()
 chr100_fst_plot
-ggsave("/fs/cbsubscb16/storage/rkc/figures/AI-GOA_chr100_fst.png", device = "png", height = 3, width = 7)
+ggsave("/fs/cbsubscb16/storage/rkc/figures/AI-GOA_chr100_wgph_fst.png", device = "png", height = 3, width = 7)
 ```
 
 GOA-NorthBering
 ```{r}
-chr100_fst_NorthBering_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/PCAM-PPLA_CM023352.1_GOA-NorthBering_polymorphic_folded.sfs.pbs.fst.txt") %>%
-  filter(chr == "CM023352.1", midPos > 10600000, midPos < 11200000) %>% rename(lgN = chr, pos = midPos) %>% mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>% select(lgN, pos, correct_fst)
+chr100_fst_NorthBering_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-NBS_wgph.fst.txt") %>%
+  filter(chr == 100, pos > 10600000, pos < 11200000) %>% rename(lgN = chr) #%>% mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>% select(lgN, pos, correct_fst)
 
 chr100_fst_NorthBering_GOA %>% arrange(desc(correct_fst))
 
 chr100_fst_plot <- get_cum_pos(chr100_fst_NorthBering_GOA) %>% plot_stat_per_snp_test()
 chr100_fst_plot
-ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA-NorthBering_chr100_fst.png", device = "png", height = 3, width = 7)
+ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA-NorthBering_chr100_wgph_fst.png", device = "png", height = 3, width = 7)
 ```
 
 GOA-SEAK
 ```{r}
-chr100_fst_SEAK_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/PCAM-PPLA_CM023352.1_GOA-SEAK_polymorphic_folded.sfs.pbs.fst.txt") %>%
-  filter(chr == "CM023352.1", midPos > 10600000, midPos < 11200000) %>% rename(lgN = chr, pos = midPos) %>% mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>% select(lgN, pos, correct_fst)
+chr100_fst_SEAK_GOA <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-SEAK_wgph.fst.txt") %>%
+  filter(chr == 100, pos > 10600000, pos < 11200000) %>% rename(lgN = chr) #%>% mutate(correct_fst = ifelse(fst < 0, 0, fst)) %>% select(lgN, pos, correct_fst)
 
 chr100_fst_SEAK_GOA %>% arrange(desc(correct_fst))
 
 chr100_fst_plot <- get_cum_pos(chr100_fst_SEAK_GOA) %>% plot_stat_per_snp_test()
 chr100_fst_plot
-ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA-SEAK_chr100_fst.png", device = "png", height = 3, width = 7)
+ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA-SEAK_chr100_wgph_fst.png", device = "png", height = 3, width = 7)
 ```
 
 ## Shared loci in top candidate regions across all comparisons
