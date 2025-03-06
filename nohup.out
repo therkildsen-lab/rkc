@@ -1,16 +1,7 @@
-1
-	-> Dumping file: angsd/ngsadmix_BSEA_GOA_PCAM-PPLA-wholegenome_polymorphic_k1.log
-	-> Dumping file: angsd/ngsadmix_BSEA_GOA_PCAM-PPLA-wholegenome_polymorphic_k1.filter
-Input: lname=angsd/BSEA_GOA_PCAM-PPLA-wholegenome_polymorphic.beagle.gz nPop=1, fname=(null) qname=(null) outfiles=angsd/ngsadmix_BSEA_GOA_PCAM-PPLA-wholegenome_polymorphic_k1
-Setup: seed=1709762049 nThreads=6 method=1
-Convergence: maxIter=2000 tol=0.000010 tolLike50=0.100000 dymBound=0
-Filters: misTol=0.050000 minMaf=0.050000 minLrt=0.000000 minInd=86
-scripts/run_ngsadmix_csj.sh: line 25: 1176758 Killed                  $NGSADMIX -likes $INPUT_PATH$BEAGLE -K $K -P $THREADS -o $INPUT_PATH'ngsadmix_'$PREFIX'_k'$K -minMaf $MINMAF -minInd $MININD
-1
-	-> Dumping file: angsd/ngsadmix_BSEA_GOA_PCAM-PPLA-wholegenome_polymorphic_k1.log
-	-> Dumping file: angsd/ngsadmix_BSEA_GOA_PCAM-PPLA-wholegenome_polymorphic_k1.filter
-Input: lname=angsd/BSEA_GOA_PCAM-PPLA-wholegenome_polymorphic.beagle.gz nPop=1, fname=(null) qname=(null) outfiles=angsd/ngsadmix_BSEA_GOA_PCAM-PPLA-wholegenome_polymorphic_k1
-Setup: seed=1709762305 nThreads=6 method=1
-Convergence: maxIter=2000 tol=0.000010 tolLike50=0.100000 dymBound=0
-Filters: misTol=0.050000 minMaf=0.050000 minLrt=0.000000 minInd=0
-scripts/run_ngsadmix_csj.sh: line 25: 1178229 Killed                  $NGSADMIX -likes $INPUT_PATH$BEAGLE -K $K -P $THREADS -o $INPUT_PATH'ngsadmix_'$PREFIX'_k'$K -minMaf $MINMAF -minInd $MININD
+ /programs/angsd-0.940/misc/thetaStat do_stat angsd/diversity/PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_wgph.thetas.idx -win 5000 -step 1000 -outnames PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_win5000_step1000_wgph.gz
+	Assuming binfile:angsd/diversity/PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_wgph.thetas.gz and indexfile:angsd/diversity/PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_wgph.thetas.idx
+		Information from index file:
+		0	CM023352.1	91277	8	118
+	 -r=(null) outnames=PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_win5000_step1000_wgph.gz step: 1000 win: 5000
+	pc.chr=CM023352.1 pc.nSites=91277 firstpos=4038 lastpos=66085546
+	Dumping file: "PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_win5000_step1000_wgph.gz.pestPG"

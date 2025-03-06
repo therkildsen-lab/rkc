@@ -773,7 +773,7 @@ size = 2
 colors = c("#74a9cf","#0570b0")
 EastBering_pop_pca <- PCA(genome_cov_EastBering, sample_table_eastbering_prib$ABLG, sample_table_eastbering_prib$Loc, 1, 2, show.ellipse = T, show.line = F, size = 4, alpha = 0, show.label = F, shape = 16)
 
-ggsave("/fs/cbsubscb16/storage/rkc/figures/BSEA_pop_pca.png", EastBering_pop_pca, device = "png", bg = 'transparent', width = 7, height = 5, units = "in")
+ggsave("/fs/cbsubscb16/storage/rkc/figures/EBS_pop_pca.png", EastBering_pop_pca, device = "png", bg = 'transparent', width = 7, height = 5, units = "in")
 ```
 
 - definite genetic differences between Pribilof Island and Bristol Bay populations. 

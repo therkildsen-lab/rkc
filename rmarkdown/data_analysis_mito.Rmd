@@ -232,36 +232,81 @@ net_loc <- haploNet(hap_pops)
 freq <- attr(net_loc, "freq")
 plot(net_loc, size = freq*3, pie = freqs_loc, labels = F)
 
-x <- as.data.frame(freqs_loc) %>% mutate(hap = seq(1:71))
+x <- as.data.frame(freqs_loc) %>% mutate(haplotype = seq(1:71))
 
-x1 <- x %>% select(AI,hap) %>% filter(AI != 0)
-x2 <- x %>% select(EastBering,hap) %>% filter(EastBering != 0)
-x3 <- x %>% select(GOA,hap) %>% filter(GOA != 0)
-x4 <- x %>% select(NorthBering,hap) %>% filter(NorthBering != 0)
-x5 <- x %>% select(SEAK,hap) %>% filter(SEAK != 0)
+x1 <- x %>% select(AI,haplotype) %>% filter(AI != 0)
+x2 <- x %>% select(EastBering,haplotype) %>% filter(EastBering != 0)
+x3 <- x %>% select(GOA,haplotype) %>% filter(GOA != 0)
+x4 <- x %>% select(NorthBering,haplotype) %>% filter(NorthBering != 0)
+x5 <- x %>% select(SEAK,haplotype) %>% filter(SEAK != 0)
 
 op <- par(mfcol = c(3, 2))
-ggplot(x1, aes(x="", y=AI, fill=as.character(hap))) +
+ggplot(x1, aes(x="", y=AI, fill=as.character(haplotype))) +
   geom_bar(stat="identity", width=1, color = "black") +
   coord_polar("y", start=0) +
-  labs(title = "Aleutian Islands")
-ggplot(x2, aes(x="", y=EastBering, fill=as.character(hap))) +
+  labs(title = "Aleutian Islands") +
+  cowplot::theme_cowplot() +
+  theme(axis.line.x = element_blank(),
+        axis.line.y = element_blank(),
+        axis.ticks = element_blank(), 
+        axis.title = element_blank(), 
+        plot.background = element_blank())
+ggplot(x2, aes(x="", y=EastBering, fill=as.character(haplotype))) +
   geom_bar(stat="identity", width=1, color = "black") +
   coord_polar("y", start=0) +
-  labs(title = "East Bering")
-ggplot(x3, aes(x="", y=GOA, fill=as.character(hap))) +
+  labs(title = "East Bering") +
+  cowplot::theme_cowplot() +
+  theme(axis.line.x = element_blank(),
+        axis.line.y = element_blank(),
+        axis.ticks = element_blank(), 
+        axis.title = element_blank(), 
+        plot.background = element_blank())
+ggplot(x3, aes(x="", y=GOA, fill=as.character(haplotype))) +
   geom_bar(stat="identity", width=1, color = "black") +
   coord_polar("y", start=0) +
-  labs(title = "Gulf of Alaska")
-ggplot(x4, aes(x="", y=NorthBering, fill=as.character(hap))) +
+  labs(title = "Gulf of Alaska") +
+  cowplot::theme_cowplot() +
+  theme(axis.line.x = element_blank(),
+        axis.line.y = element_blank(),
+        axis.ticks = element_blank(), 
+        axis.title = element_blank(), 
+        plot.background = element_blank())
+ggplot(x4, aes(x="", y=NorthBering, fill=as.character(haplotype))) +
   geom_bar(stat="identity", width=1, color = "black") +
   coord_polar("y", start=0) +
-  labs(title="North Bering")
-ggplot(x5, aes(x="", y=SEAK, fill=as.character(hap))) +
+  labs(title="North Bering") +
+  cowplot::theme_cowplot() +
+  theme(axis.line.x = element_blank(),
+        axis.line.y = element_blank(),
+        axis.ticks = element_blank(), 
+        axis.title = element_blank(), 
+        plot.background = element_blank())
+ggplot(x5, aes(x="", y=SEAK, fill=as.character(haplotype))) +
   geom_bar(stat="identity", width=1, color = "black") +
   coord_polar("y", start=0) +
-  labs(title = "Southeast Alaska")
+  labs(title = "Southeast Alaska") +
+  cowplot::theme_cowplot() +
+  theme(axis.line.x = element_blank(),
+        axis.line.y = element_blank(),
+        axis.ticks = element_blank(), 
+        axis.title = element_blank(), 
+        plot.background = element_blank())
 par(op)
+
+x_long <- x %>% pivot_longer(!haplotype, names_to = "population", values_to = "count")
+x_long$haplotype = factor(x_long$haplotype)
+ggplot(x_long, aes(x="", y = count, fill = haplotype)) +
+  geom_bar(stat="identity", width=1, color = "black") +
+  coord_polar("y", start=0, clip = "off") +
+  cowplot::theme_cowplot() +
+  theme(axis.line.x = element_blank(),
+        axis.line.y = element_blank(),
+        axis.ticks = element_blank(), 
+        axis.title = element_blank(), 
+        plot.background = element_blank()) +
+  facet_grid(population ~ .)
+
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/hap_freqs_perPop.pdf", device = "pdf", width = 5, height = 7, units = "in")
 ```
 
 ## Haplonetwork with just COI
@@ -326,5 +371,24 @@ ggplot(x, aes(x="", y = camtschaticus, fill=as.character(hap))) +
   geom_bar(stat="identity", width=1, color = "black") +
   coord_polar("y", start=0) +
   labs(title = "Aleutian Islands")
+```
+
+## Haplotype diversity
+
+```{r}
+## split pops in fasta DNAbin object
+fasta_labs <- labels.DNAbin(fasta)
+AI_index <- grep("AI", fasta_labs)
+EBS_index <- grep("EastBering", fasta_labs)
+GOA_index <- grep("GOA", fasta_labs)
+NBS_index <- grep("NorthBering", fasta_labs)
+SEAK_index <- grep("NorthBering", fasta_labs)
+
+# get haplotype diversity per population
+hap.div(fasta[AI_index,]) # 0.9916667
+hap.div(fasta[EBS_index,]) # 0.9943101
+hap.div(fasta[GOA_index,]) # 0.9970777
+hap.div(fasta[NBS_index,]) # 1.00
+hap.div(fasta[SEAK_index,]) # 1.00
 ```
 

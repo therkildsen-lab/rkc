@@ -76,13 +76,13 @@ plot_stat_per_snp_test <- function(x){
 
 ## Read in data
 ```{r}
-chr100_div <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/diversity/PCAM-PPLA_CM023352.1_GOA_wgph_polymorphic_folded.thetas.txt") %>% rename(lgN = '#Chromo', pos = Pos) %>% mutate(untrans_pairwise = exp(Pairwise)) %>% filter(pos > 10600000, pos < 11200000)
+chr100_div <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/diversity/PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_wgph.thetas.txt") %>% rename(lgN = '#Chromo', pos = Pos) %>% mutate(untrans_pairwise = exp(Pairwise)) %>% filter(pos > 10600000, pos < 11200000)
 size = 3
 
 chr100_div_plot <- get_cum_pos(chr100_div) %>% 
   plot_stat_per_snp()
 chr100_div_plot
-ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_chr100_wgph_div.png", device = "png", width = 7, height = 3)
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_chr100_wgph_div.png", device = "png", width = 7, height = 3)
 ```
 
 #### Plot fst scan for reference
@@ -139,5 +139,85 @@ list <- c(chr100_fst_AI_GOA,chr100_fst_NorthBering_GOA,chr100_fst_SEAK_GOA)
 cand_loci <- rbind(arrange(chr100_fst_AI_GOA, desc(correct_fst))[1:10,],arrange(chr100_fst_EastBering_GOA, desc(correct_fst))[1:10,], arrange(chr100_fst_NorthBering_GOA, desc(correct_fst))[1:10,], arrange(chr100_fst_SEAK_GOA, desc(correct_fst))[1:10,]) %>% group_by(pos) %>% slice(1) %>% select(pos)
 
 #write.table(cand_loci, "/fs/cbsubscb16/storage/rkc/sample_lists/fst_cand_loci.txt")
+```
+
+## Calculate tajimas d from the GOA thetas.idx file
+```{bash}
+## window size 5000 and step size 5000
+nohup /programs/angsd-0.940/misc/thetaStat do_stat angsd/diversity/PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_wgph.thetas.idx -win 5000 -step 1000 -outnames PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_win5000_step1000_wgph.gz &
+```
+
+#### Plot Tajima's D for chr100 outlier region
+```{r}
+tajimas_GOA_s5000 <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/diversity/PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_win5000_step5000_wgph.gz.pestPG") %>% rename(lgN = 'Chr', pos = WinCenter) %>% filter(pos > 10600000, pos < 11200000, nSites != 0)
+
+tajimas_GOA_s1000 <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/diversity/PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_win5000_step1000_wgph.gz.pestPG") %>% rename(lgN = 'Chr', pos = WinCenter) %>% filter(pos > 10600000, pos < 11200000, nSites != 0)
+
+ggplot(get_cum_pos(tajimas_GOA_s5000), aes(x=pos, y=Tajima)) +
+    geom_point(color = "black", size=size, alpha=0.5) +
+    scale_color_manual(values = c("black","red")) +
+    geom_smooth(color='skyblue', se=F) +
+    geom_vline(xintercept = c(10744898, 10745093, 10747909, 10749198, 10749404, 10749513, 10749636, 10749663, 10750169, 10767542, 10767560, 10767619, 10767683, 10767684, 10805120, 10841536, 10855605, 10869842, 10872551, 10892267, 10894263, 10948534, 10972255, 11049895, 11050165, 11050174)) +
+    scale_x_continuous(breaks=seq(0, 50, 5)) +
+    scale_x_continuous(breaks=seq(0, 50, 5)) +
+    coord_cartesian(ylim=c(-1, 5), expand = F) +
+    xlab('position (Mbp)') +
+    ylab('Tajimas D') +
+    #facet_grid(.~lgN, scales='free_x', space='free_x') +
+    cowplot::theme_cowplot() +
+    theme(panel.spacing = unit(0.1, 'lines'),
+          axis.title.x=element_text(),
+          legend.position='none',
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank(),
+          text = element_text(size=13),
+          axis.text = element_text(size=10))
+
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_chr100_wgph_tajima_s5000.png", device = "png", width = 7, height = 3)
+
+ggplot(get_cum_pos(tajimas_GOA_s1000), aes(x=pos, y=Tajima)) +
+    geom_point(color = "black", size=size, alpha=0.5) +
+    scale_color_manual(values = c("black","red")) +
+    geom_smooth(color='skyblue', se=F) +
+    geom_vline(xintercept = c(10744898, 10745093, 10747909, 10749198, 10749404, 10749513, 10749636, 10749663, 10750169, 10767542, 10767560, 10767619, 10767683, 10767684, 10805120, 10841536, 10855605, 10869842, 10872551, 10892267, 10894263, 10948534, 10972255, 11049895, 11050165, 11050174)) +
+    scale_x_continuous(breaks=seq(0, 50, 5)) +
+    scale_x_continuous(breaks=seq(0, 50, 5)) +
+    coord_cartesian(ylim=c(-1, 5), expand = F) +
+    xlab('position (Mbp)') +
+    ylab('Tajimas D') +
+    #facet_grid(.~lgN, scales='free_x', space='free_x') +
+    cowplot::theme_cowplot() +
+    theme(panel.spacing = unit(0.1, 'lines'),
+          axis.title.x=element_text(),
+          legend.position='none',
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank(),
+          text = element_text(size=13),
+          axis.text = element_text(size=10))
+
+#ggsave("/fs/cbsubscb16/storage/rkc/figures/GOA_chr100_wgph_tajima_s1000.png", device = "png", width = 7, height = 3)
+```
+
+#### test significance of Tajima's D in outlier region
+```{r}
+tajimas_GOA_s1000_chr100 <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/diversity/PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_win5000_step1000_wgph.gz.pestPG") %>% rename(lgN = 'Chr', pos = WinCenter) %>% filter(pos < 10747909 | pos > 10894263, nSites != 0)
+
+tajimas_GOA_s1000_sig <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/diversity/PCAM-PPLA_CM023352.1_GOA_polymorphic_folded_win5000_step1000_wgph.gz.pestPG") %>% rename(lgN = 'Chr', pos = WinCenter) %>% filter(pos > 10747909, pos < 10894263, nSites != 0)
+
+mean(tajimas_GOA_s1000_chr100$Tajima)
+var(tajimas_GOA_s1000_chr100$Tajima)
+
+mean(tajimas_GOA_s1000_sig$Tajima)
+var(tajimas_GOA_s1000_sig$Tajima)
+
+qqnorm(tajimas_GOA_s1000_chr100$Tajima)
+qqnorm(tajimas_GOA_s1000_sig$Tajima)
+
+# data is not normally distributed but it is close. My sample sizes are large so normality won't be crucial. the t-test statistic will be approximate but likely a good approximation
+tajimas_GOA_s1000_sig <- tajimas_GOA_s1000_sig %>% mutate(outlier = TRUE) %>% dplyr::select(pos, Tajima, outlier)
+tajimas_GOA_s1000_chr100 <- tajimas_GOA_s1000_chr100 %>% mutate(outlier = FALSE) %>% dplyr::select(pos, Tajima, outlier)
+
+tajima_test <- t.test(tajimas_GOA_s1000_chr100$Tajima, tajimas_GOA_s1000_sig$Tajima)
+tajima_test
 ```
 

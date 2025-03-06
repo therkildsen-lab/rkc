@@ -10,19 +10,30 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Load libraries and file lists
 ```{r}
 library(tidyverse)
+library(stats)
 POPLIST <- c("AI", "SEAK", "NorthBering", "EastBering", "GOA")
 setwd("/fs/cbsubscb16/storage/rkc/")
 
 for(p in POPLIST){
   assign(paste(p,"_list", sep = ""), read_table(paste("sample_lists/", p, "_inbreeding.txt", sep = ""), col_names = F))
 }
-sample_table <- read_tsv("sample_lists/sample_table.tsv")
+sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.tsv")
 ```
 
 ## Estimate per individual inbreeding
-```{bash}
+```{bash eval=F}
 # translate beagle to glf - author says this method may not work
-% zcat PCAM-PPLA_wgph.beagle.gz | tail -n +2 | perl -an -e 'for($i=3; $i<=$#F; $i++){print(pack("d",($F[$i]==0 ? -inf : log($F[$i]))))}' > PCAM-PPLA_wgph.glf
+zcat PCAM-PPLA_wgph.beagle.gz | tail -n +2 | perl -an -e 'for($i=3; $i<=$#F; $i++){print(pack("d",($F[$i]==0 ? -inf : log($F[$i]))))}' > PCAM-PPLA_wgph.glf
+
+zcat AI_PCAM-PPLA_wgph.beagle.gz | tail -n +2 | perl -an -e 'for($i=3; $i<=$#F; $i++){print(pack("d",($F[$i]==0 ? -inf : log($F[$i]))))}' > AI_PCAM-PPLA_wgph.glf
+
+zcat EBS_PCAM-PPLA_wgph.beagle.gz | tail -n +2 | perl -an -e 'for($i=3; $i<=$#F; $i++){print(pack("d",($F[$i]==0 ? -inf : log($F[$i]))))}' > EBS_AI_PCAM-PPLA_wgph.glf
+
+zcat GOA_PCAM-PPLA_wgph.beagle.gz | tail -n +2 | perl -an -e 'for($i=3; $i<=$#F; $i++){print(pack("d",($F[$i]==0 ? -inf : log($F[$i]))))}' > GOA_PCAM-PPLA_wgph.glf
+
+zcat NBS_PCAM-PPLA_wgph.beagle.gz | tail -n +2 | perl -an -e 'for($i=3; $i<=$#F; $i++){print(pack("d",($F[$i]==0 ? -inf : log($F[$i]))))}' > NBS_PCAM-PPLA_wgph.glf
+
+zcat SEAK_PCAM-PPLA_wgph.beagle.gz | tail -n +2 | perl -an -e 'for($i=3; $i<=$#F; $i++){print(pack("d",($F[$i]==0 ? -inf : log($F[$i]))))}' > SEAK_PCAM-PPLA_wgph.glf
 
 ## run ngsF on cluster
 # Job ID 1803940
@@ -30,7 +41,7 @@ sample_table <- read_tsv("sample_lists/sample_table.tsv")
 
 echo '#!/bin/bash
 #SBATCH --job-name=ngsF_RKC
-#SBATCH --output=/home/cas399/rkc/log/ngsF_inbreeding.log
+#SBATCH --output=/home/cas399/rkc/log/ngsF_inbreeding_AI.log
 #SBATCH --partition=regular
 #SBATCH --nodes=1
 #SBATCH --ntasks=16
@@ -47,10 +58,130 @@ mkdir -p $WORKDIR
 cd $WORKDIR
 
 ## Transfer the input files
-cp /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph.glf $WORKDIR
+cp /fs/cbsubscb16/storage/rkc/angsd/AI_PCAM-PPLA_wgph.glf $WORKDIR
 
 ## Run ngsF
-/programs/ngsF-1.2.0/ngsF --n_threads 16 --n_ind 183 --n_sites 8016901 --glf PCAM-PPLA_wgph.glf --out PCAM-PPLA_wgph_inbreeding
+/programs/ngsF-1.2.0/ngsF --n_threads 16 --n_ind 16 --n_sites 8016901 --glf AI_PCAM-PPLA_wgph.glf --out PCAM-PPLA_wgph_inbreeding_AI.txt
+
+## copy output back to cbsubscb16
+rm *.glf
+cp * /fs/cbsubscb16/storage/rkc/angsd/'| sbatch
+
+## EBS
+
+echo '#!/bin/bash
+#SBATCH --job-name=ngsF_RKC
+#SBATCH --output=/home/cas399/rkc/log/ngsF_inbreeding_EBS.log
+#SBATCH --partition=regular
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=75G
+#SBATCH --mail-user=cas399@cornell.edu  
+#SBATCH --mail-type=END
+
+## Mount the storage
+/programs/bin/labutils/mount_server cbsubscb16 /storage
+
+## create temp workdir and move files 
+WORKDIR=/workdir/$USER/$SLURM_JOB_ID/
+mkdir -p $WORKDIR
+cd $WORKDIR
+
+## Transfer the input files
+cp /fs/cbsubscb16/storage/rkc/angsd/EBS_PCAM-PPLA_wgph.glf $WORKDIR
+
+## Run ngsF
+/programs/ngsF-1.2.0/ngsF --n_threads 16 --n_ind 45 --n_sites 8016901 --glf EBS_PCAM-PPLA_wgph.glf --out PCAM-PPLA_wgph_inbreeding_EBS.txt
+
+## copy output back to cbsubscb16
+rm *.glf
+cp * /fs/cbsubscb16/storage/rkc/angsd/'| sbatch
+
+## GOA
+
+echo '#!/bin/bash
+#SBATCH --job-name=ngsF_RKC
+#SBATCH --output=/home/cas399/rkc/log/ngsF_inbreeding_GOA.log
+#SBATCH --partition=regular
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=75G
+#SBATCH --mail-user=cas399@cornell.edu  
+#SBATCH --mail-type=END
+
+## Mount the storage
+/programs/bin/labutils/mount_server cbsubscb16 /storage
+
+## create temp workdir and move files 
+WORKDIR=/workdir/$USER/$SLURM_JOB_ID/
+mkdir -p $WORKDIR
+cd $WORKDIR
+
+## Transfer the input files
+cp /fs/cbsubscb16/storage/rkc/angsd/GOA_PCAM-PPLA_wgph.glf $WORKDIR
+
+## Run ngsF
+/programs/ngsF-1.2.0/ngsF --n_threads 16 --n_ind 59 --n_sites 8016901 --glf GOA_PCAM-PPLA_wgph.glf --out PCAM-PPLA_wgph_inbreeding_GOA.txt
+
+## copy output back to cbsubscb16
+rm *.glf
+cp * /fs/cbsubscb16/storage/rkc/angsd/'| sbatch
+
+## NBS
+
+echo '#!/bin/bash
+#SBATCH --job-name=ngsF_RKC
+#SBATCH --output=/home/cas399/rkc/log/ngsF_inbreeding_NBS.log
+#SBATCH --partition=regular
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=75G
+#SBATCH --mail-user=cas399@cornell.edu  
+#SBATCH --mail-type=END
+
+## Mount the storage
+/programs/bin/labutils/mount_server cbsubscb16 /storage
+
+## create temp workdir and move files 
+WORKDIR=/workdir/$USER/$SLURM_JOB_ID/
+mkdir -p $WORKDIR
+cd $WORKDIR
+
+## Transfer the input files
+cp /fs/cbsubscb16/storage/rkc/angsd/NBS_PCAM-PPLA_wgph.glf $WORKDIR
+
+## Run ngsF
+/programs/ngsF-1.2.0/ngsF --n_threads 16 --n_ind 28 --n_sites 8016901 --glf NBS_PCAM-PPLA_wgph.glf --out PCAM-PPLA_wgph_inbreeding_NBS.txt
+
+## copy output back to cbsubscb16
+rm *.glf
+cp * /fs/cbsubscb16/storage/rkc/angsd/'| sbatch
+
+## SEAK
+
+echo '#!/bin/bash
+#SBATCH --job-name=ngsF_RKC
+#SBATCH --output=/home/cas399/rkc/log/ngsF_inbreeding_SEAK.log
+#SBATCH --partition=regular
+#SBATCH --nodes=1
+#SBATCH --ntasks=16
+#SBATCH --mem=75G
+#SBATCH --mail-user=cas399@cornell.edu  
+#SBATCH --mail-type=END
+
+## Mount the storage
+/programs/bin/labutils/mount_server cbsubscb16 /storage
+
+## create temp workdir and move files 
+WORKDIR=/workdir/$USER/$SLURM_JOB_ID/
+mkdir -p $WORKDIR
+cd $WORKDIR
+
+## Transfer the input files
+cp /fs/cbsubscb16/storage/rkc/angsd/SEAK_PCAM-PPLA_wgph.glf $WORKDIR
+
+## Run ngsF
+/programs/ngsF-1.2.0/ngsF --n_threads 16 --n_ind 35 --n_sites 8016901 --glf SEAK_PCAM-PPLA_wgph.glf --out PCAM-PPLA_wgph_inbreeding_SEAK.txt
 
 ## copy output back to cbsubscb16
 rm *.glf
@@ -60,41 +191,41 @@ cp * /fs/cbsubscb16/storage/rkc/angsd/'| sbatch
 
 ## Read data
 ```{r, message=FALSE}
-setwd("/fs/cbsubscb16/storage/rkc/")
-
-AI_inbreeding <- read_table(AI_list$X1[1], col_names = F)
-for(f in 2:length(AI_list$X1)){
-  AI_inbreeding <- cbind(AI_inbreeding, read_table(AI_list$X1[f], col_names = F))
-}
-AI_inbreeding <- cbind(filter(sample_table, Loc == "AI") %>% select(ABLG,Loc), AI_inbreeding)
-
-EB_inbreeding <- read_table(EastBering_list$X1[1], col_names = F)
-for(f in 2:length(EastBering_list$X1)){
-  EB_inbreeding <- cbind(EB_inbreeding, read_table(EastBering_list$X1[f], col_names = F))
-}
-EB_inbreeding <- cbind(filter(sample_table, Loc == "EastBering") %>% select(ABLG,Loc), EB_inbreeding)
-
-GOA_inbreeding <- read_table(GOA_list$X1[1], col_names = F)
-for(f in 2:length(GOA_list$X1)){
-  GOA_inbreeding <- cbind(GOA_inbreeding, read_table(GOA_list$X1[f], col_names = F))
-}
-GOA_inbreeding <- cbind(filter(sample_table, Loc == "GOA") %>% select(ABLG,Loc), GOA_inbreeding)
-
-NB_inbreeding <- read_table(NorthBering_list$X1[1], col_names = F)
-for(f in 2:length(NorthBering_list$X1)){
-  NB_inbreeding <- cbind(NB_inbreeding, read_table(NorthBering_list$X1[f], col_names = F))
-}
-NB_inbreeding <- cbind(filter(sample_table, Loc == "NorthBering") %>% select(ABLG,Loc), NB_inbreeding)
-
-SEAK_inbreeding <- read_table(SEAK_list$X1[1], col_names = F)
-for(f in 2:length(SEAK_list$X1)){
-  SEAK_inbreeding <- cbind(SEAK_inbreeding, read_table(SEAK_list$X1[f], col_names = F))
-}
-SEAK_inbreeding <- cbind(filter(sample_table, Loc == "SEAK") %>% select(ABLG,Loc), SEAK_inbreeding)
-
-inbreeding_raw <- rbind(AI_inbreeding,EB_inbreeding,GOA_inbreeding,NB_inbreeding,SEAK_inbreeding)
-
-colnames(inbreeding_raw) <- c("ABLG", "Loc",seq(1,104,1))
+# setwd("/fs/cbsubscb16/storage/rkc/")
+# 
+# AI_inbreeding <- read_table(AI_list$X1[1], col_names = F)
+# for(f in 2:length(AI_list$X1)){
+#   AI_inbreeding <- cbind(AI_inbreeding, read_table(AI_list$X1[f], col_names = F))
+# }
+# AI_inbreeding <- cbind(filter(sample_table, Loc == "AI") %>% select(ABLG,Loc), AI_inbreeding)
+# 
+# EB_inbreeding <- read_table(EastBering_list$X1[1], col_names = F)
+# for(f in 2:length(EastBering_list$X1)){
+#   EB_inbreeding <- cbind(EB_inbreeding, read_table(EastBering_list$X1[f], col_names = F))
+# }
+# EB_inbreeding <- cbind(filter(sample_table, Loc == "EastBering") %>% select(ABLG,Loc), EB_inbreeding)
+# 
+# GOA_inbreeding <- read_table(GOA_list$X1[1], col_names = F)
+# for(f in 2:length(GOA_list$X1)){
+#   GOA_inbreeding <- cbind(GOA_inbreeding, read_table(GOA_list$X1[f], col_names = F))
+# }
+# GOA_inbreeding <- cbind(filter(sample_table, Loc == "GOA") %>% select(ABLG,Loc), GOA_inbreeding)
+# 
+# NB_inbreeding <- read_table(NorthBering_list$X1[1], col_names = F)
+# for(f in 2:length(NorthBering_list$X1)){
+#   NB_inbreeding <- cbind(NB_inbreeding, read_table(NorthBering_list$X1[f], col_names = F))
+# }
+# NB_inbreeding <- cbind(filter(sample_table, Loc == "NorthBering") %>% select(ABLG,Loc), NB_inbreeding)
+# 
+# SEAK_inbreeding <- read_table(SEAK_list$X1[1], col_names = F)
+# for(f in 2:length(SEAK_list$X1)){
+#   SEAK_inbreeding <- cbind(SEAK_inbreeding, read_table(SEAK_list$X1[f], col_names = F))
+# }
+# SEAK_inbreeding <- cbind(filter(sample_table, Loc == "SEAK") %>% select(ABLG,Loc), SEAK_inbreeding)
+# 
+# inbreeding_raw <- rbind(AI_inbreeding,EB_inbreeding,GOA_inbreeding,NB_inbreeding,SEAK_inbreeding)
+# 
+# colnames(inbreeding_raw) <- c("ABLG", "Loc",seq(1,104,1))
 ```
 
 ## Calculate per ind avg inbreeding coefficient across all chromosomes
@@ -102,18 +233,36 @@ colnames(inbreeding_raw) <- c("ABLG", "Loc",seq(1,104,1))
 inbreeding_raw <- inbreeding_raw %>% mutate(ind_mean = rowMeans(.[3:106]), .after = Loc)
 ```
 
+## Read in ngsParalogs inbreeding files
+
+```{r}
+AI_inbreeding <- sample_table %>% filter(Loc == "AI") %>% cbind(read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph_inbreeding_AI.txt", col_names = F))
+EBS_inbreeding <- sample_table %>% filter(Loc == "EastBering") %>% cbind(read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph_inbreeding_EBS.txt", col_names = F)) %>% full_join(AI_inbreeding)
+GOA_inbreeding <- sample_table %>% filter(Loc == "GOA") %>% cbind(read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph_inbreeding_GOA.txt", col_names = F))
+NBS_inbreeding <- sample_table %>% filter(Loc == "NorthBering") %>% cbind(read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph_inbreeding_NBS.txt", col_names = F))
+SEAK_inbreeding <- sample_table %>% filter(Loc == "SEAK") %>% cbind(read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph_inbreeding_SEAK.txt", col_names = F))
+
+inbreeding_raw <- rbind(AI_inbreeding,EBS_inbreeding,GOA_inbreeding,NBS_inbreeding,SEAK_inbreeding)
+`%!in%` <- negate(`%in%`)
+inbreeding_raw <- inbreeding_raw %>% filter(ABLG %!in% c(5617, 5618, 5637, 5644, 5648, 5650, 5651, 5663, 5667, 5669, 5670))
+
+```
+
 ## ANOVA to test differences in inbreeding among pops
 ```{r}
-FIS_anova <- aov(ind_mean ~ Loc, data = inbreeding_raw)
+FIS_anova <- aov(X1 ~ Loc, data = inbreeding_raw)
 
 summary(FIS_anova)
+
+TukeyHSD(FIS_anova)
 ```
 
 ## Test assumptions
 ```{r}
-ggplot(inbreeding_raw, aes(sample = ind_mean)) + 
+ggplot(inbreeding_raw, aes(sample = X1)) + 
   stat_qq() + stat_qq_line()
 ```
+
 ```{r}
 plot(predict(FIS_anova), residuals(FIS_anova))
 ```
@@ -121,15 +270,15 @@ plot(predict(FIS_anova), residuals(FIS_anova))
 
 ## FIS boxplot
 ```{r}
-inbreeding_raw %>% ggplot(aes(x = factor(Loc,levels = c("NorthBering", "EastBering","GOA","SEAK","AI")), y = ind_mean)) +
-  geom_boxplot(aes(fill = Loc)) +
+inbreeding_raw %>% ggplot(aes(x = factor(Loc,levels = c("NorthBering", "EastBering","GOA","SEAK","AI")), y = X1)) +
+  geom_boxplot(aes(fill = Loc), outlier.shape = NA) +
   scale_fill_brewer(type = "qual", palette = 3) +
   geom_point(aes(pch = Loc),position = position_jitter(width = 0.1), alpha = 0.5, size = 1.5) +
   scale_shape_manual(values = c(15,16,17,18,15)) +
   labs(x = "Population", y = "Fis") +
   cowplot::theme_cowplot()
 
-#ggsave("/fs/cbsubscb16/storage/rkc/figures/inbreeding_boxplot.png", device = "png", height = 5, width = 8)
+# ggsave("/fs/cbsubscb16/storage/rkc/figures/inbreeding_boxplot_wgph.png", device = "png", height = 5, width = 8)
 ```
 ## Post-hoc tests
 ```{r}
@@ -138,8 +287,8 @@ TukeyHSD(FIS_anova, conf.level = 0.95)
 
 #### mean and 95% CI
 ```{r}
-inbreeding_raw %>% group_by(Loc) %>% 
-  summarise(mean = mean(ind_mean), conf95_low = mean(ind_mean)-(qt(0.975,df=length(ind_mean)-1)*sd(ind_mean)/sqrt(length(ind_mean))), conf95_high = mean(ind_mean)+(qt(0.975,df=length(ind_mean)-1)*sd(ind_mean)/sqrt(length(ind_mean))), n = length(ind_mean))
+# inbreeding_raw %>% group_by(Loc) %>% 
+#   summarise(mean = mean(ind_mean), conf95_low = mean(ind_mean)-(qt(0.975,df=length(ind_mean)-1)*sd(ind_mean)/sqrt(length(ind_mean))), conf95_high = mean(ind_mean)+(qt(0.975,df=length(ind_mean)-1)*sd(ind_mean)/sqrt(length(ind_mean))), n = length(ind_mean))
 ```
 
 

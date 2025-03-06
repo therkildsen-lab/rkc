@@ -45,6 +45,10 @@ for(s in 1:10){
   tmp <- unique(sig_list[[s]]$chr)
   assign(paste0(name_list[s],"_outSig"), out_list[[s]] %>% filter(chr %in% tmp))
 }
+
+all_sig_regions <- rbind(sig_list[[1]], sig_list[[2]], sig_list[[3]], sig_list[[4]], sig_list[[5]], sig_list[[6]], sig_list[[7]], sig_list[[8]], sig_list[[9]], sig_list[[10]])
+
+# write_tsv(all_sig_regions, "/fs/cbsubscb16/storage/rkc/localscore/all_sig_regions_wgph.tsv")
 ```
 
 ## Merge local score with Fst file
@@ -293,6 +297,14 @@ EBS_SEAK_outSigAll <- EBS_SEAK_outSigAll %>% left_join(EBS_SEAK_fst, by = c("chr
 NBS_GOA_outSigAll <- NBS_GOA_outSigAll %>% left_join(NBS_GOA_fst, by = c("chr" = "chr", "pos" = "pos"))
 GOA_SEAK_outSigAll <- GOA_SEAK_outSigAll %>% left_join(GOA_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
 NBS_SEAK_outSigAll <- NBS_SEAK_outSigAll %>% left_join(NBS_SEAK_fst, by = c("chr" = "chr", "pos" = "pos"))
+
+## How many outliers for each population 
+AI_sigs <- rbind(AI_EBS_sig, AI_GOA_sig, NBS_AI_sig, AI_SEAK_sig) %>% arrange(chr)
+EBS_sigs <- rbind(AI_EBS_sig, EBS_GOA_sig, NBS_EBS_sig, EBS_SEAK_sig) %>% arrange(chr)
+NBS_sigs <- rbind(NBS_AI_sig, NBS_EBS_sig, NBS_GOA_sig, NBS_SEAK_sig) %>% arrange(chr)
+GOA_sigs <- rbind(GOA_SEAK_sig, EBS_GOA_sig, AI_GOA_sig, NBS_GOA_sig) %>% arrange(chr)
+SEAK_sigs <- rbind(AI_SEAK_sig, EBS_SEAK_sig, GOA_SEAK_sig, NBS_SEAK_sig) %>% arrange(chr)
+
 ```
 
 ## Plot Fst manhattan plots
