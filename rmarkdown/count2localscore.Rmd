@@ -39,7 +39,7 @@ paste PCAM-PPLA_NBS_wgph.pos PCAM-PPLA_NBS_wgph.counts | column -s '\t' -t > PCA
 paste PCAM-PPLA_SEAK_wgph.pos PCAM-PPLA_SEAK_wgph.counts | column -s '\t' -t > PCAM-PPLA_SEAK_wgph.pos_counts
 ```
 
-
+#### Manually run all combinations of populations
 ```{r}
 # set Pops (just for determining file location and file names)
 #POP1 <- "NBS"; POP2 <- "GOA"
