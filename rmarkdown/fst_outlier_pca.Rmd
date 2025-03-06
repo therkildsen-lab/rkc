@@ -81,9 +81,3 @@ PCA(chr100_outlier_wgph_cov, sample_table$ABLG, sample_table$Loc, 2, 3,show.elli
 PCA(chr100_outlier_wgph_cov, sample_table$ABLG, sample_table$population, 1, 2,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 ```
 
-```{r}
-fst_6_5_10 <- read_delim("/fs/cbsubscb16/storage/rkc/islands_fstcutoff_0.25_nloci6_stepSize5000_windSize10000.txt", col_names = c("position", "chr","start","end","compare")) %>% 
-  left_join(chrom_df, by = "chr")
-fst_6_4_8 <- read_delim("/fs/cbsubscb16/storage/rkc/islands_fstcutoff_0.25_nloci6_stepSize4000_windSize8000.txt")
-```
-

@@ -86,33 +86,33 @@ NBS_SEAK_fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/NorthBering-SEAK.
 #### Test script for filtering fst files
 ```{r}
 AI_EBS_wgph_fst <- AI_EBS_fst %>% inner_join(AI_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% inner_join(EBS_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% dplyr::select(c(-totDepth.x,-totDepth.y))
-write_tsv(AI_EBS_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/AI-EBS_wgph.fst.txt")
+#write_tsv(AI_EBS_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/AI-EBS_wgph.fst.txt")
 
 AI_GOA_wgph_fst <- AI_GOA_fst %>% inner_join(AI_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% inner_join(GOA_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% dplyr::select(c(-totDepth.x,-totDepth.y))
-write_tsv(AI_GOA_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/AI-GOA_wgph.fst.txt")
+#write_tsv(AI_GOA_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/AI-GOA_wgph.fst.txt")
 
 NBS_AI_wgph_fst <- NBS_AI_fst %>% inner_join(AI_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% inner_join(NBS_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% dplyr::select(c(-totDepth.x,-totDepth.y))
-write_tsv(NBS_AI_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/AI-NBS_wgph.fst.txt")
+#write_tsv(NBS_AI_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/AI-NBS_wgph.fst.txt")
 
 AI_SEAK_wgph_fst <- AI_SEAK_fst %>% inner_join(AI_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% inner_join(SEAK_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% dplyr::select(c(-totDepth.x,-totDepth.y))
-write_tsv(AI_SEAK_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/AI-SEAK_wgph.fst.txt")
+#write_tsv(AI_SEAK_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/AI-SEAK_wgph.fst.txt")
 
 EBS_GOA_wgph_fst <- EBS_GOA_fst %>% inner_join(EBS_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% inner_join(GOA_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% dplyr::select(c(-totDepth.x,-totDepth.y))
-write_tsv(EBS_GOA_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-GOA_wgph.fst.txt")
+#write_tsv(EBS_GOA_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-GOA_wgph.fst.txt")
 
 NBS_EBS_wgph_fst <- NBS_EBS_fst %>% inner_join(EBS_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% inner_join(NBS_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% dplyr::select(c(-totDepth.x,-totDepth.y))
-write_tsv(NBS_EBS_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-NBS_wgph.fst.txt")
+#write_tsv(NBS_EBS_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-NBS_wgph.fst.txt")
 
 EBS_SEAK_wgph_fst <- EBS_SEAK_fst %>% inner_join(EBS_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% inner_join(SEAK_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% dplyr::select(c(-totDepth.x,-totDepth.y))
-write_tsv(EBS_SEAK_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-SEAK_wgph.fst.txt")
+#write_tsv(EBS_SEAK_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/EBS-SEAK_wgph.fst.txt")
 
 NBS_GOA_wgph_fst <- NBS_GOA_fst %>% inner_join(GOA_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% inner_join(NBS_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% dplyr::select(c(-totDepth.x,-totDepth.y))
-write_tsv(NBS_GOA_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-NBS_wgph.fst.txt")
+#write_tsv(NBS_GOA_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-NBS_wgph.fst.txt")
 
 GOA_SEAK_wgph_fst <- GOA_SEAK_fst %>% inner_join(GOA_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% inner_join(SEAK_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% dplyr::select(c(-totDepth.x,-totDepth.y))
-write_tsv(GOA_SEAK_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-SEAK_wgph.fst.txt")
+#write_tsv(GOA_SEAK_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/GOA-SEAK_wgph.fst.txt")
 
 NBS_SEAK_wgph_fst <- NBS_SEAK_fst %>% inner_join(NBS_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% inner_join(SEAK_wgph_pos, by = c("chr" = "chr", "pos" = "pos")) %>% dplyr::select(c(-totDepth.x,-totDepth.y))
-write_tsv(NBS_SEAK_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/NBS-SEAK_wgph.fst.txt")
+#write_tsv(NBS_SEAK_wgph_fst, "/fs/cbsubscb16/storage/rkc/angsd/fst/NBS-SEAK_wgph.fst.txt")
 ```
 

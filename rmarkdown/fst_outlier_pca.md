@@ -58,7 +58,7 @@ chrom_df <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/chrom_meta_data.tx
 ## identify outlier region on Chr 100
 
 ``` r
-chr100_Fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_CM023352.1_EastBering-GOA_polymorphic_folded.sfs.pbs.fst.txt")
+chr100_Fst <- read_tsv("/fs/cbsubscb16/storage/rkc/angsd/fst/PCAM-PPLA_CM023352.1_EastBering-GOA_polymorphic_folded.sfs.pbs.fst.txt")
 ```
 
     ## Rows: 62127 Columns: 5
@@ -103,6 +103,10 @@ zcat angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1.beagle.gz | sed -n '1482
 
 ``` bash
 nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier.beagle.gz -o /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier --threads 16 &
+
+## Run PCA for ngsParalogs dataset
+# job_id 1311440
+nohup python /programs/pcangsd-1.10/pcangsd/pcangsd.py --beagle /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph_chr100_outlier.beagle.gz -o /fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph_chr100_outlier --threads 16 &
 ```
 
 ## Plot PCAs
@@ -120,6 +124,8 @@ sample_table <- read_tsv("/fs/cbsubscb16/storage/rkc/sample_lists/sample_table.t
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
+## Original dataset PCA plot
+
 ``` r
 chr100_outlier_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-wholegenome_polymorphic_CM023352.1_outlier.cov", delim = " ", col_names = F) %>% as.matrix()
 ```
@@ -135,50 +141,92 @@ chr100_outlier_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA-who
 ``` r
 alpha = 0.7
 size = 3
-PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = T, show.line = F, show.label = T, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 ```
+
+    ## Warning in geom_enterotype(alpha = alpha, size = size, show.point =
+    ## show.point, : Ignoring unknown parameters: `size`
 
     ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
     ## ℹ Please use `linewidth` instead.
 
-    ## 
-    ## Attaching package: 'MASS'
-    ## 
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     select
-
 ![](fst_outlier_pca_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
-# ggsave("/fs/cbsubscb16/storage/rkc/figures/chr100_outlier_PCA.png", device = "png", width = 8, height = 6.5)
+PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$Loc, 2, 3,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+```
+
+    ## Warning in geom_enterotype(alpha = alpha, size = size, show.point =
+    ## show.point, : Ignoring unknown parameters: `size`
+
+![](fst_outlier_pca_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+
+``` r
+# ggsave("/fs/cbsubscb16/storage/rkc/figures/chr100_outlier_PCA.png", device = "png", width = 8, height = 6)
 
 # Three populations on the margins of the PCA, SEAK, GOA, and Aleutian Islands. East Bering is dispersed but closer to GOA, and North Bering is dispersed but closer to SEAK. 
+
+PCA(chr100_outlier_cov, sample_table$ABLG, sample_table$population, 1, 2,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 ```
+
+    ## Warning in geom_enterotype(alpha = alpha, size = size, show.point =
+    ## show.point, : Ignoring unknown parameters: `size`
+
+    ## Warning in RColorBrewer::brewer.pal(n, pal): n too large, allowed maximum for palette Set1 is 9
+    ## Returning the palette you asked for with that many colors
+
+    ## Warning: Removed 94 rows containing missing values (`geom_point()`).
+
+![](fst_outlier_pca_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
+
+## ngsParalogs dataset PCA plot
 
 ``` r
-fst_6_5_10 <- read_delim("/fs/cbsubscb16/storage/rkc/islands_fstcutoff_0.25_nloci6_stepSize5000_windSize10000.txt", col_names = c("position", "chr","start","end","compare")) %>% 
-  left_join(chrom_df, by = "chr")
+chr100_outlier_wgph_cov <- read_delim("/fs/cbsubscb16/storage/rkc/angsd/PCAM-PPLA_wgph_chr100_outlier.cov", delim = " ", col_names = F) %>% as.matrix()
 ```
 
-    ## Rows: 124 Columns: 5
+    ## Rows: 183 Columns: 183
     ## ── Column specification ────────────────────────────────────────────────────────
     ## Delimiter: " "
-    ## chr (3): position, chr, compare
-    ## dbl (2): start, end
+    ## dbl (183): X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15,...
     ## 
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 ``` r
-fst_6_4_8 <- read_delim("/fs/cbsubscb16/storage/rkc/islands_fstcutoff_0.25_nloci6_stepSize4000_windSize8000.txt")
+alpha = 0.7
+size = 3
+PCA(chr100_outlier_wgph_cov, sample_table$ABLG, sample_table$Loc, 1, 2,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
 ```
 
-    ## Rows: 119 Columns: 5
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: " "
-    ## chr (3): CM023253.1_30276001, CM023253.1, AI-GOA.fst.txt
-    ## dbl (2): 30276001, 30284001
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## Warning in geom_enterotype(alpha = alpha, size = size, show.point =
+    ## show.point, : Ignoring unknown parameters: `size`
+
+![](fst_outlier_pca_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+# ggsave("/fs/cbsubscb16/storage/rkc/figures/chr100_outlier_PCA.png", device = "png", width = 8, height = 6)
+
+PCA(chr100_outlier_wgph_cov, sample_table$ABLG, sample_table$Loc, 2, 3,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+```
+
+    ## Warning in geom_enterotype(alpha = alpha, size = size, show.point =
+    ## show.point, : Ignoring unknown parameters: `size`
+
+![](fst_outlier_pca_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+``` r
+# Three populations on the margins of the PCA, SEAK, GOA, and Aleutian Islands. East Bering is dispersed but closer to GOA, and North Bering is dispersed but closer to SEAK. 
+
+PCA(chr100_outlier_wgph_cov, sample_table$ABLG, sample_table$population, 1, 2,show.ellipse = F, show.line = F, show.label = F, alpha = 1, size = 4, index_exclude=c(94, 95, 103, 106, 107, 109, 110, 118, 119, 120, 121))
+```
+
+    ## Warning in geom_enterotype(alpha = alpha, size = size, show.point =
+    ## show.point, : Ignoring unknown parameters: `size`
+
+    ## Warning in RColorBrewer::brewer.pal(n, pal): n too large, allowed maximum for palette Set1 is 9
+    ## Returning the palette you asked for with that many colors
+
+    ## Warning: Removed 94 rows containing missing values (`geom_point()`).
+
+![](fst_outlier_pca_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->

@@ -228,11 +228,6 @@ cp * /fs/cbsubscb16/storage/rkc/angsd/'| sbatch
 # colnames(inbreeding_raw) <- c("ABLG", "Loc",seq(1,104,1))
 ```
 
-## Calculate per ind avg inbreeding coefficient across all chromosomes
-```{r}
-inbreeding_raw <- inbreeding_raw %>% mutate(ind_mean = rowMeans(.[3:106]), .after = Loc)
-```
-
 ## Read in ngsParalogs inbreeding files
 
 ```{r}
@@ -267,6 +262,7 @@ ggplot(inbreeding_raw, aes(sample = X1)) +
 plot(predict(FIS_anova), residuals(FIS_anova))
 ```
 
+- assumptions are not well met, but our sample size is high so our ANOVA will be a good approximation of the true F stat
 
 ## FIS boxplot
 ```{r}
